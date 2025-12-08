@@ -4,13 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>TruVesta Wallet - Secure Login</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-   
+
   <style>
     :root {
       /* Palette */
@@ -22,7 +21,7 @@
       --text-main: #FFFFFF;
       --text-muted: #8E8E93;
       --danger: #FF453A;
-      
+
       /* Effects */
       --glass-border: 1px solid rgba(212, 175, 55, 0.15);
       --glass-blur: blur(25px);
@@ -37,17 +36,23 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: var(--bg-dark);
       color: var(--text-main);
-      height: 100dvh; /* Dynamic Viewport Height for mobile browsers */
+      
+      /* RESPONSIVE FIX: Allow scrolling if content is taller than screen */
+      min-height: 100dvh; 
+      width: 100%;
+      overflow-x: hidden;
+      overflow-y: auto; 
+      
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden; /* Prevent scroll during intro */
       position: relative;
     }
 
     /* --- ANIMATED BACKGROUND --- */
     .ambient-bg {
-      position: absolute;
+      /* RESPONSIVE FIX: Fixed position so it doesn't scroll away */
+      position: fixed; 
       width: 200%;
       height: 200%;
       top: -50%;
@@ -119,17 +124,20 @@
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, var(--gold-dark), var(--gold-primary), var(--gold-light));
-      transition: width 6s linear; /* Duration matches 6 seconds */
+      transition: width 6s linear; 
       box-shadow: 0 0 10px var(--gold-primary);
     }
 
     /* --- MAIN CARD --- */
     .login-wrapper {
       width: 100%;
+      /* RESPONSIVE FIX: Min height ensures vertical centering on large screens, allows expansion on small */
+      min-height: 100dvh; 
       padding: 20px;
       display: flex;
       justify-content: center;
-      opacity: 0; /* Hidden initially */
+      align-items: center;
+      opacity: 0; 
       transform: translateY(20px);
       transition: var(--transition);
     }
@@ -146,9 +154,9 @@
       box-shadow: var(--shadow-soft);
       position: relative;
       overflow: hidden;
+      margin: auto 0; /* Helps with vertical centering logic */
     }
 
-    /* Top gold shimmer line */
     .card::before {
       content: '';
       position: absolute;
@@ -185,7 +193,7 @@
       font-size: 26px;
       color: var(--text-main);
     }
-    
+
     .header p {
       margin: 8px 0 0;
       color: var(--text-muted);
@@ -208,9 +216,7 @@
       letter-spacing: 0.5px;
     }
 
-    .field-wrapper {
-      position: relative;
-    }
+    .field-wrapper { position: relative; }
 
     .field-wrapper i {
       position: absolute;
@@ -250,6 +256,8 @@
       font-size: 13px;
       margin-bottom: 25px;
       color: var(--text-muted);
+      flex-wrap: wrap; /* Allows wrapping on tiny screens */
+      gap: 10px;
     }
 
     .actions a {
@@ -317,7 +325,7 @@
       box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
       filter: brightness(1.1);
     }
-    
+
     .btn-gold:disabled {
       opacity: 0.7;
       cursor: not-allowed;
@@ -381,12 +389,13 @@
     }
 
     .copyright {
-      position: absolute;
+      position: absolute; /* Keeps it at bottom usually */
       bottom: 10px;
       width: 100%;
       text-align: center;
       font-size: 10px;
       color: rgba(255,255,255,0.2);
+      pointer-events: none;
     }
 
     /* Animations */
@@ -399,11 +408,29 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Responsive */
+    /* --- RESPONSIVE OPTIMIZATIONS --- */
+    
+    /* 1. Mobile Portrait & Narrow Screens */
     @media (max-width: 480px) {
-      .card { padding: 30px 20px; border-radius: 20px; backdrop-filter: blur(15px); }
+      .card { 
+        padding: 30px 20px; 
+        border-radius: 20px; 
+        backdrop-filter: blur(15px);
+        margin: 20px 0; /* Adds breathing room when scrolling */
+      }
       .header h2 { font-size: 22px; }
       .btn { padding: 14px; }
+      .copyright { position: relative; margin-top: 20px; bottom: 0; }
+    }
+
+    /* 2. Mobile Landscape Mode (Short Height) */
+    @media (max-height: 700px) {
+      .login-wrapper { padding-top: 40px; padding-bottom: 40px; display: block; }
+      .card { margin: 0 auto; }
+      .header { margin-bottom: 20px; }
+      .logo-mark { width: 40px; height: 40px; margin-bottom: 10px; }
+      .input-group { margin-bottom: 15px; }
+      .copyright { position: relative; padding: 20px 0; }
     }
   </style>
 </head>
@@ -433,7 +460,7 @@
       </div>
 
       <div id="form-container">
-        
+
         <form id="login-form">
           <div class="input-group">
             <label>Email Address</label>
@@ -442,7 +469,7 @@
               <i class="fa-regular fa-envelope"></i>
             </div>
           </div>
-          
+
           <div class="input-group">
             <label>Password</label>
             <div class="field-wrapper">
@@ -473,7 +500,7 @@
               <i class="fa-regular fa-user"></i>
             </div>
           </div>
-          
+
           <div class="input-group">
             <label>Email Address</label>
             <div class="field-wrapper">
@@ -481,7 +508,7 @@
               <i class="fa-regular fa-envelope"></i>
             </div>
           </div>
-          
+
           <div class="input-group">
             <label>Set Password</label>
             <div class="field-wrapper">
@@ -496,7 +523,7 @@
         </form>
 
         <div class="divider">Or Authenticate With</div>
-        
+
         <button class="btn btn-outline" id="google-btn">
           <i class="fa-brands fa-google"></i> Google
         </button>
@@ -505,14 +532,14 @@
           <span id="toggle-msg">New Client?</span>
           <span id="toggle-action">Create Account</span>
         </div>
-      
+
       </div>
 
       <div id="errorMessage" class="error-msg"></div>
     </div>
+    
+    <div class="copyright">© 2025 TruVesta Wallet. Secured System.</div>
   </div>
-
-  <div class="copyright">© 2025 TruVesta Wallet. Secured System.</div>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -524,23 +551,17 @@
         const loader = document.getElementById('intro-loader');
         const progressBar = document.getElementById('progress-bar');
         const mainContent = document.getElementById('main-content');
-        
-        // Start the progress bar
+
         setTimeout(() => {
             progressBar.style.width = '100%';
         }, 100);
 
-        // Remove loader after 6 seconds
         setTimeout(() => {
             loader.style.opacity = '0';
             loader.style.visibility = 'hidden';
-            
-            // Fade in main content
             mainContent.style.opacity = '1';
             mainContent.style.transform = 'translateY(0)';
-            
-            // Allow body to scroll again if needed (though hidden by CSS)
-            document.body.style.overflow = 'auto';
+            // Removed manual overflow manipulation here as CSS handles it better now
         }, 6000); 
     });
 
@@ -571,17 +592,15 @@
     const headerTitle = document.getElementById('header-title');
     const headerDesc = document.getElementById('header-desc');
     const errorMessage = document.getElementById('errorMessage');
-    
+
     let isLogin = true;
 
     toggleAction.addEventListener('click', () => {
-        errorMessage.innerText = ""; // Clear errors
+        errorMessage.innerText = ""; 
         isLogin = !isLogin;
-
-        // Simple Fade Transition
         const formContainer = document.getElementById('form-container');
         formContainer.style.opacity = '0';
-        
+
         setTimeout(() => {
             if(isLogin) {
                 loginForm.style.display = 'block';
@@ -603,13 +622,10 @@
     });
 
     /* --- 4. AUTH LOGIC --- */
-    
-    // Login
     const loginBtn = document.getElementById('login-btn');
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         errorMessage.innerText = "";
-        
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
 
@@ -627,12 +643,10 @@
         });
     });
 
-    // Signup
     const signupBtn = document.getElementById('signup-btn');
     signupForm.addEventListener('submit', (e) => {
         e.preventDefault();
         errorMessage.innerText = "";
-
         const name = document.getElementById('signup-name').value;
         const email = document.getElementById('signup-email').value;
         const password = document.getElementById('signup-password').value;
@@ -648,13 +662,10 @@
         auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
             const userId = userCredential.user.uid;
-            
-            // Database structure
             const updates = {};
             updates['/users/' + userId] = { name: name, email: email };
             updates['/userHoldings/' + userId] = { 'BTC': {hold:0}, 'ETH': {hold:0}, 'SOL': {hold:0}, 'USDT': {hold:0} };
             updates['/userStakingData/' + userId] = { totalStaked: 0, rewardsEarned: 0 };
-            
             return database.ref().update(updates);
         })
         .then(() => {
@@ -667,45 +678,28 @@
         });
     });
 
-    // --- GOOGLE AUTH LOGIC (ADDED) ---
     const googleBtn = document.getElementById('google-btn');
-    
     googleBtn.addEventListener('click', () => {
         errorMessage.innerText = "";
-        
-        // 1. Create the Google Provider
         var provider = new firebase.auth.GoogleAuthProvider();
-
-        // 2. Start the Popup
         auth.signInWithPopup(provider)
         .then((result) => {
-            // The signed-in user info
             var user = result.user;
             var isNewUser = result.additionalUserInfo.isNewUser;
-
             if (isNewUser) {
-                // 3. IF NEW USER: Initialize Database (Same as your Signup logic)
                 const updates = {};
-                updates['/users/' + user.uid] = { 
-                    name: user.displayName || "Valued Client", 
-                    email: user.email 
-                };
-                // Initialize empty wallet
+                updates['/users/' + user.uid] = { name: user.displayName || "Valued Client", email: user.email };
                 updates['/userHoldings/' + user.uid] = { 'BTC': {hold:0}, 'ETH': {hold:0}, 'SOL': {hold:0}, 'USDT': {hold:0} };
                 updates['/userStakingData/' + user.uid] = { totalStaked: 0, rewardsEarned: 0 };
-                
                 return database.ref().update(updates);
             } else {
-                // 4. IF EXISTING USER: Just resolve the promise to continue
                 return Promise.resolve();
             }
         })
         .then(() => {
-            // 5. Success - Redirect to assets
             window.location.href = 'assets.html';
         })
         .catch((error) => {
-            // Handle Errors
             errorMessage.innerText = mapAuthError(error.code);
             console.error("Google Auth Error:", error);
         });
