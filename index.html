@@ -20,6 +20,7 @@
       --text-main: #FFFFFF;
       --text-muted: #8E8E93;
       --danger: #FF453A;
+      --success: #32D74B; /* Added Green for Success */
       --glass-border: 1px solid rgba(212, 175, 55, 0.15);
       --glass-blur: blur(25px);
       --shadow-soft: 0 20px 50px rgba(0,0,0,0.5);
@@ -36,15 +37,14 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: var(--bg-dark);
       color: var(--text-main);
-      /* FIX: Prevents horizontal scroll/zoom issues caused by the background */
       overflow-x: hidden; 
       position: relative;
     }
 
     /* --- ANIMATED BACKGROUND --- */
     .ambient-bg {
-      position: fixed; /* FIX: Stays in place, doesn't stretch page */
-      width: 200vw;    /* Use viewport width to be safe */
+      position: fixed; 
+      width: 200vw;    
       height: 200vh;
       top: -50%;
       left: -50%;
@@ -62,13 +62,12 @@
 
     /* --- MAIN WRAPPER --- */
     .login-wrapper {
-      /* FIX: Flex column centers content perfectly on screen */
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 100vh; /* Full viewport height */
-      padding: 20px;     /* Padding from screen edges */
+      min-height: 100vh; 
+      padding: 20px;     
       width: 100%;
       position: relative;
       z-index: 1;
@@ -77,7 +76,7 @@
     /* --- CARD STYLE --- */
     .card {
       width: 100%;
-      max-width: 380px; /* Optimal mobile reading width */
+      max-width: 380px; 
       background: var(--bg-card);
       backdrop-filter: var(--glass-blur);
       -webkit-backdrop-filter: var(--glass-blur);
@@ -87,10 +86,9 @@
       box-shadow: var(--shadow-soft);
       position: relative;
       overflow: hidden;
-      margin-bottom: 30px; /* Space for copyright */
+      margin-bottom: 30px; 
     }
 
-    /* Shimmer Effect on Card Top */
     .card::before {
       content: '';
       position: absolute;
@@ -155,10 +153,10 @@
       width: 100%;
       background: rgba(0,0,0,0.3);
       border: 1px solid rgba(255,255,255,0.08);
-      padding: 15px 15px 15px 45px; /* Comfortable touch padding */
+      padding: 15px 15px 15px 45px; 
       border-radius: 12px;
       color: white;
-      font-size: 15px; /* 16px prevents iOS zoom, 15px looks sleek */
+      font-size: 15px; 
       transition: var(--transition);
     }
 
@@ -243,7 +241,34 @@
       color: rgba(255,255,255,0.2);
     }
     
-    .error-msg { color: var(--danger); font-size: 12px; text-align: center; margin-top: 10px; }
+    .error-msg { color: var(--danger); font-size: 12px; text-align: center; margin-top: 10px; font-weight: 600; }
+    
+    /* --- NEW: Verification Message Styling --- */
+    .verify-msg {
+        text-align: center;
+        animation: fadeUp 0.5s ease-out;
+    }
+    .verify-icon {
+        font-size: 3rem;
+        color: var(--success);
+        margin-bottom: 15px;
+    }
+    .verify-title {
+        color: var(--text-main);
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    .verify-desc {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+    .email-highlight {
+        color: var(--gold-primary);
+        font-weight: 600;
+    }
 
     /* --- INTRO LOADER --- */
     #intro-loader {
@@ -256,6 +281,7 @@
     .progress-bar { width: 150px; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
     .progress-fill { height: 100%; width: 0%; background: var(--gold-primary); transition: width 3s linear; }
     @keyframes pulse { 50% { opacity: 0.5; transform: scale(0.95); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
   </style>
 </head>
@@ -328,13 +354,29 @@
           <button type="submit" id="signup-btn" class="btn btn-gold">Initialize Account</button>
         </form>
 
-        <div class="divider">Or Authenticate With</div>
-        <button class="btn btn-outline" id="google-btn"><i class="fa-brands fa-google"></i> Google</button>
-
-        <div class="toggle-text">
-          <span id="toggle-msg">New Client?</span>
-          <span id="toggle-action">Create Account</span>
+        <div id="verify-ui" class="verify-msg" style="display: none;">
+            <i class="fa-regular fa-envelope-open verify-icon"></i>
+            <div class="verify-title">Check Your Inbox</div>
+            <div class="verify-desc">
+                We've sent a verification link to <br>
+                <span id="verify-email-text" class="email-highlight">email@address.com</span>.
+                <br><br>Please verify your email to activate your portfolio.
+            </div>
+            <button class="btn btn-outline" id="back-to-login">
+                Return to Login
+            </button>
         </div>
+
+        <div id="social-container">
+            <div class="divider">Or Authenticate With</div>
+            <button class="btn btn-outline" id="google-btn"><i class="fa-brands fa-google"></i> Google</button>
+
+            <div class="toggle-text">
+            <span id="toggle-msg">New Client?</span>
+            <span id="toggle-action">Create Account</span>
+            </div>
+        </div>
+        
         <div id="errorMessage" class="error-msg"></div>
       </div>
     </div>
@@ -376,6 +418,9 @@
     const toggleAction = document.getElementById('toggle-action');
     const toggleMsg = document.getElementById('toggle-msg');
     const headerTitle = document.getElementById('header-title');
+    const verifyUI = document.getElementById('verify-ui');
+    const socialContainer = document.getElementById('social-container');
+    
     let isLogin = true;
 
     toggleAction.addEventListener('click', () => {
@@ -390,35 +435,119 @@
       }
     });
 
+    document.getElementById('back-to-login').addEventListener('click', () => {
+        // Reset UI to login state
+        verifyUI.style.display = 'none';
+        loginForm.style.display = 'block';
+        socialContainer.style.display = 'block';
+        headerTitle.innerText = "Welcome Back";
+        document.getElementById('header-desc').innerText = "Access your premium asset portfolio";
+        isLogin = true;
+    });
+
     /* 4. Auth Logic */
+    
+    // --- LOGIN (With Verification Check) ---
     document.getElementById('login-btn').addEventListener('click', (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
       const pass = document.getElementById('login-password').value;
+      const errorDiv = document.getElementById('errorMessage');
+
       auth.signInWithEmailAndPassword(email, pass)
-        .then(() => window.location.href = 'assets.html')
-        .catch(err => document.getElementById('errorMessage').innerText = err.message);
+        .then((userCredential) => {
+            const user = userCredential.user;
+            
+            // CHECK IF EMAIL IS VERIFIED
+            if (!user.emailVerified) {
+                // If not verified, sign them out immediately
+                auth.signOut();
+                errorDiv.style.color = "var(--danger)";
+                errorDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Verification Required.<br>Please check your email inbox.';
+                return;
+            }
+
+            // If verified, proceed
+            window.location.href = 'assets.html';
+        })
+        .catch(err => {
+            errorDiv.style.color = "var(--danger)";
+            errorDiv.innerText = mapAuthError(err.code);
+        });
     });
 
+    // --- SIGNUP (With Verification Send) ---
+    const signupBtn = document.getElementById('signup-btn');
+    
     document.getElementById('signup-btn').addEventListener('click', (e) => {
       e.preventDefault();
       const name = document.getElementById('signup-name').value;
       const email = document.getElementById('signup-email').value;
       const pass = document.getElementById('signup-password').value;
+      const errorDiv = document.getElementById('errorMessage');
+
+      if(pass.length < 6) { errorDiv.innerText = "Password must be at least 6 characters."; return; }
       
+      signupBtn.disabled = true;
+      signupBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+
       auth.createUserWithEmailAndPassword(email, pass)
         .then((cred) => {
-          return db.ref('users/' + cred.user.uid).set({ name: name, email: email });
+            // 1. Create DB Entry
+            return db.ref('users/' + cred.user.uid).set({ name: name, email: email })
+            .then(() => {
+                // 2. Send Verification Email
+                return cred.user.sendEmailVerification();
+            });
         })
-        .then(() => window.location.href = 'assets.html')
-        .catch(err => document.getElementById('errorMessage').innerText = err.message);
+        .then(() => {
+            // 3. Sign Out (Don't let them in yet)
+            return auth.signOut();
+        })
+        .then(() => {
+            // 4. Update UI to Show Success Message
+            signupForm.style.display = 'none';
+            socialContainer.style.display = 'none';
+            verifyUI.style.display = 'block';
+            
+            document.getElementById('verify-email-text').innerText = email;
+            document.getElementById('header-desc').innerText = "Account Initialization";
+            
+            signupBtn.disabled = false;
+            signupBtn.innerText = "Initialize Account";
+        })
+        .catch(err => {
+            errorDiv.innerText = mapAuthError(err.code);
+            signupBtn.disabled = false;
+            signupBtn.innerText = "Initialize Account";
+        });
     });
 
+    // --- GOOGLE AUTH ---
     document.getElementById('google-btn').addEventListener('click', () => {
       const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).then(() => window.location.href = 'assets.html')
-        .catch(err => console.error(err));
+      auth.signInWithPopup(provider)
+      .then((result) => {
+          // Google accounts are auto-verified, so we can usually just let them in.
+          // But we should create the DB entry if it's a new user.
+           if (result.additionalUserInfo.isNewUser) {
+                const user = result.user;
+                db.ref('users/' + user.uid).set({ name: user.displayName, email: user.email });
+           }
+           window.location.href = 'assets.html';
+      })
+      .catch(err => console.error(err));
     });
+
+    function mapAuthError(code) {
+        switch(code) {
+            case 'auth/invalid-email': return 'Invalid email address.';
+            case 'auth/user-not-found': return 'Account not found.';
+            case 'auth/wrong-password': return 'Incorrect password.';
+            case 'auth/email-already-in-use': return 'Email is already registered.';
+            default: return 'Authentication failed. Please try again.';
+        }
+    }
   </script>
 </body>
 </html>
