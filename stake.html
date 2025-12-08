@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TruVesta - Staking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+   
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+
+  <style>
+    /* === LUXURIOUS THEME VARIABLES (Gold/Deep Charcoal) === */
+    :root{
+      --bg-0: #1C1C1E; /* Deep Charcoal */
+      --bg-1: #2C2C2E; /* Dark Grey */
+      --bg-2: #404043; /* Medium Dark Grey */
+      --txt-1: #E0E0E0; /* Off-White for contrast */
+      --txt-2: #A0A0A0; /* Soft Grey */
+      --pri-color: #D4AF37; /* Classic Gold */
+      --pri-gradient: linear-gradient(90deg, #D4AF37, #FFD700); /* Gold Gradient */
+      --btn-bg: #D4AF37; /* Solid Gold Button */
+      --btn-txt: #1C1C1E; /* Dark text on Gold */
+      --good: #34D399; /* Emerald Green for positive */
+      --bad: #F87171; /* Soft Red for negative */
+      --warn: #FBBF24; /* Amber */
+      --edge: rgba(212, 175, 55, .2); /* Soft Gold border/edge */
+      --glow: 0 4px 15px rgba(0,0,0,.5); /* Darker, subtle glow */
+      --radius: 14px; /* Slightly softer corners */
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding-bottom: 80px;
+      font-family: Inter, system-ui, sans-serif;
+      color:var(--txt-1); background-color: var(--bg-0);
+      letter-spacing:.2px; min-height: 100dvh;
+    }
+    .app{display:flex; flex-direction:column; position: relative; min-height: 100dvh;}
+    .main{padding:16px; display:flex; flex-direction:column; gap:16px;}
+    
+    /* HEADER */
+    .header{display:flex; gap:14px; align-items:center; justify-content:space-between; padding: 4px 0;}
+    .header .app-title {
+        font-family: 'Playfair Display', serif; 
+        font-weight: 900;
+        font-size: 24px;
+        color: var(--pri-color);
+        letter-spacing: 1px;
+    }
+    .header .btn-icon {
+      width: 40px; height: 40px;
+      display: grid; place-items: center;
+      font-size: 16px;
+      background: transparent; border: 0; color: var(--txt-2); cursor: pointer;
+    }
+
+    /* BUTTONS */
+    .btn{
+      padding:10px 14px; border-radius:10px; border: 0;
+      color:var(--txt-1); background: var(--bg-2); cursor:pointer;
+      font-size: 14px; font-weight: 500; transition: background .2s;
+    }
+    .btn.primary{
+      background: var(--btn-bg); color: var(--btn-txt); font-weight: 700;
+      box-shadow: 0 4px 10px rgba(212, 175, 55, 0.4); 
+    }
+    .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+    
+    /* CARDS */
+    .card{
+      background: var(--bg-1); border:1px solid var(--edge); 
+      border-radius: var(--radius); box-shadow: var(--glow);
+    }
+    .card .head{
+      display:flex; align-items:center; justify-content:space-between; 
+      padding:14px 16px; border-bottom:1px solid var(--edge);
+    }
+    .card .head h3{margin:0; font-size:17px; font-weight:700; color: var(--pri-color);}
+    .card .body{padding:16px;}
+
+    /* NAV */
+    .bottom-nav{
+      position:fixed; bottom:0; left:0; right:0; height: 65px;
+      display:flex; align-items:center; justify-content: space-around;
+      background: var(--bg-1); border-top: 1px solid var(--edge); z-index: 1000;
+      box-shadow: 0 -5px 30px rgba(0,0,0,.5);
+    }
+    .bottom-nav a{
+      flex:1; display:flex; flex-direction: column; align-items: center; justify-content: center;
+      text-decoration: none; color: var(--txt-2); font-size: 10px; font-weight: 500; gap: 4px; padding: 8px 0;
+      transition: color .2s;
+    }
+    .bottom-nav a i{font-size: 20px;}
+    .bottom-nav a.active{color: var(--pri-color); font-weight: 700;}
+    
+    /* FORM ELEMENTS */
+    .form-group{margin-bottom:16px;}
+    .form-group label{font-size:12px; color:var(--txt-2); margin-left:4px; display:block; margin-bottom: 4px;}
+    .form-group input, .form-group select {
+        width:100%; padding:14px; background:var(--bg-2); border:1px solid var(--edge); 
+        color:var(--txt-1); border-radius:12px; outline:none; font-size: 16px;
+    }
+    .input-addon-container { position: relative; }
+    .input-addon-container .addon {
+        position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+        color: var(--txt-2); font-weight: 600; font-size: 14px;
+    }
+    
+    /* STAKE LIST */
+    .stake-list { display: flex; flex-direction: column; gap: 12px; }
+    .stake-item {
+        background: var(--bg-2); border: 1px solid var(--edge); 
+        border-radius: 12px; padding: 14px 16px; 
+    }
+    .stake-item-header {
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 1px solid var(--edge); padding-bottom: 10px; margin-bottom: 10px;
+    }
+    .stake-item-header .symbol { font-weight: 700; font-size: 18px; color: var(--pri-color); }
+    .stake-item-details { display: flex; flex-direction: column; gap: 8px; }
+    .detail-row { display: flex; justify-content: space-between; font-size: 14px; }
+    .detail-label { color: var(--txt-2); }
+    .detail-value { font-weight: 600; color: var(--txt-1); }
+    .progress-bar {
+        height: 6px; background: var(--bg-1); border-radius: 3px; margin-top: 5px;
+        overflow: hidden;
+    }
+    .progress-bar-fill {
+        height: 100%; background: var(--good); transition: width 0.5s ease-in-out;
+    }
+    .reward-status { 
+        display: flex; justify-content: space-between; align-items: center; 
+        padding-top: 10px; margin-top: 10px; border-top: 1px solid var(--edge); 
+    }
+    .reward-status .amount { font-weight: 700; color: var(--good); }
+    
+    .status-msg { margin-top: 15px; font-size: 13px; color: var(--warn); }
+    .stake-item.pending { border-color: var(--warn); } 
+    .stake-item.active { border-color: var(--good); }
+
+    /* Custom Readonly Input Style */
+    input[readonly] {
+        background-color: #252527; /* Slightly darker */
+        color: var(--txt-2);
+        cursor: not-allowed;
+        border-color: var(--edge);
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="app" id="stake-view">
+    <main class="main">
+      <header class="header">
+        <button class="btn-icon" onclick="window.location.href='assets.html'"><i class="fa-solid fa-arrow-left"></i></button>
+        <span class="app-title">Staking Hub</span>
+        <div style="width: 40px;"></div> </header>
+      
+      <div class="card" id="global-stake-overview">
+        <div class="head"><h3>Portfolio Stakes</h3></div>
+        <div class="body" style="display: flex; flex-direction: column; gap: 15px;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="font-size: 15px; color: var(--txt-2);">Total Staked Value</span>
+            <span id="totalStakedValue" style="font-size: 15px; font-weight: 600; color: var(--txt-1);">$0.00</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="font-size: 15px; color: var(--txt-2);">Available Rewards</span>
+            <span id="totalAvailableRewards" style="font-size: 15px; font-weight: 600; color: var(--pri-color);">$0.00</span>
+          </div>
+          <button class="btn primary" id="withdrawRewardsBtn" onclick="withdrawAllRewards()" disabled style="width:100%; padding:14px; font-size:16px; margin-top: 10px;">
+              Withdraw All Rewards
+          </button>
+        </div>
+      </div>
+
+      <div class="card" id="create-stake-card">
+        <div class="head"><h3>New Stake</h3></div>
+        <div class="body">
+          <div class="form-group">
+            <label for="stakeCoin">Coin to Stake</label>
+            <select id="stakeCoin" style="font-weight: 600;">
+              <option value="">Loading Balances...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="stakeAmount">Amount to Lock</label>
+            <div class="input-addon-container">
+                <input id="stakeAmount" type="number" placeholder="0.00" min="0.001">
+                <span class="addon" id="stakeCoinSymbol">--</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:6px;">
+                 <p id="stakeBalanceInfo" style="font-size: 12px; color: var(--txt-2); margin:0;">Available: 0.00 --</p>
+                 <p id="dynamicRateInfo" style="font-size: 12px; color: var(--pri-color); font-weight:600; margin:0;">Rate: 0% Daily</p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="stakeDuration">Staking Period (Fixed)</label>
+            <div class="input-addon-container">
+                <input id="stakeDurationDisplay" type="text" value="250 Days" readonly style="font-weight: 600;">
+                <span class="addon"><i class="fa-solid fa-lock" style="font-size: 14px; color: var(--txt-2);"></i></span>
+            </div>
+            <p id="apyInfo" style="font-size: 12px; color: var(--warn); margin-top: 6px;">Daily reward % depends on total USD value staked.</p>
+          </div>
+          <button class="btn primary" id="confirmStakeBtn" onclick="confirmStake()" style="width:100%; padding:14px; font-size:16px;">
+              Confirm Stake
+          </button>
+        </div>
+      </div>
+      
+      <div class="card" id="active-stakes-card">
+        <div class="head"><h3>Your Active Stakes</h3></div>
+        <div class="body">
+          <p id="noStakesMessage" style="text-align:center; color:var(--txt-2); margin-bottom: 16px;">No active stakes found.</p>
+          <div class="stake-list" id="activeStakesList">
+            </div>
+        </div>
+      </div>
+
+    </main>
+
+    <nav class="bottom-nav">
+        <a class="active" href="#" title="Stake"><i class="fa-solid fa-layer-group"></i><span>Stake</span></a>
+        <a href="assets.html" title="Assets"><i class="fa-solid fa-wallet"></i><span>Assets</span></a>
+        <a href="profile.html" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+    </nav>
+  </div> 
+  
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  
+  <script>
+    // --- FIREBASE INIT ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyByvett5gGhga0jx2pBChmg41IKaTvbY24",
+      authDomain: "bustrack-e4f8f.firebaseapp.com",
+      databaseURL: "https://bustrack-e4f8f-default-rtdb.firebaseio.com",
+      projectId: "bustrack-e4f8f",
+      storageBucket: "bustrack-e4f8f.firebasestorage.app",
+      messagingSenderId: "544737954134",
+      appId: "1:544737954134:web:91a197cc88d0a67c43eef7"
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+
+    // --- CONFIG ---
+    let STAKE_TIERS = [
+        { max: 49, rate: 0.01 },        // $0-$49: 1%
+        { max: 99, rate: 0.012 },       // $50-$99: 1.2%
+        { max: 249, rate: 0.015 },      // $100-$249: 1.5%
+        { max: 499, rate: 0.017 },      // $250-$499: 1.7%
+        { max: 999, rate: 0.02 },       // $500-$999: 2%
+        { max: 1499, rate: 0.022 },     // $1000-$1499: 2.2%
+        { max: 2499, rate: 0.025 },     // $1500-$2499: 2.5%
+        { max: 5000, rate: 0.027 },     // $2500-$5000: 2.7%
+        { max: Infinity, rate: 0.03 }   // $5000+: 3%
+    ];
+
+    // FIXED DURATION CONSTANT
+    const FIXED_DURATION_DAYS = 250; 
+    
+    let MIN_WITHDRAW_COMPLETION = 0.50; // 50% completion required
+    
+    // --- GLOBAL VARS ---
+    let userId = null;
+    let latestPrices = {}; 
+    let activeStakes = {}; 
+    let userBalances = {}; 
+    let fetchedAddresses = {}; 
+    const REQUIRED_COINS = ['btc', 'eth', 'usdt', 'trx', 'bnb', 'sol', 'xrp'];
+    
+    // CoinGecko IDs for real price fetching
+    const COINGECKO_ID_MAP = {
+        'BTC': 'bitcoin',
+        'ETH': 'ethereum',
+        'BNB': 'binancecoin',
+        'SOL': 'solana',
+        'XRP': 'ripple',
+        'USDT': 'tether',
+        'TRX': 'tron',
+    };
+    
+    const USER_ADDRESSES_PATH = 'privilegesecdata/';
+    const USER_HOLDINGS_PATH = 'userHoldings/'; 
+    const USER_SETTINGS_PATH = 'userSettings/'; 
+    
+    // --- AUTH & INIT ---
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        userId = user.uid;
+        
+        loadUserStakingSettings(user.uid).then(() => {
+             fetchAndInitPublicAddresses(user.uid);
+             listenForActiveStakes();
+        });
+        
+        fetchLivePrices(); // Hit API for real prices
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+
+    /**
+     * Loads user-specific settings.
+     */
+    function loadUserStakingSettings(userId) {
+        const path = USER_SETTINGS_PATH + userId;
+        const ref = database.ref(path);
+
+        return ref.get().then((snapshot) => {
+            const data = snapshot.val();
+            
+            if (data) {
+                if (data.tiers && Array.isArray(data.tiers)) {
+                    STAKE_TIERS = data.tiers;
+                    console.log("Staking: Using user-specific Tiers.");
+                }
+
+                if (data.minWithdraw !== undefined && data.minWithdraw !== null) {
+                    MIN_WITHDRAW_COMPLETION = parseFloat(data.minWithdraw);
+                }
+            }
+            updateUIInfo();
+
+        }).catch(error => {
+            console.error("Error fetching user settings:", error);
+            updateUIInfo(); 
+        });
+    }
+
+    /**
+     * Determine the Daily Rate based on USD Amount
+     */
+    function getRateForUsdAmount(usdAmount) {
+        if (!usdAmount || usdAmount < 0) return 0;
+        
+        for (let tier of STAKE_TIERS) {
+            if (usdAmount <= tier.max) {
+                return tier.rate;
+            }
+        }
+        return 0.01; 
+    }
+
+    function updateUIInfo() {
+        const minWithdrawPercent = (MIN_WITHDRAW_COMPLETION * 100).toFixed(0);
+        document.getElementById('apyInfo').innerHTML = 
+            `Higher stake amount = Higher Daily Reward.<br>
+            <span style="color:var(--txt-2);">Withdrawal requires ${minWithdrawPercent}% completion of the 250-day period.</span>`;
+    }
+
+    // --- REAL TIME RATE CALCULATION UI ---
+    function updateEstimatedRate() {
+        const amount = parseFloat(document.getElementById('stakeAmount').value);
+        const coin = document.getElementById('stakeCoin').value;
+        const rateLabel = document.getElementById('dynamicRateInfo');
+        
+        if (!coin || isNaN(amount) || amount <= 0) {
+            rateLabel.textContent = "Rate: 0% Daily";
+            return;
+        }
+        
+        const price = latestPrices[coin]?.price || 0;
+        const usdValue = amount * price;
+        const dailyRate = getRateForUsdAmount(usdValue);
+        
+        rateLabel.textContent = `~${(dailyRate * 100).toFixed(1)}% Daily (Value: $${fmt(usdValue, 0)})`;
+    }
+
+    // Add listener to input
+    document.getElementById('stakeAmount').addEventListener('input', updateEstimatedRate);
+
+    // --- BALANCE FETCHING ---
+    function fetchAndInitPublicAddresses(userId) {
+        const path = USER_ADDRESSES_PATH + userId;
+        const ref = database.ref(path);
+
+        ref.get().then((snapshot) => {
+            const data = snapshot.val();
+            let updateNeeded = false;
+            let initialData = {};
+
+            if (!data) {
+                REQUIRED_COINS.forEach(coin => { initialData[coin] = ''; });
+                ref.set(initialData);
+                fetchedAddresses = initialData;
+                updateNeeded = true;
+            } else {
+                fetchedAddresses = data;
+                REQUIRED_COINS.forEach(coin => {
+                    if (fetchedAddresses[coin] === undefined) {
+                        fetchedAddresses[coin] = '';
+                        updateNeeded = true; 
+                    }
+                });
+                if (updateNeeded) { ref.update(fetchedAddresses); }
+            }
+            
+            const hasAddress = Object.values(fetchedAddresses).some(addr => addr && addr !== '');
+
+            if (hasAddress) {
+                 fetchLiveBalances(); 
+            } else {
+                 renderStakeForm(); 
+            }
+        }).catch(error => {
+            console.error("Error fetching addresses:", error);
+            renderStakeForm();
+        });
+    }
+
+    async function fetchLiveBalances() {
+        if (typeof ethers === 'undefined') {
+            console.error("Ethers library not loaded.");
+            return;
+        }
+
+        const fetchBalance = async (coin, address) => {
+            if (!address) return 0.0;
+            try {
+                switch (coin) {
+                    case 'ETH': {
+                        const ethProvider = new ethers.providers.JsonRpcProvider("https://eth.llamarpc.com");
+                        const balance = await ethProvider.getBalance(address);
+                        return parseFloat(ethers.utils.formatEther(balance));
+                    }
+                    case 'BNB': {
+                        const bscProvider = new ethers.providers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
+                        const balance = await bscProvider.getBalance(address);
+                        return parseFloat(ethers.utils.formatEther(balance));
+                    }
+                    case 'USDT': {
+                        // === TRC-20 USDT CHECK ===
+                        if(!address.startsWith('T')) return 0.0; 
+                        const res = await fetch(`https://api.trongrid.io/v1/accounts/${address}`);
+                        const data = await res.json();
+                        
+                        if (data.data && data.data.length > 0) {
+                             const account = data.data[0];
+                             let usdtBal = 0;
+                             if(account.trc20) {
+                                 account.trc20.forEach(tokenObj => {
+                                     // USDT Contract: TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t
+                                     if(tokenObj['TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t']) {
+                                         usdtBal = parseFloat(tokenObj['TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t']);
+                                     }
+                                 });
+                             }
+                             return usdtBal / 1000000; 
+                        }
+                        return 0.0;
+                    }
+                    case 'BTC': {
+                        const res = await fetch(`https://api.blockcypher.com/v1/btc/main/addrs/${address}/balance`);
+                        const data = await res.json();
+                        return data.balance !== undefined ? data.balance / 100000000 : 0.0;
+                    }
+                    case 'TRX': {
+                        const res = await fetch(`https://api.trongrid.io/wallet/getaccount`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ address: address, visible: true })
+                        });
+                        const data = await res.json();
+                        return data.balance !== undefined ? data.balance / 1000000 : 0.0; 
+                    }
+                    case 'SOL': {
+                        const res = await fetch(`https://api.mainnet-beta.solana.com`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ "jsonrpc": "2.0", "id": 1, "method": "getBalance", "params": [address] })
+                        });
+                        const data = await res.json();
+                        return data.result && data.result.value !== undefined ? data.result.value / 1000000000 : 0.0; 
+                    }
+                    case 'XRP': {
+                        const res = await fetch(`https://s1.ripple.com:51234`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ "method": "account_info", "params": [{ "account": address, "ledger_index": "current" }] })
+                        });
+                        const data = await res.json();
+                        return data.result?.account_data?.Balance !== undefined ? parseFloat(data.result.account_data.Balance) / 1000000 : 0.0; 
+                    }
+                    default:
+                        return 0.0;
+                }
+            } catch (e) {
+                console.error(`${coin} Balance Fetch Error:`, e);
+                return 0.0;
+            }
+        };
+
+        const [
+            ethBal, bnbBal, usdtBal, btcBal, trxBal, solBal, xrpBal
+        ] = await Promise.all([
+            fetchBalance('ETH', fetchedAddresses['eth']),
+            fetchBalance('BNB', fetchedAddresses['bnb']),
+            fetchBalance('USDT', fetchedAddresses['usdt']),
+            fetchBalance('BTC', fetchedAddresses['btc']),
+            fetchBalance('TRX', fetchedAddresses['trx']),
+            fetchBalance('SOL', fetchedAddresses['sol']),
+            fetchBalance('XRP', fetchedAddresses['xrp'])
+        ]);
+
+        userBalances['ETH'] = ethBal;
+        userBalances['BNB'] = bnbBal;
+        userBalances['USDT'] = usdtBal;
+        userBalances['BTC'] = btcBal;
+        userBalances['TRX'] = trxBal;
+        userBalances['SOL'] = solBal;
+        userBalances['XRP'] = xrpBal;
+
+        console.log("✅ Live Balances Fetched:", userBalances);
+        renderStakeForm(); 
+    }
+    
+    // --- HELPER FUNCTIONS ---
+    function fmt(n, p=2){
+      const num = parseFloat(n);
+      if (isNaN(num)) return '0.00';
+      
+      let minFrac = 2; 
+      let maxFrac = 2;
+      const absNum = Math.abs(num);
+
+      if (absNum < 1) { maxFrac = 6; minFrac = 2; }
+      if (p === 4) { maxFrac = 4; minFrac = 4; }
+
+      return num.toLocaleString(undefined,{ minimumFractionDigits: minFrac, maximumFractionDigits: maxFrac });
+    }
+    
+    // Fetch live prices from CoinGecko (fallback to mocks if fails)
+    async function fetchLivePrices() {
+        const coinIds = REQUIRED_COINS.map(s => COINGECKO_ID_MAP[s.toUpperCase()]).filter(id => id);
+        const idsString = coinIds.join(',');
+        const apiUrl = `https://api.coingecko.com/api/v3/simple/price?ids=${idsString}&vs_currencies=usd`;
+
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error();
+            const data = await response.json();
+            
+            const newPrices = {};
+            for (const [symbol, id] of Object.entries(COINGECKO_ID_MAP)) {
+                if (data[id]) {
+                    newPrices[symbol] = { price: data[id].usd };
+                }
+            }
+            latestPrices = newPrices;
+            updateEstimatedRate(); // Update calculation with real price
+            
+        } catch (error) { 
+            console.warn("Price fetch failed, using fallback.");
+            fetchMockPrices(); 
+        }
+    }
+    
+    function fetchMockPrices() {
+        latestPrices = {
+            'ETH': { price: 3500.00 },
+            'BNB': { price: 600.00 },
+            'USDT': { price: 1.00 },
+            'BTC': { price: 65000.00 },
+            'SOL': { price: 150.00 },
+            'XRP': { price: 0.50 },
+            'TRX': { price: 0.12 }
+        };
+        updateEstimatedRate();
+    }
+    
+    // --- UI RENDERING ---
+    function renderStakeForm() {
+        const select = document.getElementById('stakeCoin');
+        select.innerHTML = '';
+        let firstCoin = '';
+        
+        REQUIRED_COINS.forEach(coinLower => {
+            const coin = coinLower.toUpperCase();
+            const balance = userBalances[coin] || 0; 
+
+            // Show coin if balance > 0 (or very small amount)
+            if (balance > 0.000001) { 
+                if (!firstCoin) firstCoin = coin;
+                const option = document.createElement('option');
+                option.value = coin;
+                option.textContent = `${coin} (${fmt(balance, 4)})`;
+                select.appendChild(option);
+            }
+        });
+        
+        if (select.options.length === 0) {
+             const option = document.createElement('option');
+             option.value = '';
+             option.textContent = 'No Balance Available';
+             option.disabled = true;
+             select.appendChild(option);
+             document.getElementById('confirmStakeBtn').disabled = true;
+        } else {
+             document.getElementById('confirmStakeBtn').disabled = false;
+        }
+
+        select.onchange = updateStakeFormInfo;
+        updateStakeFormInfo();
+    }
+    
+    function updateStakeFormInfo() {
+        const selectedCoin = document.getElementById('stakeCoin').value;
+        const balance = userBalances[selectedCoin] || 0; 
+        
+        document.getElementById('stakeCoinSymbol').textContent = selectedCoin || '--';
+        document.getElementById('stakeBalanceInfo').textContent = `Available: ${fmt(balance, 4)} ${selectedCoin || '--'}`;
+        
+        updateEstimatedRate();
+    }
+    
+    function listenForActiveStakes() {
+        if (!userId) return;
+        
+        database.ref('userStakes/' + userId).on('value', (snapshot) => {
+            activeStakes = snapshot.val() || {};
+            renderActiveStakes(); 
+        });
+    }
+
+    function renderActiveStakes() {
+        const container = document.getElementById('activeStakesList');
+        const noStakesMessage = document.getElementById('noStakesMessage');
+
+        container.innerHTML = ''; 
+        
+        let totalStakedValueUSD = 0;
+        let totalAvailableRewardsUSD = 0;
+        let hasActiveRewards = false;
+        let hasAnyStakes = Object.keys(activeStakes).length > 0;
+
+        if (!hasAnyStakes) {
+            noStakesMessage.style.display = 'block';
+            document.getElementById('withdrawRewardsBtn').disabled = true;
+            document.getElementById('totalStakedValue').textContent = '$0.00';
+            document.getElementById('totalAvailableRewards').textContent = '$0.00';
+            return;
+        } else {
+            noStakesMessage.style.display = 'none';
+        }
+        
+        for (const stakeId in activeStakes) {
+            const stake = activeStakes[stakeId];
+            const status = stake.status || 'ACTIVE'; 
+            
+            const isPending = status === 'PENDING';
+
+            const lockedAmount = parseFloat(stake.amount);
+            const price = latestPrices[stake.coin]?.price || 0;
+            
+            const dailyRate = stake.dailyRate !== undefined ? stake.dailyRate : 0.01; 
+
+            let completionPercentage = 0;
+            let availableRewards = 0;
+            let endTimeText = 'N/A';
+            let canWithdrawLocked = false;
+            let statusText;
+            let statusColor;
+
+            if (isPending) {
+                statusText = 'Pending Approval';
+                statusColor = 'var(--warn)';
+                endTimeText = `${stake.durationDays} Days`;
+            } else {
+                const startTime = new Date(stake.startTime);
+                const endTime = new Date(startTime.getTime() + (stake.durationDays * 24 * 60 * 60 * 1000));
+                const now = new Date();
+                
+                const totalDurationMs = endTime.getTime() - startTime.getTime();
+                const elapsedDurationMs = now.getTime() - startTime.getTime();
+                
+                const daysElapsed = Math.floor(elapsedDurationMs / (24 * 60 * 60 * 1000));
+                
+                const currentTotalBalance = lockedAmount * Math.pow(1 + dailyRate, daysElapsed);
+                availableRewards = (currentTotalBalance - lockedAmount) - parseFloat(stake.rewardsWithdrawn);
+                
+                completionPercentage = totalDurationMs > 0 ? Math.min(100, (elapsedDurationMs / totalDurationMs) * 100) : 100;
+                
+                canWithdrawLocked = completionPercentage >= (MIN_WITHDRAW_COMPLETION * 100); 
+                endTimeText = endTime.toLocaleDateString();
+
+                if (completionPercentage >= 100) {
+                    statusText = 'Completed';
+                    statusColor = 'var(--good)';
+                } else {
+                    statusText = 'Active';
+                    statusColor = 'var(--good)';
+                }
+
+                totalStakedValueUSD += lockedAmount * price; 
+                totalAvailableRewardsUSD += availableRewards * price;
+                if (availableRewards > 0.000001 && canWithdrawLocked) hasActiveRewards = true;
+            }
+
+            const item = document.createElement('div');
+            item.className = `stake-item ${isPending ? 'pending' : 'active'}`; 
+            
+            item.innerHTML = `
+                <div class="stake-item-header">
+                    <span class="symbol">${stake.coin} Stake</span>
+                    <span style="font-size: 12px; color: ${statusColor}; font-weight: 600;">
+                        ${statusText}
+                    </span>
+                </div>
+                <div class="stake-item-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Locked Amount</span>
+                        <span class="detail-value">${fmt(lockedAmount, 4)} ${stake.coin} (~$${fmt(lockedAmount * price)})</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Daily Reward</span>
+                        <span class="detail-value">${(dailyRate * 100).toFixed(2)}% Daily</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">End Date</span>
+                        <span class="detail-value">${endTimeText}</span>
+                    </div>
+                    ${!isPending ? `
+                        <div class="detail-row">
+                            <span class="detail-label">Completion Status</span>
+                            <span class="detail-value">${completionPercentage.toFixed(2)}%</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-bar-fill" style="width: ${completionPercentage}%;"></div></div>
+                    ` : ''}
+                </div>
+                <div class="reward-status">
+                    <span class="detail-label">Available Rewards</span>
+                    <span class="amount">${fmt(availableRewards < 0 ? 0 : availableRewards, 4)} ${stake.coin}</span>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="btn primary" style="flex:1;" 
+                        onclick="withdrawLockedStake('${stakeId}')" 
+                        ${canWithdrawLocked && !isPending ? '' : 'disabled'}>
+                        Withdraw Locked
+                    </button>
+                    <button class="btn" style="flex:1;" onclick="collectRewards('${stakeId}')" 
+                        ${availableRewards > 0.000001 && !isPending && canWithdrawLocked ? '' : 'disabled'}>
+                        Collect Rewards
+                    </button>
+                </div>
+                ${!isPending ? 
+                    (
+                        !canWithdrawLocked ? 
+                            `<p class="status-msg">Withdrawal requires ${fmt(MIN_WITHDRAW_COMPLETION * 100, 0)}% completion.</p>` 
+                            : ''
+                    )
+                    : ''}
+                ${isPending ? 
+                    `<p class="status-msg" style="color:var(--warn); text-align:center; font-weight:600;">Awaiting Admin Confirmation.</p>` 
+                    : ''}
+            `;
+            container.appendChild(item);
+        }
+        
+        document.getElementById('totalStakedValue').textContent = '$' + fmt(totalStakedValueUSD);
+        document.getElementById('totalAvailableRewards').textContent = '$' + fmt(totalAvailableRewardsUSD);
+        document.getElementById('withdrawRewardsBtn').disabled = !hasActiveRewards;
+    }
+    
+    // --- STAKING LOGIC ---
+    
+    function confirmStake() {
+        const coin = document.getElementById('stakeCoin').value;
+        const amount = parseFloat(document.getElementById('stakeAmount').value);
+        // FORCE USE OF FIXED DURATION
+        const duration = FIXED_DURATION_DAYS; 
+        
+        const balance = userBalances[coin] || 0; 
+        const confirmBtn = document.getElementById('confirmStakeBtn');
+
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount to stake.');
+            return;
+        }
+
+        if (amount > balance) {
+            alert(`Insufficient ${coin} balance. Max available: ${fmt(balance, 4)} ${coin}`);
+            return;
+        }
+        
+        const price = latestPrices[coin]?.price || 0;
+        const usdValue = amount * price;
+        const assignedRate = getRateForUsdAmount(usdValue);
+
+        if (!confirm(`Stake ${fmt(amount, 4)} ${coin}?\nValue: ~$${fmt(usdValue, 0)}\nDaily Reward: ${(assignedRate*100).toFixed(2)}%\nDuration: ${duration} Days (Locked)`)) {
+            return;
+        }
+
+        confirmBtn.disabled = true;
+        const initialBtnText = confirmBtn.textContent;
+        confirmBtn.textContent = 'Submitting Request...';
+        
+        const stakeRef = database.ref('userStakes/' + userId).push();
+        const newStake = {
+            id: stakeRef.key,
+            coin: coin,
+            amount: amount.toFixed(4),
+            durationDays: duration,
+            startTime: 0, 
+            dailyRate: assignedRate, 
+            rewardsWithdrawn: 0.0, 
+            status: 'PENDING' 
+        };
+
+        database.ref('userStakes/' + userId + '/' + stakeRef.key).set(newStake).then(() => {
+            alert(`Staking request submitted! Locked rate: ${(assignedRate*100).toFixed(2)}% Daily.`);
+            document.getElementById('stakeAmount').value = '';
+            updateEstimatedRate();
+        }).catch(error => {
+            console.error("Firebase Stake Submission Error:", error);
+            alert("Staking submission failed. Please try again.");
+            
+        }).finally(() => {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = initialBtnText;
+        });
+    }
+    
+    function collectRewards(stakeId) {
+        const stake = activeStakes[stakeId];
+        if (!stake || stake.status === 'PENDING') return alert('Stake is pending approval or inactive.');
+        
+        const lockedAmount = parseFloat(stake.amount);
+        const dailyRate = stake.dailyRate || 0.01;
+        const startTime = new Date(stake.startTime);
+        const now = new Date();
+        
+        const totalDurationMs = (stake.durationDays * 24 * 60 * 60 * 1000);
+        const elapsedDurationMs = now.getTime() - startTime.getTime();
+        const completionPercentage = totalDurationMs > 0 ? (elapsedDurationMs / totalDurationMs) : 1;
+        
+        if (completionPercentage < MIN_WITHDRAW_COMPLETION) {
+            alert(`Reward withdrawal requires ${fmt(MIN_WITHDRAW_COMPLETION * 100, 0)}% completion.`);
+            return;
+        }
+
+        const daysElapsed = Math.floor(elapsedDurationMs / (24 * 60 * 60 * 1000));
+        
+        const currentTotalBalance = lockedAmount * Math.pow(1 + dailyRate, daysElapsed);
+        const totalEarnedRewards = currentTotalBalance - lockedAmount;
+        const availableRewards = totalEarnedRewards - parseFloat(stake.rewardsWithdrawn);
+        
+        if (availableRewards < 0.000001) {
+            alert('No rewards available to collect.');
+            return;
+        }
+
+        if (!confirm(`Confirm collecting ${fmt(availableRewards, 4)} ${stake.coin} rewards?`)) {
+            return;
+        }
+        
+        const currentHoldingsBalance = userBalances[stake.coin] || 0;
+        const newHoldingsBalance = currentHoldingsBalance + availableRewards;
+        
+        const holdingsUpdatePath = USER_HOLDINGS_PATH + userId + '/' + stake.coin + '/hold';
+
+        const newRewardsWithdrawn = parseFloat(stake.rewardsWithdrawn) + availableRewards;
+        
+        const updates = {};
+        updates[holdingsUpdatePath] = newHoldingsBalance;
+        updates['userStakes/' + userId + '/' + stakeId + '/rewardsWithdrawn'] = newRewardsWithdrawn;
+        
+        database.ref().update(updates)
+        .then(() => {
+            alert(`Collected ${fmt(availableRewards, 4)} ${stake.coin} rewards!`);
+            
+            userBalances[stake.coin] = newHoldingsBalance;
+            updateStakeFormInfo();
+        }).catch(error => {
+            console.error("Reward Collection Error:", error);
+            alert("Reward collection failed. Please check console.");
+        });
+    }
+
+    function withdrawLockedStake(stakeId) {
+        const stake = activeStakes[stakeId];
+        if (!stake || stake.status === 'PENDING') return alert('Stake is pending approval or inactive.');
+
+        const lockedAmount = parseFloat(stake.amount);
+        const startTime = new Date(stake.startTime);
+        const endTime = new Date(startTime.getTime() + (stake.durationDays * 24 * 60 * 60 * 1000));
+        const now = new Date();
+        const totalDurationMs = endTime.getTime() - startTime.getTime();
+        const elapsedDurationMs = now.getTime() - startTime.getTime();
+        const completionPercentage = totalDurationMs > 0 ? (elapsedDurationMs / totalDurationMs) : 1;
+        
+        const canWithdraw = completionPercentage >= MIN_WITHDRAW_COMPLETION; 
+
+        if (!canWithdraw) {
+            alert(`Cannot withdraw locked stake. Requires ${fmt(MIN_WITHDRAW_COMPLETION * 100, 0)}% completion. Current: ${(completionPercentage*100).toFixed(2)}%`);
+            return;
+        }
+
+        if (!confirm(`Confirm withdrawing the locked ${fmt(lockedAmount, 4)} ${stake.coin}?`)) {
+            return;
+        }
+        
+        const currentHoldingsBalance = userBalances[stake.coin] || 0;
+        const newHoldingsBalance = currentHoldingsBalance + lockedAmount;
+        
+        const holdingsUpdatePath = USER_HOLDINGS_PATH + userId + '/' + stake.coin + '/hold';
+        
+        const updates = {};
+        updates[holdingsUpdatePath] = newHoldingsBalance;
+        updates['userStakes/' + userId + '/' + stakeId] = null; 
+        
+        database.ref().update(updates)
+        .then(() => {
+            alert(`Locked stake of ${fmt(lockedAmount, 4)} ${stake.coin} withdrawn successfully.`);
+            
+            userBalances[stake.coin] = newHoldingsBalance;
+            updateStakeFormInfo();
+        }).catch(error => {
+            console.error("Stake Withdrawal Error:", error);
+            alert("Withdrawal failed. Please check console.");
+        });
+    }
+
+    function withdrawAllRewards() {
+        let totalToCollect = 0;
+        let collectedInfo = {}; 
+        let updates = {}; 
+
+        for (const stakeId in activeStakes) {
+            const stake = activeStakes[stakeId];
+            if (stake.status === 'PENDING') continue;
+
+            const startTime = new Date(stake.startTime);
+            const now = new Date();
+            const elapsedDurationMs = now.getTime() - startTime.getTime();
+            const totalDurationMs = (stake.durationDays * 24 * 60 * 60 * 1000);
+            const completionPercentage = totalDurationMs > 0 ? (elapsedDurationMs / totalDurationMs) : 1;
+            
+            if (completionPercentage < MIN_WITHDRAW_COMPLETION) continue;
+
+            const lockedAmount = parseFloat(stake.amount);
+            const dailyRate = stake.dailyRate || 0.01;
+            const daysElapsed = Math.floor(elapsedDurationMs / (24 * 60 * 60 * 1000));
+            
+            const currentTotalBalance = lockedAmount * Math.pow(1 + dailyRate, daysElapsed);
+            const totalEarnedRewards = currentTotalBalance - lockedAmount;
+            const availableRewards = totalEarnedRewards - parseFloat(stake.rewardsWithdrawn);
+
+            if (availableRewards > 0.000001) {
+                totalToCollect += availableRewards;
+                collectedInfo[stake.coin] = (collectedInfo[stake.coin] || 0) + availableRewards;
+                
+                const newRewardsWithdrawn = parseFloat(stake.rewardsWithdrawn) + availableRewards;
+                updates['userStakes/' + userId + '/' + stakeId + '/rewardsWithdrawn'] = newRewardsWithdrawn;
+            }
+        }
+
+        if (totalToCollect < 0.000001) {
+             alert('No eligible rewards available to collect.');
+             return;
+        }
+        
+        const totalUsdValue = Object.keys(collectedInfo).reduce((acc, coin) => {
+            return acc + (collectedInfo[coin] * (latestPrices[coin]?.price || 0));
+        }, 0);
+
+        if (!confirm(`Confirm collecting total rewards: ~$${fmt(totalUsdValue)} (various coins)?`)) {
+             return;
+        }
+        
+        const holdingsUpdates = {};
+        for (const coin in collectedInfo) {
+            const currentHoldingsBalance = userBalances[coin] || 0;
+            const newHoldingsBalance = currentHoldingsBalance + collectedInfo[coin];
+            
+            holdingsUpdates[USER_HOLDINGS_PATH + userId + '/' + coin + '/hold'] = newHoldingsBalance;
+            
+            userBalances[coin] = newHoldingsBalance;
+        }
+
+        Object.assign(updates, holdingsUpdates);
+        
+        database.ref().update(updates).then(() => {
+            alert(`Successfully collected rewards from all stakes!`);
+            
+            updateStakeFormInfo();
+        }).catch(error => {
+            console.error("Mass Withdrawal Error:", error);
+            alert("Mass reward collection failed. Please check console.");
+        });
+    }
+
+    // Initialize form info after the script loads
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('stakeCoin').addEventListener('change', updateStakeFormInfo);
+        updateStakeFormInfo();
+    });
+  </script>
+</body>
+</html>

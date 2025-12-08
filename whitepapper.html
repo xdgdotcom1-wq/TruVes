@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TruVesta: Decentralized Staking Protocol - White Paper</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Define a custom color palette for DARK MODE */
+        :root {
+            --color-primary: #F9FAFB; /* Light Text */
+            --color-secondary: #D1D5DB; /* Gray Secondary Text */
+            --color-accent: #34D399; /* Emerald Green for highlight */
+            --color-background: #111827; /* Dark Background (Gray 900) */
+            --color-card: #1F2937; /* Darker card background (Gray 800) */
+            --color-border: #374151; /* Dark border (Gray 700) */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-primary);
+        }
+
+        .paper-container {
+            max-width: 900px;
+            margin: auto;
+            padding: 2rem 1rem;
+        }
+
+        /* Title Styling */
+        .wp-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--color-primary);
+            border-bottom: 4px solid var(--color-accent);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem; /* Reduced margin to fit proprietary line */
+        }
+
+        /* Section Header Styling */
+        .wp-section-header {
+            font-family: 'Playfair Display', serif;
+            color: var(--color-primary);
+            border-left: 5px solid var(--color-accent);
+            padding-left: 1rem;
+            margin-top: 2.5rem; /* Increased margin for professionalism */
+            margin-bottom: 1.5rem;
+        }
+
+        /* Responsive Bullet Points */
+        .wp-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--color-secondary);
+        }
+
+        .wp-list li::before {
+            content: '•';
+            color: var(--color-accent);
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 1.25rem;
+        }
+        
+        .code-block {
+            background-color: #0F172A; /* Slate 900 for code background */
+            color: #E2E8F0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            overflow-x: auto;
+            border: 1px solid var(--color-border);
+        }
+
+        .figure-placeholder {
+            border: 2px dashed var(--color-accent);
+            background-color: var(--color-card);
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 1.5rem 0;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="paper-container">
+
+        <!-- HEADER / TITLE -->
+        <header class="text-center mb-10">
+            <h1 class="wp-title text-4xl sm:text-5xl font-extrabold">TruVesta Protocol White Paper</h1>
+            <p class="text-xl text-accent font-semibold mt-4">Proprietary & Confidential</p>
+            <p class="text-lg text-gray-400 mt-2">A Decentralized, Cross-Chain Staking and Yield Aggregation Platform</p>
+            <p class="text-sm text-gray-500 mt-2">Version 1.2 (Audit Ready) | December 2025</p>
+        </header>
+
+        <!-- 1. ABSTRACT -->
+        <section id="abstract" class="mb-10 p-6 bg-card rounded-xl shadow-2xl border-l-4 border-accent">
+            <h2 class="text-2xl font-bold mb-3 text-accent">Abstract</h2>
+            <p class="text-gray-300 leading-relaxed">
+                The TruVesta Protocol is designed as a secure, non-custodial gateway for decentralized finance (DeFi) staking and automated yield optimization. It addresses critical challenges in the contemporary DeFi ecosystem—specifically asset fragmentation, complex user interfaces, and opaque risk exposure. By consolidating multi-chain assets under robust Smart Vault Contracts and employing risk-mitigated Yield Aggregation Routers, TruVesta offers unparalleled capital efficiency. This document provides a rigorous overview of the protocol’s architecture, governance model, advanced security mechanisms, and the strategic road map for achieving full decentralization and sustainable growth within the Proof-of-Stake economy.
+            </p>
+        </section>
+
+        <!-- 2. INTRODUCTION -->
+        <section id="introduction">
+            <h2 class="wp-section-header text-3xl font-bold">1. Introduction</h2>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                The shift towards Proof-of-Stake (PoS) consensus mechanisms has established passive yield generation as a foundational element of crypto asset management. TruVesta capitalizes on this paradigm shift by offering a unified, simplified, and highly transparent staking environment across multiple heterogeneous blockchains. The protocol is named for Vesta, the hearth goddess, symbolizing stability, security, and sustained warmth (yield) for our community.
+            </p>
+            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-300">1.1 Problem Statement and Solution</h3>
+            <p class="text-gray-300 leading-relaxed">
+                Existing decentralized staking requires advanced technical knowledge and subjects users to high gas fees and limited diversification options. TruVesta eliminates this complexity by integrating automated bridging and asset wrapping services, allowing users to stake a diverse portfolio of assets (BTC, ETH, stablecoins) through a single, secure gateway, optimizing their capital's utility.
+            </p>
+            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-300">1.2 Core Protocol Commitments</h3>
+            <ul class="wp-list">
+                <li>**Security:** Mandate external, independent smart contract audits before any major code deployment.</li>
+                <li>**Non-Custodial:** User assets remain secured by cryptographic keys held only by the user.</li>
+                <li>**Efficiency:** Employ continuous optimization algorithms to select the best available APY across integrated DeFi platforms.</li>
+                <li>**Transparency:** Utilize verifiable on-chain data and external oracles for all financial metrics.</li>
+            </ul>
+        </section>
+
+        <!-- 3. PROTOCOL ARCHITECTURE AND TECHNOLOGY -->
+        <section id="architecture">
+            <h2 class="wp-section-header text-3xl font-bold">2. Protocol Architecture and Technology</h2>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                The architecture employs a layered, battle-tested structure, maximizing isolation between the user-facing interface, the vault contracts, and the underlying yield strategies.
+            </p>
+
+            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-300">2.1 Smart Vault Contracts</h3>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                These are the entry points for the staked assets. They enforce the user-defined lockup period and track rewards. Crucially, they serve as the intermediary between the user and the yield aggregation layer, ensuring a single point of interaction for risk management.
+            </p>
+            <div class="code-block text-sm">
+                // Simplified Vault Lock Function (Solidity)<br>
+                function lockAsset(address _user, uint256 _amount, uint256 _durationDays) public {<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;require(_amount > 0, "Amount must be positive");<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;require(_durationDays > 0, "Duration must be set");<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;assetToken.transferFrom(msg.sender, address(this), _amount);<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;stakes[_user].push(Stake(_amount, _durationDays, block.timestamp));<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;emit Staked(_user, _amount, _durationDays);<br>
+                }
+            </div>
+
+            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-300">2.2 Yield Aggregation Router</h3>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                The Aggregation Router intelligently deploys capital received from the Smart Vaults into vetted external DeFi protocols (e.g., liquidity pools, stablecoin lending). The router is designed with withdrawal limits and risk-rating parameters to minimize exposure to impermanent loss or protocol exploits.
+            </p>
+            <div class="figure-placeholder">
+                <p class="text-xl font-semibold text-white">Figure 1. TruVesta Yield Aggregation Flow</p>
+                <p class="text-sm text-gray-400 mt-2">Diagram illustrating capital movement from Vault to Router and into external yield strategies.</p>
+            </div>
+            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-300">2.3 Real-Time Reporting and Oracles</h3>
+            <p class="text-gray-300 leading-relaxed">
+                All reward calculations and APY projections rely on audited oracle data (e.g., Chainlink) to provide precise, timely asset valuation. This ensures the transparent metrics reflected in the user interface (as implemented in `stake.html`) are cryptographically verified.
+            </p>
+        </section>
+        
+        <!-- 4. SECURITY AND AUDITS (NEW SECTION) -->
+        <section id="security">
+            <h2 class="wp-section-header text-3xl font-bold">3. Security and Audits</h2>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                Security is paramount. The protocol employs a defense-in-depth strategy, combining robust contract design with rigorous external review and community governance.
+            </p>
+
+            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-300">3.1 Auditing and Formal Verification</h3>
+            <ul class="wp-list">
+                <li>**Mandatory Audits:** All major contract updates must pass comprehensive security reviews by at least two Tier-1 external audit firms.</li>
+                <li>**Bug Bounty Program:** A continuous, high-reward bounty program is active to incentivize security researchers to identify vulnerabilities.</li>
+                <li>**Formal Verification:** Critical economic functions are subjected to formal verification methods to mathematically prove their soundness.</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-300">3.2 Protocol Safety Measures</h3>
+            <ul class="wp-list">
+                <li>**Upgradeability Time-Locks:** All governance-approved smart contract upgrades are subject to a minimum 48-hour time-lock delay, allowing the community to review and react to potential malicious changes.</li>
+                <li>**Emergency Shutdown:** A multi-signature treasury wallet, controlled by the DAO, retains the authority for an emergency shutdown (pause) of the Aggregation Router in the event of an external protocol exploit, limiting user exposure.</li>
+            </ul>
+        </section>
+
+        <!-- 5. TRUVESTA TOKENOMICS (TRV) -->
+        <section id="tokenomics">
+            <h2 class="wp-section-header text-3xl font-bold">4. TruVesta Tokenomics (TRV)</h2>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                The TRV token serves as the deflationary governance and utility core of the TruVesta ecosystem, aligning participant incentives with the long-term health of the protocol.
+            </p>
+
+            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-300">4.1 Token Distribution</h3>
+            <ul class="wp-list">
+                <li>**Staking Rewards (40%):** Distributed via a decaying emission schedule over 5 years.</li>
+                <li>**Treasury/DAO (25%):** Ensures long-term sustainability, liquidity provision, and strategic investments.</li>
+                <li>**Team & Advisors (20%):** Subject to a 1-year cliff and 3-year linear vesting schedule to ensure commitment.</li>
+                <li>**Public Sale & Liquidity (15%):** Used for initial market provision and community bootstrapping.</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-300">4.2 Utility and Governance</h3>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                TRV holders exercise control over critical protocol parameters, including integration of new yield strategies, changes to fee tiers, and treasury spending. Utility benefits include tiered protocol fee reductions and access to TRV-exclusive high-yield staking vaults.
+            </p>
+        </section>
+
+        <!-- 6. ROADMAP -->
+        <section id="roadmap">
+            <h2 class="wp-section-header text-3xl font-bold">5. Roadmap and Future Vision</h2>
+            <p class="text-gray-300 leading-relaxed mb-4">
+                The TruVesta journey is structured around four phases, leading to full DAO governance and market leadership in decentralized staking.
+            </p>
+
+            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-300">Phase I: Core Deployment (Q4 2025)</h3>
+            <ul class="wp-list">
+                <li>Deployment of core staking vaults (ETH, USDT).</li>
+                <li>Initial Web Interface and mobile optimization.</li>
+                <li>Successful internal security review and price oracle integration.</li>
+            </ul>
+            
+            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-300">Phase II: Cross-Chain & Liquidity Expansion (Q1 2026)</h3>
+            <ul class="wp-list">
+                <li>Integration of cross-chain bridges (BNB, Solana) and asset wrapping.</li>
+                <li>Deployment and stress testing of the Yield Aggregation Router.</li>
+                <li>Launch of the TRV utility token and initial liquidity pools.</li>
+            </ul>
+            
+            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-300">Phase III: Governance & DAO Transition (Q2 2026)</h3>
+            <ul class="wp-list">
+                <li>Launch of the TruVesta DAO voting portal.</li>
+                <li>Transition of key protocol parameters (fees, APY distribution) to DAO control.</li>
+                <li>Integration of decentralized insurance/coverage mechanisms for staked assets.</li>
+            </ul>
+            
+            <h3 class="text-xl font-semibold mt-6 mb-3 text-gray-300">Phase IV: Product Diversification (H2 2026)</h3>
+            <ul class="wp-list">
+                <li>Integration of structured financial products (e.g., fixed-rate and bond-style staking).</li>
+                <li>Development of an official native mobile application.</li>
+                <li>Exploration of Real-World Asset (RWA) staking pools.</li>
+            </ul>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="text-center mt-20 pt-8 border-t border-gray-700">
+            <p class="text-sm text-gray-500 font-bold mb-1">TruVesta Protocol - Registered Document ID: 90210-TVP-V1.2</p>
+            <p class="text-sm text-gray-500">&copy; 2025 TruVesta Labs. All rights reserved. This document is the proprietary information of TruVesta Labs.</p>
+            <p class="text-xs text-gray-600 mt-2">.</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>
+
