@@ -12,7 +12,6 @@
 
   <style>
     :root {
-      /* Palette */
       --bg-dark: #0f0f11;
       --bg-card: rgba(30, 30, 35, 0.65);
       --gold-primary: #D4AF37;
@@ -21,8 +20,6 @@
       --text-main: #FFFFFF;
       --text-muted: #8E8E93;
       --danger: #FF453A;
-
-      /* Effects */
       --glass-border: 1px solid rgba(212, 175, 55, 0.15);
       --glass-blur: blur(25px);
       --shadow-soft: 0 20px 50px rgba(0,0,0,0.5);
@@ -31,30 +28,24 @@
 
     * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
       font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: var(--bg-dark);
       color: var(--text-main);
-      
-      /* RESPONSIVE FIX: Allow scrolling if content is taller than screen */
-      min-height: 100dvh; 
-      width: 100%;
-      overflow-x: hidden;
-      overflow-y: auto; 
-      
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      /* FIX: Prevents horizontal scroll/zoom issues caused by the background */
+      overflow-x: hidden; 
       position: relative;
     }
 
     /* --- ANIMATED BACKGROUND --- */
     .ambient-bg {
-      /* RESPONSIVE FIX: Fixed position so it doesn't scroll away */
-      position: fixed; 
-      width: 200%;
-      height: 200%;
+      position: fixed; /* FIX: Stays in place, doesn't stretch page */
+      width: 200vw;    /* Use viewport width to be safe */
+      height: 200vh;
       top: -50%;
       left: -50%;
       background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.08), transparent 40%),
@@ -69,94 +60,37 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* --- INTRO LOADER --- */
-    #intro-loader {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: var(--bg-dark);
-      z-index: 9999;
+    /* --- MAIN WRAPPER --- */
+    .login-wrapper {
+      /* FIX: Flex column centers content perfectly on screen */
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      transition: opacity 0.8s ease-in-out, visibility 0.8s;
-    }
-
-    .loader-content {
-      text-align: center;
-      animation: fadeUp 1s ease-out;
-    }
-
-    .loader-icon {
-      font-size: 4rem;
-      color: var(--gold-primary);
-      margin-bottom: 20px;
-      filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
-      animation: pulseGold 2s infinite ease-in-out;
-    }
-
-    .loader-text {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      color: var(--gold-primary);
-      letter-spacing: 2px;
-      margin-bottom: 5px;
-    }
-
-    .loader-sub {
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-    }
-
-    .progress-container {
-      position: absolute;
-      bottom: 100px;
-      width: 200px;
-      height: 2px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--gold-dark), var(--gold-primary), var(--gold-light));
-      transition: width 6s linear; 
-      box-shadow: 0 0 10px var(--gold-primary);
-    }
-
-    /* --- MAIN CARD --- */
-    .login-wrapper {
+      min-height: 100vh; /* Full viewport height */
+      padding: 20px;     /* Padding from screen edges */
       width: 100%;
-      /* RESPONSIVE FIX: Min height ensures vertical centering on large screens, allows expansion on small */
-      min-height: 100dvh; 
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0; 
-      transform: translateY(20px);
-      transition: var(--transition);
+      position: relative;
+      z-index: 1;
     }
 
+    /* --- CARD STYLE --- */
     .card {
       width: 100%;
-      max-width: 400px;
+      max-width: 380px; /* Optimal mobile reading width */
       background: var(--bg-card);
       backdrop-filter: var(--glass-blur);
       -webkit-backdrop-filter: var(--glass-blur);
       border: var(--glass-border);
       border-radius: 24px;
-      padding: 40px 32px;
+      padding: 35px 25px;
       box-shadow: var(--shadow-soft);
       position: relative;
       overflow: hidden;
-      margin: auto 0; /* Helps with vertical centering logic */
+      margin-bottom: 30px; /* Space for copyright */
     }
 
+    /* Shimmer Effect on Card Top */
     .card::before {
       content: '';
       position: absolute;
@@ -165,13 +99,10 @@
       opacity: 0.8;
     }
 
-    .header {
-      text-align: center;
-      margin-bottom: 35px;
-    }
+    .header { text-align: center; margin-bottom: 30px; }
 
     .logo-mark {
-      width: 50px; height: 50px;
+      width: 48px; height: 48px;
       border: 1px solid var(--gold-primary);
       border-radius: 12px;
       display: flex;
@@ -179,49 +110,40 @@
       justify-content: center;
       margin: 0 auto 15px;
       color: var(--gold-primary);
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
       transform: rotate(45deg);
     }
-
     .logo-mark i { transform: rotate(-45deg); }
 
     .header h2 {
       margin: 0;
       font-family: 'Playfair Display', serif;
       font-weight: 700;
-      font-size: 26px;
+      font-size: 24px;
       color: var(--text-main);
     }
 
-    .header p {
-      margin: 8px 0 0;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
+    .header p { margin: 8px 0 0; color: var(--text-muted); font-size: 13px; }
 
-    /* --- FORM ELEMENTS --- */
-    .input-group {
-      margin-bottom: 20px;
-      position: relative;
-    }
-
+    /* --- INPUTS --- */
+    .input-group { margin-bottom: 18px; position: relative; }
+    
     .input-group label {
       display: block;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--text-muted);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     .field-wrapper { position: relative; }
-
+    
     .field-wrapper i {
       position: absolute;
-      left: 16px;
-      top: 50%;
+      left: 16px; top: 50%;
       transform: translateY(-50%);
       color: var(--text-muted);
       font-size: 14px;
@@ -233,234 +155,128 @@
       width: 100%;
       background: rgba(0,0,0,0.3);
       border: 1px solid rgba(255,255,255,0.08);
-      padding: 16px 16px 16px 45px;
+      padding: 15px 15px 15px 45px; /* Comfortable touch padding */
       border-radius: 12px;
       color: white;
-      font-family: inherit;
-      font-size: 15px;
+      font-size: 15px; /* 16px prevents iOS zoom, 15px looks sleek */
       transition: var(--transition);
     }
 
     input:focus {
       border-color: var(--gold-primary);
       background: rgba(0,0,0,0.5);
-      box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
     }
 
-    input:focus + i { color: var(--gold-primary); }
-
+    /* --- ACTIONS --- */
     .actions {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
+      font-size: 12px;
       margin-bottom: 25px;
       color: var(--text-muted);
-      flex-wrap: wrap; /* Allows wrapping on tiny screens */
-      gap: 10px;
     }
-
-    .actions a {
-      color: var(--gold-primary);
-      text-decoration: none;
-      transition: 0.3s;
-    }
-    .actions a:hover { text-decoration: underline; color: var(--gold-light); }
-
-    /* Custom Checkbox */
-    .checkbox-container {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-    }
+    .actions a { color: var(--gold-primary); text-decoration: none; }
+    
+    .checkbox-container { display: flex; align-items: center; cursor: pointer; }
     .checkbox-container input { display: none; }
     .checkmark {
       width: 16px; height: 16px;
       border: 1px solid var(--text-muted);
       border-radius: 4px;
       margin-right: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: 0.3s;
-    }
-    .checkmark::after {
-      content: '\f00c';
-      font-family: 'Font Awesome 6 Free';
-      font-weight: 900;
-      font-size: 10px;
-      color: #000;
-      display: none;
+      display: flex; align-items: center; justify-content: center;
     }
     .checkbox-container input:checked ~ .checkmark {
-      background: var(--gold-primary);
-      border-color: var(--gold-primary);
+      background: var(--gold-primary); border-color: var(--gold-primary);
     }
-    .checkbox-container input:checked ~ .checkmark::after { display: block; }
+    .checkbox-container input:checked ~ .checkmark::after {
+      content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 10px; color: #000;
+    }
 
     /* --- BUTTONS --- */
     .btn {
       width: 100%;
-      padding: 16px;
+      padding: 15px;
       border-radius: 12px;
       border: none;
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 15px; font-weight: 700;
       cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
+      display: flex; justify-content: center; align-items: center; gap: 10px;
       transition: var(--transition);
     }
 
     .btn-gold {
       background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
       color: #1a1a1a;
-      box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
-    }
-
-    .btn-gold:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
-      filter: brightness(1.1);
-    }
-
-    .btn-gold:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      transform: none;
     }
 
     .divider {
-      text-align: center;
-      margin: 25px 0;
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      text-align: center; margin: 20px 0;
+      font-size: 10px; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px;
       position: relative;
     }
     .divider::before, .divider::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      width: 35%;
-      height: 1px;
-      background: rgba(255,255,255,0.1);
+      content: ''; position: absolute; top: 50%;
+      width: 35%; height: 1px; background: rgba(255,255,255,0.1);
     }
-    .divider::before { left: 0; }
-    .divider::after { right: 0; }
+    .divider::before { left: 0; } .divider::after { right: 0; }
 
     .btn-outline {
       background: transparent;
       border: 1px solid rgba(255,255,255,0.2);
-      color: white;
-      font-weight: 500;
-    }
-    .btn-outline:hover {
-      background: rgba(255,255,255,0.05);
-      border-color: white;
+      color: white; font-weight: 500;
     }
 
-    /* --- FOOTER / TOGGLE --- */
     .toggle-text {
-      text-align: center;
-      margin-top: 25px;
-      font-size: 14px;
-      color: var(--text-muted);
+      text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-muted);
     }
-    .toggle-text span {
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-      margin-left: 5px;
-      transition: 0.3s;
-    }
-    .toggle-text span:hover { color: var(--gold-primary); }
-
-    .error-msg {
-      color: var(--danger);
-      font-size: 13px;
-      text-align: center;
-      margin-top: 15px;
-      font-weight: 500;
-      min-height: 20px;
-    }
+    .toggle-text span { color: white; font-weight: 700; cursor: pointer; margin-left: 5px; }
 
     .copyright {
-      position: absolute; /* Keeps it at bottom usually */
-      bottom: 10px;
+      position: absolute;
+      bottom: 15px;
       width: 100%;
       text-align: center;
       font-size: 10px;
       color: rgba(255,255,255,0.2);
-      pointer-events: none;
     }
-
-    /* Animations */
-    @keyframes pulseGold {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.05); opacity: 0.8; }
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* --- RESPONSIVE OPTIMIZATIONS --- */
     
-    /* 1. Mobile Portrait & Narrow Screens */
-    @media (max-width: 480px) {
-      .card { 
-        padding: 30px 20px; 
-        border-radius: 20px; 
-        backdrop-filter: blur(15px);
-        margin: 20px 0; /* Adds breathing room when scrolling */
-      }
-      .header h2 { font-size: 22px; }
-      .btn { padding: 14px; }
-      .copyright { position: relative; margin-top: 20px; bottom: 0; }
-    }
+    .error-msg { color: var(--danger); font-size: 12px; text-align: center; margin-top: 10px; }
 
-    /* 2. Mobile Landscape Mode (Short Height) */
-    @media (max-height: 700px) {
-      .login-wrapper { padding-top: 40px; padding-bottom: 40px; display: block; }
-      .card { margin: 0 auto; }
-      .header { margin-bottom: 20px; }
-      .logo-mark { width: 40px; height: 40px; margin-bottom: 10px; }
-      .input-group { margin-bottom: 15px; }
-      .copyright { position: relative; padding: 20px 0; }
+    /* --- INTRO LOADER --- */
+    #intro-loader {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--bg-dark); z-index: 9999;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      transition: opacity 0.5s;
     }
+    .loader-icon { font-size: 3rem; color: var(--gold-primary); margin-bottom: 15px; animation: pulse 1.5s infinite; }
+    .progress-bar { width: 150px; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0%; background: var(--gold-primary); transition: width 3s linear; }
+    @keyframes pulse { 50% { opacity: 0.5; transform: scale(0.95); } }
+
   </style>
 </head>
 <body>
 
   <div id="intro-loader">
-    <div class="loader-content">
-      <i class="fa-solid fa-shield-halved loader-icon"></i>
-      <div class="loader-text">TruVesta</div>
-      <div class="loader-sub">Securing Your Future</div>
-    </div>
-    <div class="progress-container">
-      <div class="progress-bar" id="progress-bar"></div>
-    </div>
+    <i class="fa-solid fa-shield-halved loader-icon"></i>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
   </div>
 
   <div class="ambient-bg"></div>
 
-  <div class="login-wrapper" id="main-content">
+  <div class="login-wrapper">
     <div class="card">
       <div class="header">
-        <div class="logo-mark" id="header-icon">
-          <i class="fa-solid fa-shield-halved"></i>
-        </div>
+        <div class="logo-mark"><i class="fa-solid fa-shield-halved"></i></div>
         <h2 id="header-title">Welcome Back</h2>
         <p id="header-desc">Access your premium asset portfolio</p>
       </div>
 
       <div id="form-container">
-
         <form id="login-form">
           <div class="input-group">
             <label>Email Address</label>
@@ -469,7 +285,6 @@
               <i class="fa-regular fa-envelope"></i>
             </div>
           </div>
-
           <div class="input-group">
             <label>Password</label>
             <div class="field-wrapper">
@@ -477,16 +292,12 @@
               <i class="fa-solid fa-lock"></i>
             </div>
           </div>
-
           <div class="actions">
             <label class="checkbox-container">
-              <input type="checkbox" id="rememberMe">
-              <span class="checkmark"></span>
-              Remember me
+              <input type="checkbox"> <span class="checkmark"></span> Remember me
             </label>
             <a href="#">Forgot Password?</a>
           </div>
-
           <button type="submit" id="login-btn" class="btn btn-gold">
             <span>Secure Login</span> <i class="fa-solid fa-arrow-right"></i>
           </button>
@@ -500,7 +311,6 @@
               <i class="fa-regular fa-user"></i>
             </div>
           </div>
-
           <div class="input-group">
             <label>Email Address</label>
             <div class="field-wrapper">
@@ -508,36 +318,27 @@
               <i class="fa-regular fa-envelope"></i>
             </div>
           </div>
-
           <div class="input-group">
-            <label>Set Password</label>
+            <label>Password</label>
             <div class="field-wrapper">
-              <input type="password" id="signup-password" placeholder="Min. 6 characters" required>
+              <input type="password" id="signup-password" placeholder="Min. 6 chars" required>
               <i class="fa-solid fa-key"></i>
             </div>
           </div>
-
-          <button type="submit" id="signup-btn" class="btn btn-gold">
-            Initialize Account
-          </button>
+          <button type="submit" id="signup-btn" class="btn btn-gold">Initialize Account</button>
         </form>
 
         <div class="divider">Or Authenticate With</div>
-
-        <button class="btn btn-outline" id="google-btn">
-          <i class="fa-brands fa-google"></i> Google
-        </button>
+        <button class="btn btn-outline" id="google-btn"><i class="fa-brands fa-google"></i> Google</button>
 
         <div class="toggle-text">
           <span id="toggle-msg">New Client?</span>
           <span id="toggle-action">Create Account</span>
         </div>
-
+        <div id="errorMessage" class="error-msg"></div>
       </div>
-
-      <div id="errorMessage" class="error-msg"></div>
     </div>
-    
+
     <div class="copyright">© 2025 TruVesta Wallet. Secured System.</div>
   </div>
 
@@ -546,26 +347,16 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <script>
-    /* --- 1. INTRO LOADER LOGIC --- */
-    window.addEventListener('load', () => {
-        const loader = document.getElementById('intro-loader');
-        const progressBar = document.getElementById('progress-bar');
-        const mainContent = document.getElementById('main-content');
+    /* 1. Loader Logic */
+    window.onload = () => {
+      document.getElementById('progress-fill').style.width = '100%';
+      setTimeout(() => {
+        document.getElementById('intro-loader').style.opacity = '0';
+        setTimeout(() => { document.getElementById('intro-loader').style.display = 'none'; }, 500);
+      }, 2500);
+    };
 
-        setTimeout(() => {
-            progressBar.style.width = '100%';
-        }, 100);
-
-        setTimeout(() => {
-            loader.style.opacity = '0';
-            loader.style.visibility = 'hidden';
-            mainContent.style.opacity = '1';
-            mainContent.style.transform = 'translateY(0)';
-            // Removed manual overflow manipulation here as CSS handles it better now
-        }, 6000); 
-    });
-
-    /* --- 2. FIREBASE CONFIG --- */
+    /* 2. Firebase Init */
     const firebaseConfig = {
       apiKey: "AIzaSyByvett5gGhga0jx2pBChmg41IKaTvbY24",
       authDomain: "bustrack-e4f8f.firebaseapp.com",
@@ -575,146 +366,59 @@
       messagingSenderId: "544737954134",
       appId: "1:544737954134:web:91a197cc88d0a67c43eef7"
     };
-
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    } else {
-      firebase.app(); 
-    }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const database = firebase.database();
+    const db = firebase.database();
 
-    /* --- 3. UI TOGGLE LOGIC --- */
+    /* 3. Toggle Logic */
     const loginForm = document.getElementById('login-form');
     const signupForm = document.getElementById('signup-form');
     const toggleAction = document.getElementById('toggle-action');
     const toggleMsg = document.getElementById('toggle-msg');
     const headerTitle = document.getElementById('header-title');
-    const headerDesc = document.getElementById('header-desc');
-    const errorMessage = document.getElementById('errorMessage');
-
     let isLogin = true;
 
     toggleAction.addEventListener('click', () => {
-        errorMessage.innerText = ""; 
-        isLogin = !isLogin;
-        const formContainer = document.getElementById('form-container');
-        formContainer.style.opacity = '0';
-
-        setTimeout(() => {
-            if(isLogin) {
-                loginForm.style.display = 'block';
-                signupForm.style.display = 'none';
-                headerTitle.innerText = "Welcome Back";
-                headerDesc.innerText = "Access your premium asset portfolio";
-                toggleMsg.innerText = "New Client?";
-                toggleAction.innerText = "Create Account";
-            } else {
-                loginForm.style.display = 'none';
-                signupForm.style.display = 'block';
-                headerTitle.innerText = "New Portfolio";
-                headerDesc.innerText = "Begin your journey with TruVesta";
-                toggleMsg.innerText = "Existing Client?";
-                toggleAction.innerText = "Sign In";
-            }
-            formContainer.style.opacity = '1';
-        }, 300);
+      isLogin = !isLogin;
+      document.getElementById('errorMessage').innerText = "";
+      if (isLogin) {
+        loginForm.style.display = 'block'; signupForm.style.display = 'none';
+        headerTitle.innerText = "Welcome Back"; toggleMsg.innerText = "New Client?"; toggleAction.innerText = "Create Account";
+      } else {
+        loginForm.style.display = 'none'; signupForm.style.display = 'block';
+        headerTitle.innerText = "New Portfolio"; toggleMsg.innerText = "Existing Client?"; toggleAction.innerText = "Sign In";
+      }
     });
 
-    /* --- 4. AUTH LOGIC --- */
-    const loginBtn = document.getElementById('login-btn');
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        errorMessage.innerText = "";
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-
-        loginBtn.disabled = true;
-        loginBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying Credentials...';
-
-        auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-            window.location.href = 'assets.html'; 
-        })
-        .catch((error) => {
-            errorMessage.innerText = mapAuthError(error.code);
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = '<span>Secure Login</span> <i class="fa-solid fa-arrow-right"></i>';
-        });
+    /* 4. Auth Logic */
+    document.getElementById('login-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const pass = document.getElementById('login-password').value;
+      auth.signInWithEmailAndPassword(email, pass)
+        .then(() => window.location.href = 'assets.html')
+        .catch(err => document.getElementById('errorMessage').innerText = err.message);
     });
 
-    const signupBtn = document.getElementById('signup-btn');
-    signupForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        errorMessage.innerText = "";
-        const name = document.getElementById('signup-name').value;
-        const email = document.getElementById('signup-email').value;
-        const password = document.getElementById('signup-password').value;
-
-        if(password.length < 6) {
-            errorMessage.innerText = "Security Alert: Password too short (min 6 chars).";
-            return;
-        }
-
-        signupBtn.disabled = true;
-        signupBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Generating Keys...';
-
-        auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const userId = userCredential.user.uid;
-            const updates = {};
-            updates['/users/' + userId] = { name: name, email: email };
-            updates['/userHoldings/' + userId] = { 'BTC': {hold:0}, 'ETH': {hold:0}, 'SOL': {hold:0}, 'USDT': {hold:0} };
-            updates['/userStakingData/' + userId] = { totalStaked: 0, rewardsEarned: 0 };
-            return database.ref().update(updates);
+    document.getElementById('signup-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('signup-name').value;
+      const email = document.getElementById('signup-email').value;
+      const pass = document.getElementById('signup-password').value;
+      
+      auth.createUserWithEmailAndPassword(email, pass)
+        .then((cred) => {
+          return db.ref('users/' + cred.user.uid).set({ name: name, email: email });
         })
-        .then(() => {
-            window.location.href = 'assets.html';
-        })
-        .catch((error) => {
-            errorMessage.innerText = mapAuthError(error.code);
-            signupBtn.disabled = false;
-            signupBtn.innerHTML = 'Initialize Account';
-        });
+        .then(() => window.location.href = 'assets.html')
+        .catch(err => document.getElementById('errorMessage').innerText = err.message);
     });
 
-    const googleBtn = document.getElementById('google-btn');
-    googleBtn.addEventListener('click', () => {
-        errorMessage.innerText = "";
-        var provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider)
-        .then((result) => {
-            var user = result.user;
-            var isNewUser = result.additionalUserInfo.isNewUser;
-            if (isNewUser) {
-                const updates = {};
-                updates['/users/' + user.uid] = { name: user.displayName || "Valued Client", email: user.email };
-                updates['/userHoldings/' + user.uid] = { 'BTC': {hold:0}, 'ETH': {hold:0}, 'SOL': {hold:0}, 'USDT': {hold:0} };
-                updates['/userStakingData/' + user.uid] = { totalStaked: 0, rewardsEarned: 0 };
-                return database.ref().update(updates);
-            } else {
-                return Promise.resolve();
-            }
-        })
-        .then(() => {
-            window.location.href = 'assets.html';
-        })
-        .catch((error) => {
-            errorMessage.innerText = mapAuthError(error.code);
-            console.error("Google Auth Error:", error);
-        });
+    document.getElementById('google-btn').addEventListener('click', () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then(() => window.location.href = 'assets.html')
+        .catch(err => console.error(err));
     });
-
-    function mapAuthError(code) {
-        switch(code) {
-            case 'auth/invalid-email': return 'Error: Invalid email format.';
-            case 'auth/user-not-found': return 'Error: Identity not found.';
-            case 'auth/wrong-password': return 'Error: Invalid credentials.';
-            case 'auth/email-already-in-use': return 'Error: Email already associated with a portfolio.';
-            case 'auth/popup-closed-by-user': return 'Authentication Canceled.';
-            default: return 'Authentication Error. Please retry.';
-        }
-    }
   </script>
 </body>
 </html>
