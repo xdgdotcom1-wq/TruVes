@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-   
+    
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 
   <style>
@@ -39,7 +39,7 @@
     }
     .app{display:flex; flex-direction:column; position: relative; min-height: 100dvh;}
     .main{padding:16px; display:flex; flex-direction:column; gap:16px;}
-    
+      
     /* HEADER */
     .header{display:flex; gap:14px; align-items:center; justify-content:space-between; padding: 4px 0;}
     .header .app-title {
@@ -60,8 +60,9 @@
     .btn{
       padding:10px 14px; border-radius:10px; border: 0;
       color:var(--txt-1); background: var(--bg-2); cursor:pointer;
-      font-size: 14px; font-weight: 500; transition: background .2s;
+      font-size: 14px; font-weight: 500; transition: background .2s, transform 0.1s;
     }
+    .btn:active { transform: scale(0.98); }
     .btn.primary{
       background: var(--btn-bg); color: var(--btn-txt); font-weight: 700;
       box-shadow: 0 4px 10px rgba(212, 175, 55, 0.4); 
@@ -71,7 +72,7 @@
         cursor: not-allowed;
         box-shadow: none;
     }
-    
+      
     /* CARDS */
     .card{
       background: var(--bg-1); border:1px solid var(--edge); 
@@ -98,20 +99,31 @@
     }
     .bottom-nav a i{font-size: 20px;}
     .bottom-nav a.active{color: var(--pri-color); font-weight: 700;}
-    
-    /* FORM ELEMENTS */
+      
+    /* FORM ELEMENTS - PROFESSIONAL STYLE */
     .form-group{margin-bottom:16px;}
     .form-group label{font-size:12px; color:var(--txt-2); margin-left:4px; display:block; margin-bottom: 4px;}
+    
     .form-group input, .form-group select {
-        width:100%; padding:14px; background:var(--bg-2); border:1px solid var(--edge); 
+        width:100%; padding:14px; background:var(--bg-2); 
+        border:1px solid var(--edge); 
         color:var(--txt-1); border-radius:12px; outline:none; font-size: 16px;
-    }
-    .input-addon-container { position: relative; }
-    .input-addon-container .addon {
-        position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-        color: var(--txt-2); font-weight: 600; font-size: 14px;
+        transition: border-color 0.3s, box-shadow 0.3s;
     }
     
+    /* FOCUS STATE FOR PROFESSIONAL FEEL */
+    .form-group input:focus, .form-group select:focus {
+        border-color: var(--pri-color);
+        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15);
+    }
+
+    .input-addon-container { position: relative; }
+    .input-addon-container .addon {
+        position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+        color: var(--txt-2); font-weight: 600; font-size: 14px;
+        pointer-events: none;
+    }
+      
     /* STAKE LIST */
     .stake-list { display: flex; flex-direction: column; gap: 12px; }
     .stake-item {
@@ -139,22 +151,92 @@
         padding-top: 10px; margin-top: 10px; border-top: 1px solid var(--edge); 
     }
     .reward-status .amount { font-weight: 700; color: var(--good); }
-    
+      
     .status-msg { margin-top: 15px; font-size: 13px; color: var(--warn); }
     .stake-item.pending { border-color: var(--warn); } 
     .stake-item.active { border-color: var(--good); }
 
     /* Custom Readonly Input Style */
     input[readonly] {
-        background-color: #252527; /* Slightly darker */
+        background-color: #252527; 
         color: var(--txt-2);
         cursor: not-allowed;
-        border-color: var(--edge);
+        border-color: rgba(255,255,255,0.05);
     }
+    input[readonly]:focus {
+        border-color: rgba(255,255,255,0.05);
+        box-shadow: none;
+    }
+
+    /* === CUSTOM MODAL / DIALOG BOX STYLES === */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 2000;
+        opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: all; }
+
+    .custom-dialog {
+        background: var(--bg-1);
+        width: 90%; max-width: 350px;
+        border-radius: 20px;
+        border: 1px solid var(--edge);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        overflow: hidden;
+    }
+    .modal-overlay.show .custom-dialog { transform: translateY(0); }
+
+    .dialog-header {
+        background: var(--bg-2);
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--edge);
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .dialog-title {
+        font-family: 'Playfair Display', serif;
+        color: var(--pri-color);
+        font-size: 18px; font-weight: 700; margin: 0;
+    }
+    .dialog-body {
+        padding: 20px;
+        text-align: center;
+        color: var(--txt-1);
+        font-size: 15px;
+        line-height: 1.5;
+    }
+    .dialog-actions {
+        display: flex; gap: 10px;
+        padding: 0 20px 20px 20px;
+    }
+    .dialog-btn {
+        flex: 1; padding: 12px; border-radius: 10px; border: none;
+        font-weight: 600; cursor: pointer; font-size: 14px;
+    }
+    .btn-cancel { background: var(--bg-2); color: var(--txt-2); }
+    .btn-confirm { background: var(--pri-color); color: var(--btn-txt); }
 
   </style>
 </head>
 <body>
+
+  <div id="customModal" class="modal-overlay">
+      <div class="custom-dialog">
+          <div class="dialog-header">
+              <h3 class="dialog-title" id="modalTitle">Notification</h3>
+          </div>
+          <div class="dialog-body" id="modalMessage">
+              Message goes here...
+          </div>
+          <div class="dialog-actions">
+              <button class="dialog-btn btn-cancel" id="modalCancelBtn" onclick="closeModal(false)">Cancel</button>
+              <button class="dialog-btn btn-confirm" id="modalConfirmBtn" onclick="closeModal(true)">Confirm</button>
+          </div>
+      </div>
+  </div>
 
   <div class="app" id="stake-view">
     <main class="main">
@@ -162,7 +244,7 @@
         <button class="btn-icon" onclick="window.location.href='assets.html'"><i class="fa-solid fa-arrow-left"></i></button>
         <span class="app-title">Staking Hub</span>
         <div style="width: 40px;"></div> </header>
-      
+       
       <div class="card" id="global-stake-overview">
         <div class="head"><h3>Portfolio Stakes</h3></div>
         <div class="body" style="display: flex; flex-direction: column; gap: 15px;">
@@ -213,7 +295,7 @@
           </button>
         </div>
       </div>
-      
+       
       <div class="card" id="active-stakes-card">
         <div class="head"><h3>Your Active Stakes</h3></div>
         <div class="body">
@@ -231,11 +313,11 @@
         <a href="profile.html" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
     </nav>
   </div> 
-  
+   
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  
+   
   <script>
     // --- FIREBASE INIT ---
     const firebaseConfig = {
@@ -250,6 +332,47 @@
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const database = firebase.database();
+
+    // --- CUSTOM MODAL LOGIC ---
+    let modalResolver = null;
+
+    function openModal(title, message, isConfirm = false) {
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalMessage').innerHTML = message.replace(/\n/g, '<br>');
+        
+        const cancelBtn = document.getElementById('modalCancelBtn');
+        const confirmBtn = document.getElementById('modalConfirmBtn');
+        
+        if (isConfirm) {
+            cancelBtn.style.display = 'block';
+            confirmBtn.textContent = 'Confirm';
+        } else {
+            cancelBtn.style.display = 'none';
+            confirmBtn.textContent = 'OK';
+        }
+
+        document.getElementById('customModal').classList.add('show');
+
+        return new Promise((resolve) => {
+            modalResolver = resolve;
+        });
+    }
+
+    function closeModal(result) {
+        document.getElementById('customModal').classList.remove('show');
+        if (modalResolver) {
+            modalResolver(result);
+            modalResolver = null;
+        }
+    }
+
+    async function showAlert(message, title = 'Notification') {
+        await openModal(title, message, false);
+    }
+
+    async function showConfirm(message, title = 'Confirm Action') {
+        return await openModal(title, message, true);
+    }
 
     // --- CONFIG ---
     let STAKE_TIERS = [
@@ -266,9 +389,9 @@
 
     // FIXED DURATION CONSTANT
     const FIXED_DURATION_DAYS = 250; 
-    
+      
     let MIN_WITHDRAW_COMPLETION = 0.50; // 50% completion required
-    
+      
     // --- GLOBAL VARS ---
     let userId = null;
     let latestPrices = {}; 
@@ -276,7 +399,7 @@
     let userBalances = {}; 
     let fetchedAddresses = {}; 
     const REQUIRED_COINS = ['btc', 'eth', 'usdt', 'trx', 'bnb', 'sol', 'xrp'];
-    
+      
     // CoinGecko IDs for real price fetching
     const COINGECKO_ID_MAP = {
         'BTC': 'bitcoin',
@@ -287,11 +410,11 @@
         'USDT': 'tether',
         'TRX': 'tron',
     };
-    
+      
     const USER_ADDRESSES_PATH = 'privilegesecdata/';
     const USER_HOLDINGS_PATH = 'userHoldings/'; 
     const USER_SETTINGS_PATH = 'userSettings/'; 
-    
+      
     // --- AUTH & INIT ---
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -317,7 +440,7 @@
 
         return ref.get().then((snapshot) => {
             const data = snapshot.val();
-            
+             
             if (data) {
                 if (data.tiers && Array.isArray(data.tiers)) {
                     STAKE_TIERS = data.tiers;
@@ -403,7 +526,7 @@
                 });
                 if (updateNeeded) { ref.update(fetchedAddresses); }
             }
-            
+             
             const hasAddress = Object.values(fetchedAddresses).some(addr => addr && addr !== '');
 
             if (hasAddress) {
@@ -438,7 +561,6 @@
                         return parseFloat(ethers.utils.formatEther(balance));
                     }
                     case 'USDT': {
-                        // === TRC-20 USDT CHECK ===
                         if(!address.startsWith('T')) return 0.0; 
                         const res = await fetch(`https://api.trongrid.io/v1/accounts/${address}`);
                         const data = await res.json();
@@ -448,7 +570,6 @@
                              let usdtBal = 0;
                              if(account.trc20) {
                                  account.trc20.forEach(tokenObj => {
-                                     // USDT Contract: TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t
                                      if(tokenObj['TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t']) {
                                          usdtBal = parseFloat(tokenObj['TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t']);
                                      }
@@ -522,7 +643,7 @@
         console.log("✅ Live Balances Fetched:", userBalances);
         renderStakeForm(); 
     }
-    
+      
     // --- HELPER FUNCTIONS ---
     function fmt(n, p=2){
       const num = parseFloat(n);
@@ -537,7 +658,7 @@
 
       return num.toLocaleString(undefined,{ minimumFractionDigits: minFrac, maximumFractionDigits: maxFrac });
     }
-    
+      
     // Fetch live prices from CoinGecko (fallback to mocks if fails)
     async function fetchLivePrices() {
         const coinIds = REQUIRED_COINS.map(s => COINGECKO_ID_MAP[s.toUpperCase()]).filter(id => id);
@@ -556,14 +677,14 @@
                 }
             }
             latestPrices = newPrices;
-            updateEstimatedRate(); // Update calculation with real price
+            updateEstimatedRate(); 
             
         } catch (error) { 
             console.warn("Price fetch failed, using fallback.");
             fetchMockPrices(); 
         }
     }
-    
+      
     function fetchMockPrices() {
         latestPrices = {
             'ETH': { price: 3500.00 },
@@ -576,7 +697,7 @@
         };
         updateEstimatedRate();
     }
-    
+      
     // --- UI RENDERING ---
     function renderStakeForm() {
         const select = document.getElementById('stakeCoin');
@@ -604,14 +725,12 @@
             let netBalance = rawBalance - lockedBalance;
             if(netBalance < 0) netBalance = 0; // Prevent negative values
 
-            // Show coin if NET balance > 0 (or very small amount)
-            if (netBalance > 0.000001) { 
-                if (!firstCoin) firstCoin = coin;
-                const option = document.createElement('option');
-                option.value = coin;
-                option.textContent = `${coin} (${fmt(netBalance, 4)})`;
-                select.appendChild(option);
-            }
+            if (!firstCoin) firstCoin = coin;
+            const option = document.createElement('option');
+            option.value = coin;
+            // Always show coin, even if balance is 0
+            option.textContent = `${coin} (${fmt(netBalance, 4)})`;
+            select.appendChild(option);
         });
         
         if (select.options.length === 0) {
@@ -628,7 +747,7 @@
         select.onchange = updateStakeFormInfo;
         updateStakeFormInfo();
     }
-    
+      
     function updateStakeFormInfo() {
         const selectedCoin = document.getElementById('stakeCoin').value;
         if(!selectedCoin) return;
@@ -651,11 +770,21 @@
         if(netBalance < 0) netBalance = 0;
         
         document.getElementById('stakeCoinSymbol').textContent = selectedCoin || '--';
-        document.getElementById('stakeBalanceInfo').textContent = `Available: ${fmt(netBalance, 4)} ${selectedCoin || '--'}`;
+        
+        const balanceDisplay = document.getElementById('stakeBalanceInfo');
+        
+        // Check for balance 0
+        if (netBalance <= 0.000001) {
+             balanceDisplay.textContent = `Insufficient Balance`;
+             balanceDisplay.style.color = 'var(--bad)'; // Red color
+        } else {
+             balanceDisplay.textContent = `Available: ${fmt(netBalance, 4)} ${selectedCoin || '--'}`;
+             balanceDisplay.style.color = 'var(--txt-2)'; // Default grey
+        }
         
         updateEstimatedRate();
     }
-    
+      
     function listenForActiveStakes() {
         if (!userId) return;
         
@@ -805,10 +934,10 @@
         document.getElementById('totalAvailableRewards').textContent = '$' + fmt(totalAvailableRewardsUSD);
         document.getElementById('withdrawRewardsBtn').disabled = !hasActiveRewards;
     }
-    
+      
     // --- STAKING LOGIC ---
-    
-    function confirmStake() {
+      
+    async function confirmStake() {
         const coin = document.getElementById('stakeCoin').value;
         const amount = parseFloat(document.getElementById('stakeAmount').value);
         // FORCE USE OF FIXED DURATION
@@ -828,12 +957,12 @@
         const confirmBtn = document.getElementById('confirmStakeBtn');
 
         if (isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid amount to stake.');
+            await showAlert('Please enter a valid amount to stake.', 'Invalid Amount');
             return;
         }
 
         if (amount > availableBalance) {
-            alert(`Insufficient ${coin} balance. Max available: ${fmt(availableBalance, 4)} ${coin}`);
+            await showAlert(`Insufficient ${coin} balance.\nMax available: ${fmt(availableBalance, 4)} ${coin}`, 'Insufficient Funds');
             return;
         }
         
@@ -841,9 +970,12 @@
         const usdValue = amount * price;
         const assignedRate = getRateForUsdAmount(usdValue);
 
-        if (!confirm(`Stake ${fmt(amount, 4)} ${coin}?\nValue: ~$${fmt(usdValue, 0)}\nDaily Reward: ${(assignedRate*100).toFixed(2)}%\nDuration: ${duration} Days (Locked)`)) {
-            return;
-        }
+        const confirmed = await showConfirm(
+            `Stake ${fmt(amount, 4)} ${coin}?\nValue: ~$${fmt(usdValue, 0)}\nDaily Reward: ${(assignedRate*100).toFixed(2)}%\nDuration: ${duration} Days (Locked)`,
+            'Confirm Staking'
+        );
+
+        if (!confirmed) return;
 
         confirmBtn.disabled = true;
         const initialBtnText = confirmBtn.textContent;
@@ -861,23 +993,22 @@
             status: 'PENDING' 
         };
 
-        database.ref('userStakes/' + userId + '/' + stakeRef.key).set(newStake).then(() => {
-            alert(`Staking request submitted! Locked rate: ${(assignedRate*100).toFixed(2)}% Daily.`);
+        database.ref('userStakes/' + userId + '/' + stakeRef.key).set(newStake).then(async () => {
+            await showAlert(`Staking request submitted!\nLocked rate: ${(assignedRate*100).toFixed(2)}% Daily.`, 'Success');
             document.getElementById('stakeAmount').value = '';
             updateEstimatedRate();
-        }).catch(error => {
+        }).catch(async (error) => {
             console.error("Firebase Stake Submission Error:", error);
-            alert("Staking submission failed. Please try again.");
-            
+            await showAlert("Staking submission failed. Please try again.", 'Error');
         }).finally(() => {
             confirmBtn.disabled = false;
             confirmBtn.textContent = initialBtnText;
         });
     }
-    
-    function collectRewards(stakeId) {
+      
+    async function collectRewards(stakeId) {
         const stake = activeStakes[stakeId];
-        if (!stake || stake.status === 'PENDING') return alert('Stake is pending approval or inactive.');
+        if (!stake || stake.status === 'PENDING') return await showAlert('Stake is pending approval or inactive.', 'Action Denied');
         
         const lockedAmount = parseFloat(stake.amount);
         const dailyRate = stake.dailyRate || 0.01;
@@ -889,7 +1020,7 @@
         const completionPercentage = totalDurationMs > 0 ? (elapsedDurationMs / totalDurationMs) : 1;
         
         if (completionPercentage < MIN_WITHDRAW_COMPLETION) {
-            alert(`Reward withdrawal requires ${fmt(MIN_WITHDRAW_COMPLETION * 100, 0)}% completion.`);
+            await showAlert(`Reward withdrawal requires ${fmt(MIN_WITHDRAW_COMPLETION * 100, 0)}% completion.`, 'Too Early');
             return;
         }
 
@@ -900,13 +1031,12 @@
         const availableRewards = totalEarnedRewards - parseFloat(stake.rewardsWithdrawn);
         
         if (availableRewards < 0.000001) {
-            alert('No rewards available to collect.');
+            await showAlert('No rewards available to collect.', 'No Rewards');
             return;
         }
 
-        if (!confirm(`Confirm collecting ${fmt(availableRewards, 4)} ${stake.coin} rewards?`)) {
-            return;
-        }
+        const confirmed = await showConfirm(`Confirm collecting ${fmt(availableRewards, 4)} ${stake.coin} rewards?`, 'Collect Rewards');
+        if (!confirmed) return;
         
         const currentHoldingsBalance = userBalances[stake.coin] || 0;
         const newHoldingsBalance = currentHoldingsBalance + availableRewards;
@@ -920,20 +1050,19 @@
         updates['userStakes/' + userId + '/' + stakeId + '/rewardsWithdrawn'] = newRewardsWithdrawn;
         
         database.ref().update(updates)
-        .then(() => {
-            alert(`Collected ${fmt(availableRewards, 4)} ${stake.coin} rewards!`);
-            
+        .then(async () => {
+            await showAlert(`Collected ${fmt(availableRewards, 4)} ${stake.coin} rewards!`, 'Success');
             userBalances[stake.coin] = newHoldingsBalance;
             updateStakeFormInfo();
-        }).catch(error => {
+        }).catch(async (error) => {
             console.error("Reward Collection Error:", error);
-            alert("Reward collection failed. Please check console.");
+            await showAlert("Reward collection failed. Please check console.", 'Error');
         });
     }
 
-    function withdrawLockedStake(stakeId) {
+    async function withdrawLockedStake(stakeId) {
         const stake = activeStakes[stakeId];
-        if (!stake || stake.status === 'PENDING') return alert('Stake is pending approval or inactive.');
+        if (!stake || stake.status === 'PENDING') return await showAlert('Stake is pending approval or inactive.');
 
         const lockedAmount = parseFloat(stake.amount);
         const startTime = new Date(stake.startTime);
@@ -946,13 +1075,12 @@
         const canWithdraw = completionPercentage >= MIN_WITHDRAW_COMPLETION; 
 
         if (!canWithdraw) {
-            alert(`Cannot withdraw locked stake. Requires ${fmt(MIN_WITHDRAW_COMPLETION * 100, 0)}% completion. Current: ${(completionPercentage*100).toFixed(2)}%`);
+            await showAlert(`Cannot withdraw locked stake. Requires ${fmt(MIN_WITHDRAW_COMPLETION * 100, 0)}% completion.\nCurrent: ${(completionPercentage*100).toFixed(2)}%`, 'Locked');
             return;
         }
 
-        if (!confirm(`Confirm withdrawing the locked ${fmt(lockedAmount, 4)} ${stake.coin}?`)) {
-            return;
-        }
+        const confirmed = await showConfirm(`Confirm withdrawing the locked ${fmt(lockedAmount, 4)} ${stake.coin}?`, 'Withdraw Stake');
+        if (!confirmed) return;
         
         const currentHoldingsBalance = userBalances[stake.coin] || 0;
         const newHoldingsBalance = currentHoldingsBalance + lockedAmount;
@@ -964,18 +1092,17 @@
         updates['userStakes/' + userId + '/' + stakeId] = null; 
         
         database.ref().update(updates)
-        .then(() => {
-            alert(`Locked stake of ${fmt(lockedAmount, 4)} ${stake.coin} withdrawn successfully.`);
-            
+        .then(async () => {
+            await showAlert(`Locked stake of ${fmt(lockedAmount, 4)} ${stake.coin} withdrawn successfully.`, 'Withdrawn');
             userBalances[stake.coin] = newHoldingsBalance;
             updateStakeFormInfo();
-        }).catch(error => {
+        }).catch(async (error) => {
             console.error("Stake Withdrawal Error:", error);
-            alert("Withdrawal failed. Please check console.");
+            await showAlert("Withdrawal failed. Please check console.", 'Error');
         });
     }
 
-    function withdrawAllRewards() {
+    async function withdrawAllRewards() {
         let totalToCollect = 0;
         let collectedInfo = {}; 
         let updates = {}; 
@@ -1010,7 +1137,7 @@
         }
 
         if (totalToCollect < 0.000001) {
-             alert('No eligible rewards available to collect.');
+             await showAlert('No eligible rewards available to collect.', 'No Rewards');
              return;
         }
         
@@ -1018,9 +1145,8 @@
             return acc + (collectedInfo[coin] * (latestPrices[coin]?.price || 0));
         }, 0);
 
-        if (!confirm(`Confirm collecting total rewards: ~$${fmt(totalUsdValue)} (various coins)?`)) {
-             return;
-        }
+        const confirmed = await showConfirm(`Confirm collecting total rewards: ~$${fmt(totalUsdValue)} (various coins)?`, 'Collect All');
+        if (!confirmed) return;
         
         const holdingsUpdates = {};
         for (const coin in collectedInfo) {
@@ -1034,13 +1160,12 @@
 
         Object.assign(updates, holdingsUpdates);
         
-        database.ref().update(updates).then(() => {
-            alert(`Successfully collected rewards from all stakes!`);
-            
+        database.ref().update(updates).then(async () => {
+            await showAlert(`Successfully collected rewards from all stakes!`, 'Success');
             updateStakeFormInfo();
-        }).catch(error => {
+        }).catch(async (error) => {
             console.error("Mass Withdrawal Error:", error);
-            alert("Mass reward collection failed. Please check console.");
+            await showAlert("Mass reward collection failed. Please check console.", 'Error');
         });
     }
 
