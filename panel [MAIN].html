@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XC Master Console - Pro</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+  <style>
+    :root {
+      --bg-body: #09090b;
+      --bg-sidebar: #121217;
+      --bg-card: #1c1c22;
+      --bg-input: #27272a;
+      
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      
+      --accent: #6366f1; /* Indigo */
+      --accent-hover: #4f46e5;
+      
+      --success: #22c55e;
+      --warning: #eab308;
+      --danger: #ef4444;
+      
+      --border: #2e2e36;
+      --radius: 8px;
+      --shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+
+    * { box-sizing: border-box; outline: none; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-body);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      font-size: 14px;
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+      width: 250px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      gap: 8px;
+      z-index: 10;
+    }
+    
+    .brand {
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-left: 10px;
+    }
+    .brand i { color: var(--accent); font-size: 20px; }
+
+    .nav-item {
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      color: var(--text-muted);
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-item:hover { background: var(--bg-input); color: white; }
+    .nav-item.active { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+    .nav-item i { width: 20px; text-align: center; }
+
+    .connection-status {
+      margin-top: auto;
+      padding: 12px;
+      background: var(--bg-input);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); box-shadow: 0 0 8px currentColor; }
+    .status-text { font-weight: 600; color: var(--text-muted); }
+    
+    /* Status Colors */
+    .status-live .status-dot { background: var(--success); color: var(--success); }
+    .status-live .status-text { color: var(--success); }
+    .status-offline .status-dot { background: var(--warning); color: var(--warning); }
+    .status-offline .status-text { color: var(--warning); }
+
+    /* --- MAIN CONTENT --- */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+
+    .topbar {
+      height: 64px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-sidebar);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+    }
+    
+    h2 { font-size: 18px; font-weight: 600; }
+
+    /* Buttons & Inputs */
+    .btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn:hover { border-color: var(--text-muted); }
+    .btn-sm { padding: 4px 10px; font-size: 11px; }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: white; }
+    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-danger { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: var(--danger); }
+    .btn-danger:hover { background: var(--danger); color: white; }
+
+    input, select, textarea {
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      color: white;
+      padding: 10px;
+      border-radius: 6px;
+      width: 100%;
+      font-family: inherit;
+      font-size: 13px;
+      transition: border 0.2s;
+    }
+    input:focus { border-color: var(--accent); }
+    input:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Content Layout */
+    .content-area { flex: 1; overflow-y: auto; padding: 30px; }
+    .section { display: none; animation: fadeIn 0.3s ease; }
+    .section.active { display: block; }
+    @keyframes fadeIn { from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:translateY(0);} }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .card-header h3 { font-size: 16px; font-weight: 600; color: white; display: flex; align-items: center; gap: 8px; }
+
+    /* Form Groups */
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+    .form-row { display: flex; gap: 10px; }
+
+    /* User Manager Specifics */
+    .user-list-item {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .user-list-item:hover { background: var(--bg-input); }
+    .user-list-item.selected { background: rgba(99, 102, 241, 0.1); border-left: 3px solid var(--accent); }
+    
+    .badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .badge-gray { background: var(--bg-input); color: var(--text-muted); }
+    .badge-green { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+    .badge-blue { background: rgba(99, 102, 241, 0.15); color: var(--accent); }
+
+    /* Holding Item */
+    .holding-item {
+        display: flex; justify-content: space-between; align-items: center;
+        background: var(--bg-body); border: 1px solid var(--border);
+        padding: 10px; border-radius: 6px; margin-bottom: 10px;
+    }
+    .holding-item.has-balance { border-color: var(--success); background: rgba(34, 197, 94, 0.05); }
+    .holding-label { font-weight: 600; font-size: 13px; color: var(--text-muted); width: 60px; }
+    .holding-item.has-balance .holding-label { color: var(--success); }
+
+    /* Table */
+    .table-responsive { overflow-x: auto; border: 1px solid var(--border); border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--bg-input); color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+    td { color: var(--text-main); }
+    tr:hover td { background: var(--bg-input); }
+
+    /* Loading Overlay */
+    #loadingOverlay {
+        position: absolute; top:0; left:0; width:100%; height:100%;
+        background: rgba(9, 9, 11, 0.8);
+        display: flex; justify-content: center; align-items: center;
+        z-index: 100; backdrop-filter: blur(4px);
+    }
+    .spinner { width: 40px; height: 40px; border: 4px solid var(--bg-input); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+  </style>
+</head>
+<body>
+
+  <div id="loadingOverlay">
+    <div style="text-align:center;">
+        <div class="spinner"></div>
+        <p style="margin-top:15px; font-weight:600;">Connecting to Database...</p>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="brand">
+      <i class="fa-solid fa-layer-group"></i>
+      <span>XC Master Admin</span>
+    </div>
+    
+    <div class="nav-item active" onclick="showSection('dashboard', this)">
+      <i class="fa-solid fa-chart-line"></i> Dashboard
+    </div>
+    <div class="nav-item" onclick="showSection('users', this)">
+      <i class="fa-solid fa-users"></i> User Manager
+    </div>
+    <div class="nav-item" onclick="showSection('wallet', this)">
+      <i class="fa-brands fa-bitcoin"></i> Market & Coin
+    </div>
+    <div class="nav-item" onclick="showSection('addressPool', this)">
+        <i class="fa-solid fa-database"></i> Address Pool
+    </div>
+    <div class="nav-item" onclick="showSection('settings', this)">
+      <i class="fa-solid fa-gears"></i> App Settings
+    </div>
+
+    <div class="connection-status status-offline" id="connStatus">
+        <div class="status-dot"></div>
+        <div class="status-text" id="connText">Disconnected</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+        <h2 id="pageTitle">Dashboard</h2>
+        <div style="display:flex; gap:10px;">
+            <label class="btn">
+                <i class="fa-solid fa-upload"></i> Import JSON (Offline)
+                <input type="file" id="jsonInput" style="display:none;" accept=".json" onchange="handleJsonUpload(this)">
+            </label>
+            <button class="btn btn-primary" onclick="exportData()">
+                <i class="fa-solid fa-download"></i> Backup Data
+            </button>
+        </div>
+    </div>
+
+    <div class="content-area">
+        
+        <div id="dashboard" class="section active">
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fa-solid fa-user-group"></i> Total Users</h3></div>
+                    <h1 id="stat-users">0</h1>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3><i class="fa-solid fa-wallet"></i> Address Pool</h3></div>
+                    <h1 id="stat-pool">0</h1>
+                    <small style="color:var(--text-muted)">Addresses Generated</small>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3><i class="fa-solid fa-arrow-trend-up"></i> Market Trend</h3></div>
+                    <h1 id="stat-change" style="color:var(--success)">0%</h1>
+                </div>
+            </div>
+        </div>
+
+        <div id="users" class="section">
+            <div class="grid-2" style="grid-template-columns: 350px 1fr; height: calc(100vh - 140px);">
+                
+                <div class="card" style="display:flex; flex-direction:column; padding:0; overflow:hidden;">
+                    <div style="padding:15px; border-bottom:1px solid var(--border);">
+                        <input type="text" id="userSearch" placeholder="Search Email, Name or UID..." onkeyup="renderUserList()">
+                    </div>
+                    <div id="userListContainer" style="flex:1; overflow-y:auto;">
+                        </div>
+                </div>
+
+                <div class="card" id="userEditor" style="overflow-y:auto; display:none;">
+                    <div class="card-header">
+                        <div>
+                            <h2 id="ue-name" style="margin:0;">User Name</h2>
+                            <small id="ue-uid" style="font-family:monospace; color:var(--accent);">UID</small>
+                        </div>
+                        <div class="badge badge-green" id="ue-email">email@test.com</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Main Fiat Balance ($)</label>
+                        <div class="form-row">
+                            <input type="number" id="ue-balance">
+                            <button class="btn btn-primary" onclick="saveUserBalance()">Update</button>
+                        </div>
+                    </div>
+
+                    <hr style="border:0; border-top:1px solid var(--border); margin:20px 0;">
+
+                    <div class="card-header" style="margin-bottom:10px;">
+                        <h3><i class="fa-solid fa-coins"></i> Crypto Holdings</h3>
+                        <button class="btn btn-sm" onclick="promptAddCoin()">+ Add Custom Coin</button>
+                    </div>
+                    
+                    <div id="holdingsContainer" style="margin-top:15px;"></div>
+                    <button class="btn btn-primary" style="margin-top:15px; width:100%;" onclick="saveAllHoldings()">Save All Holdings</button>
+
+                    <hr style="border:0; border-top:1px solid var(--border); margin:20px 0;">
+
+                    <h3><i class="fa-solid fa-key"></i> Private Receiving Addresses</h3>
+                    <div id="privAddrContainer" style="margin-top:15px;"></div>
+                    <button class="btn btn-primary" style="margin-top:15px;" onclick="savePrivAddresses()">Save Addresses</button>
+                </div>
+                
+                <div class="card" id="noUserSelected" style="display:flex; align-items:center; justify-content:center; color:var(--text-muted);">
+                    <p>Select a user from the list to edit details.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="wallet" class="section">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fa-solid fa-globe"></i> Global Market Data</h3></div>
+                    <div class="form-group">
+                        <label>Portfolio Change (%)</label>
+                        <input type="number" id="market-change">
+                    </div>
+                    <div id="market-coins-list"></div>
+                    <button class="btn btn-primary" style="margin-top:20px;" onclick="saveMarketData()">Update Market</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3><i class="fa-solid fa-layer-group"></i> Global Staking Rules</h3></div>
+                    <div class="form-group">
+                        <label>Estimated APY (%)</label>
+                        <input type="number" id="rule-apy">
+                    </div>
+                    <div class="form-group">
+                        <label>Min. Withdrawal Amount</label>
+                        <input type="number" id="rule-min">
+                    </div>
+                    <div class="form-group">
+                        <label>Min. Withdrawal Coin Symbol</label>
+                        <input type="text" id="rule-coin">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveStakingRules()">Save Rules</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="addressPool" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <h3><i class="fa-solid fa-database"></i> Address Pool</h3>
+                        <span class="badge badge-blue" id="pool-count">0 Loaded</span>
+                    </div>
+                    <input type="text" id="poolSearch" placeholder="Search Wallet, Email or Address..." style="width:250px; font-size:12px;" onkeyup="renderAddressPool()">
+                </div>
+                <div class="table-responsive" style="max-height: 600px;">
+                    <table id="poolTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Status</th>
+                                <th>Assigned To</th>
+                                <th>ETH / BNB</th>
+                                <th>BTC</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="poolTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings" class="section">
+            <div class="card" style="max-width:600px;">
+                <div class="card-header"><h3><i class="fa-solid fa-bullhorn"></i> System Notice Popup</h3></div>
+                <div class="form-group">
+                    <label>Popup Title</label>
+                    <input type="text" id="note-title">
+                </div>
+                <div class="form-group">
+                    <label>Date Label</label>
+                    <input type="text" id="note-date">
+                </div>
+                <div class="form-group">
+                    <label>Version Label</label>
+                    <input type="text" id="note-ver">
+                </div>
+                <div class="form-group">
+                    <label>Message Body (supports \n for new lines)</label>
+                    <textarea id="note-msg" rows="6" style="background:var(--bg-body); color:white; width:100%; padding:10px; border-radius:6px; border:1px solid var(--border);"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="saveNotice()">Publish Notice</button>
+            </div>
+        </div>
+
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+  <script>
+    // --- 1. FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyByvett5gGhga0jx2pBChmg41IKaTvbY24",
+      authDomain: "bustrack-e4f8f.firebaseapp.com",
+      databaseURL: "https://bustrack-e4f8f-default-rtdb.firebaseio.com",
+      projectId: "bustrack-e4f8f",
+      storageBucket: "bustrack-e4f8f.firebasestorage.app",
+      messagingSenderId: "544737954134",
+      appId: "1:544737954134:web:91a197cc88d0a67c43eef7"
+    };
+
+    let db;
+    let localData = {}; 
+    let isOffline = false;
+    let currentUserUid = null;
+    
+    const STANDARD_COINS = ['BTC', 'ETH', 'BNB', 'SOL', 'TRX', 'USDT', 'XRP', 'ADA', 'DOGE', 'LTC', 'MATIC', 'DOT'];
+
+    window.addEventListener('load', initApp);
+
+    function initApp() {
+        try {
+            const app = firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            setupRealtimeListeners();
+        } catch (e) {
+            console.error("Firebase Init Error:", e);
+            setOfflineMode();
+        }
+    }
+
+    function setupRealtimeListeners() {
+        const connectedRef = db.ref(".info/connected");
+        connectedRef.on("value", (snap) => {
+            if (snap.val() === true) {
+                setOnlineMode();
+            }
+        });
+
+        db.ref('/').on('value', (snapshot) => {
+            localData = snapshot.val() || {};
+            refreshUI();
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }, (error) => {
+            console.error("Read Error:", error);
+            notify("Permission Denied or Network Error. Switch to JSON Mode.", "error");
+            setOfflineMode();
+            document.getElementById('loadingOverlay').style.display = 'none';
+        });
+    }
+
+    function setOnlineMode() {
+        isOffline = false;
+        const statusEl = document.getElementById('connStatus');
+        statusEl.className = 'connection-status status-live';
+        document.getElementById('connText').textContent = "Live Database";
+    }
+
+    function setOfflineMode() {
+        isOffline = true;
+        const statusEl = document.getElementById('connStatus');
+        statusEl.className = 'connection-status status-offline';
+        document.getElementById('connText').textContent = "Offline / JSON Mode";
+        document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
+    // --- 2. JSON IMPORT/EXPORT ---
+    function handleJsonUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                localData = JSON.parse(e.target.result);
+                refreshUI();
+                setOfflineMode();
+                notify("JSON Data Loaded Successfully", "success");
+            } catch (err) {
+                notify("Invalid JSON File", "error");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function exportData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localData, null, 2));
+        const anchor = document.createElement('a');
+        anchor.setAttribute("href", dataStr);
+        anchor.setAttribute("download", "firebase_backup_" + Date.now() + ".json");
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+    }
+
+    // --- 3. UI RENDERING ---
+    function refreshUI() {
+        renderDashboard();
+        renderUserList();
+        if (currentUserUid) loadUser(currentUserUid);
+        renderWalletMarket();
+        renderAddressPool();
+        renderSettings();
+    }
+
+    function showSection(id, btn) {
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('pageTitle').innerText = btn.innerText.trim();
+    }
+
+    function renderDashboard() {
+        const userCount = localData.users ? Object.keys(localData.users).length : 0;
+        const poolCount = localData.addressPool ? Object.keys(localData.addressPool).length : 0;
+        const trend = localData.walletData ? localData.walletData.portfolioChange : 0;
+
+        document.getElementById('stat-users').innerText = userCount;
+        document.getElementById('stat-pool').innerText = poolCount;
+        document.getElementById('stat-change').innerText = trend + "%";
+    }
+
+    // --- 4. USER MANAGER ---
+    function renderUserList() {
+        const listEl = document.getElementById('userListContainer');
+        const filter = document.getElementById('userSearch').value.toLowerCase();
+        listEl.innerHTML = '';
+
+        if (!localData.users) return;
+
+        Object.entries(localData.users).forEach(([uid, user]) => {
+            const searchStr = (user.email + user.name + uid).toLowerCase();
+            if (filter && !searchStr.includes(filter)) return;
+
+            const div = document.createElement('div');
+            div.className = `user-list-item ${uid === currentUserUid ? 'selected' : ''}`;
+            div.onclick = () => loadUser(uid);
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between;">
+                    <span style="font-weight:600; font-size:13px;">${user.name || 'No Name'}</span>
+                    <span class="badge badge-gray">${uid.substring(0,5)}...</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${user.email}</div>
+            `;
+            listEl.appendChild(div);
+        });
+    }
+
+    function loadUser(uid) {
+        currentUserUid = uid;
+        document.getElementById('noUserSelected').style.display = 'none';
+        document.getElementById('userEditor').style.display = 'block';
+        renderUserList(); 
+
+        const user = localData.users[uid];
+        document.getElementById('ue-name').innerText = user.name || 'Unknown';
+        document.getElementById('ue-uid').innerText = uid;
+        document.getElementById('ue-email').innerText = user.email;
+        document.getElementById('ue-balance').value = user.balance || 0;
+
+        renderUserHoldings(uid);
+
+        const privEl = document.getElementById('privAddrContainer');
+        privEl.innerHTML = '';
+        const privData = (localData.privilegesecdata && localData.privilegesecdata[uid]) ? localData.privilegesecdata[uid] : {};
+        ['btc', 'eth', 'bnb', 'sol', 'trx', 'usdt', 'xrp'].forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'form-group';
+            div.innerHTML = `
+                <label>${c.toUpperCase()} Address</label>
+                <input type="text" class="priv-input" data-coin="${c}" value="${privData[c] || ''}">
+            `;
+            privEl.appendChild(div);
+        });
+    }
+
+    function renderUserHoldings(uid) {
+        const holdingsEl = document.getElementById('holdingsContainer');
+        holdingsEl.innerHTML = '';
+        
+        const userHoldings = (localData.userHoldings && localData.userHoldings[uid]) ? localData.userHoldings[uid] : {};
+        const globalCoins = localData.globalcoindata ? Object.keys(localData.globalcoindata) : [];
+        const existingUserCoins = Object.keys(userHoldings);
+        
+        const mergedCoins = [...new Set([...STANDARD_COINS, ...globalCoins, ...existingUserCoins])].sort();
+
+        mergedCoins.forEach(coin => {
+            const h = userHoldings[coin] || { hold: 0 };
+            const hasBal = h.hold > 0;
+            
+            const div = document.createElement('div');
+            div.className = `holding-item ${hasBal ? 'has-balance' : ''}`;
+            div.innerHTML = `
+                <div class="holding-label">${coin}</div>
+                <input type="number" class="holding-input" data-coin="${coin}" value="${h.hold || 0}" style="width:120px;">
+            `;
+            holdingsEl.appendChild(div);
+        });
+    }
+
+    function promptAddCoin() {
+        if(!currentUserUid) return notify("Select a user first", "error");
+        
+        const coinSymbol = prompt("Enter Coin Symbol (e.g. SHIB):");
+        if(coinSymbol) {
+            const symbol = coinSymbol.toUpperCase();
+            if(!localData.userHoldings) localData.userHoldings = {};
+            if(!localData.userHoldings[currentUserUid]) localData.userHoldings[currentUserUid] = {};
+            
+            if(!localData.userHoldings[currentUserUid][symbol]) {
+                localData.userHoldings[currentUserUid][symbol] = { hold: 0 };
+            }
+            renderUserHoldings(currentUserUid);
+            notify(`Added ${symbol}. Set balance and click Save.`, "success");
+        }
+    }
+
+    function saveUserBalance() {
+        if (!currentUserUid) return;
+        const val = parseFloat(document.getElementById('ue-balance').value);
+        updateDB(`users/${currentUserUid}/balance`, val);
+    }
+
+    function saveAllHoldings() {
+        if (!currentUserUid) return;
+        const inputs = document.querySelectorAll('.holding-input');
+        const updates = {};
+        inputs.forEach(inp => {
+            const coin = inp.dataset.coin;
+            const val = parseFloat(inp.value);
+            let name = coin;
+            if(localData.globalcoindata && localData.globalcoindata[coin]) name = localData.globalcoindata[coin].name;
+            
+            if(val > 0 || localData.userHoldings?.[currentUserUid]?.[coin]) {
+                 updates[`userHoldings/${currentUserUid}/${coin}`] = { hold: val, name: name };
+            }
+        });
+        updateDBRoot(updates);
+    }
+
+    function savePrivAddresses() {
+        if (!currentUserUid) return;
+        const inputs = document.querySelectorAll('.priv-input');
+        const updates = {};
+        inputs.forEach(inp => {
+            updates[`privilegesecdata/${currentUserUid}/${inp.dataset.coin}`] = inp.value.trim();
+        });
+        updateDBRoot(updates);
+    }
+
+    // --- 5. MARKET & RULES ---
+    function renderWalletMarket() {
+        if (localData.walletData) {
+            document.getElementById('market-change').value = localData.walletData.portfolioChange || 0;
+            const list = document.getElementById('market-coins-list');
+            list.innerHTML = '';
+            
+            const coins = localData.walletData.coinData || {};
+            Object.entries(coins).forEach(([sym, data]) => {
+                const div = document.createElement('div');
+                div.style.marginBottom = '10px';
+                div.innerHTML = `
+                    <label style="color:var(--accent); font-weight:bold;">${sym}</label>
+                    <div class="form-row">
+                        <input type="number" class="market-inp" data-sym="${sym}" data-field="price" value="${data.price}" placeholder="Price">
+                        <input type="number" class="market-inp" data-sym="${sym}" data-field="chg" value="${data.chg}" placeholder="Change %">
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        if (localData.globalStakingRules) {
+            document.getElementById('rule-apy').value = localData.globalStakingRules.estAPY || 0;
+            document.getElementById('rule-min').value = localData.globalStakingRules.minWithdrawal || 0;
+            document.getElementById('rule-coin').value = localData.globalStakingRules.minWithdrawalCoin || '';
+        }
+    }
+
+    function saveMarketData() {
+        const change = parseFloat(document.getElementById('market-change').value);
+        const inputs = document.querySelectorAll('.market-inp');
+        const updates = {};
+        
+        updates['walletData/portfolioChange'] = change;
+        inputs.forEach(inp => {
+            updates[`walletData/coinData/${inp.dataset.sym}/${inp.dataset.field}`] = parseFloat(inp.value);
+        });
+        updateDBRoot(updates);
+    }
+
+    function saveStakingRules() {
+        const updates = {};
+        updates['globalStakingRules/estAPY'] = parseFloat(document.getElementById('rule-apy').value);
+        updates['globalStakingRules/minWithdrawal'] = parseFloat(document.getElementById('rule-min').value);
+        updates['globalStakingRules/minWithdrawalCoin'] = document.getElementById('rule-coin').value;
+        updateDBRoot(updates);
+    }
+
+    // --- 6. ADDRESS POOL (UPDATED) ---
+    function renderAddressPool() {
+        const tbody = document.getElementById('poolTableBody');
+        const filter = document.getElementById('poolSearch').value.toLowerCase();
+        
+        tbody.innerHTML = '';
+        if (!localData.addressPool) return;
+
+        const pool = localData.addressPool;
+        document.getElementById('pool-count').innerText = Object.keys(pool).length + " Loaded";
+
+        Object.entries(pool).forEach(([id, data]) => {
+            // RESOLVE USER EMAIL
+            let assignedDisplay = "-";
+            if (data.assigned && data.assignedToUid) {
+                // Check if user exists in localData.users
+                if (localData.users && localData.users[data.assignedToUid]) {
+                    assignedDisplay = localData.users[data.assignedToUid].email;
+                } else {
+                    // Fallback to UID if email not found
+                    assignedDisplay = data.assignedToUid; 
+                }
+            }
+
+            // SEARCH FILTER
+            const searchString = `${id} ${assignedDisplay} ${data.eth || ''} ${data.btc || ''}`.toLowerCase();
+            if (filter && !searchString.includes(filter)) return;
+
+            const tr = document.createElement('tr');
+            const statusBadge = data.assigned 
+                ? `<span class="badge badge-blue">Assigned</span>` 
+                : `<span class="badge badge-green">Free</span>`;
+                
+            const assignedClass = data.assigned ? "color:var(--accent); font-weight:600;" : "color:var(--text-muted);";
+
+            tr.innerHTML = `
+                <td><strong>${id}</strong></td>
+                <td>${statusBadge}</td>
+                <td style="${assignedClass}">${assignedDisplay}</td>
+                <td style="font-family:monospace; font-size:12px;">${data.eth ? data.eth.substring(0,10)+'...' : ''}</td>
+                <td style="font-family:monospace; font-size:12px;">${data.btc ? data.btc.substring(0,10)+'...' : ''}</td>
+                <td><button class="btn" style="padding:4px 8px; font-size:11px;" onclick="togglePool('${id}', ${data.assigned})">Toggle</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function togglePool(id, currentStatus) {
+        updateDB(`addressPool/${id}/assigned`, !currentStatus);
+    }
+
+    // --- 7. SETTINGS ---
+    function renderSettings() {
+        if(localData.system_notice) {
+            const n = localData.system_notice;
+            document.getElementById('note-title').value = n.title || '';
+            document.getElementById('note-date').value = n.date || '';
+            document.getElementById('note-ver').value = n.version || '';
+            document.getElementById('note-msg').value = n.message || '';
+        }
+    }
+
+    function saveNotice() {
+        const updates = {
+            title: document.getElementById('note-title').value,
+            date: document.getElementById('note-date').value,
+            version: document.getElementById('note-ver').value,
+            message: document.getElementById('note-msg').value,
+            isEnabled: true
+        };
+        updateDB('system_notice', updates);
+    }
+
+    // --- HELPER: DATABASE UPDATE ---
+    function updateDB(path, value) {
+        if (isOffline) {
+            notify("Offline Mode: Changes saved to memory. Export JSON to save file.", "success");
+        } else {
+            db.ref(path).set(value).then(() => notify("Updated Successfully", "success"))
+            .catch(e => notify("Update Failed: " + e.message, "error"));
+        }
+    }
+
+    function updateDBRoot(updates) {
+        if (isOffline) {
+            notify("Offline Mode: Changes saved to memory. Export JSON.", "success");
+        } else {
+            db.ref().update(updates).then(() => notify("Batch Update Successful", "success"))
+            .catch(e => notify("Batch Update Failed: " + e.message, "error"));
+        }
+    }
+
+    function notify(msg, type) {
+        let color = type === "error" ? "#ef4444" : "#22c55e";
+        Toastify({
+            text: msg,
+            duration: 3000,
+            gravity: "bottom",
+            position: "right",
+            style: { background: color, borderRadius: "8px", fontSize:"13px" }
+        }).showToast();
+    }
+  </script>
+</body>
+</html>
