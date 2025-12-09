@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>XC Master Console - Pro</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -32,7 +32,7 @@
       --shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
 
-    * { box-sizing: border-box; outline: none; margin: 0; padding: 0; }
+    * { box-sizing: border-box; outline: none; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     
     body {
       font-family: 'Inter', sans-serif;
@@ -46,14 +46,15 @@
 
     /* --- SIDEBAR --- */
     .sidebar {
-      width: 250px;
+      width: 260px;
       background: var(--bg-sidebar);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       padding: 20px;
       gap: 8px;
-      z-index: 10;
+      z-index: 50;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .brand {
@@ -95,16 +96,14 @@
       font-size: 12px;
     }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); box-shadow: 0 0 8px currentColor; }
-    .status-text { font-weight: 600; color: var(--text-muted); }
     
-    /* Status Colors */
     .status-live .status-dot { background: var(--success); color: var(--success); }
-    .status-live .status-text { color: var(--success); }
+    .status-live .status-text { color: var(--success); font-weight: 600; }
     .status-offline .status-dot { background: var(--warning); color: var(--warning); }
-    .status-offline .status-text { color: var(--warning); }
+    .status-offline .status-text { color: var(--warning); font-weight: 600; }
 
     /* --- MAIN CONTENT --- */
-    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; width: 100%; }
 
     .topbar {
       height: 64px;
@@ -114,9 +113,12 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 30px;
+      flex-shrink: 0;
     }
     
-    h2 { font-size: 18px; font-weight: 600; }
+    .menu-toggle { display: none; font-size: 20px; cursor: pointer; color: var(--text-main); margin-right: 15px; }
+
+    h2 { font-size: 18px; font-weight: 600; white-space: nowrap; }
 
     /* Buttons & Inputs */
     .btn {
@@ -130,13 +132,12 @@
       font-weight: 500;
       transition: 0.2s;
       display: inline-flex; align-items: center; gap: 8px;
+      white-space: nowrap;
     }
     .btn:hover { border-color: var(--text-muted); }
     .btn-sm { padding: 4px 10px; font-size: 11px; }
     .btn-primary { background: var(--accent); border-color: var(--accent); color: white; }
     .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-    .btn-danger { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: var(--danger); }
-    .btn-danger:hover { background: var(--danger); color: white; }
 
     input, select, textarea {
       background: var(--bg-body);
@@ -150,10 +151,9 @@
       transition: border 0.2s;
     }
     input:focus { border-color: var(--accent); }
-    input:disabled { opacity: 0.6; cursor: not-allowed; }
 
     /* Content Layout */
-    .content-area { flex: 1; overflow-y: auto; padding: 30px; }
+    .content-area { flex: 1; overflow-y: auto; padding: 30px; position: relative; }
     .section { display: none; animation: fadeIn 0.3s ease; }
     .section.active { display: block; }
     @keyframes fadeIn { from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:translateY(0);} }
@@ -169,9 +169,8 @@
       box-shadow: var(--shadow);
     }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .card-header h3 { font-size: 16px; font-weight: 600; color: white; display: flex; align-items: center; gap: 8px; }
+    .card-header h3 { font-size: 16px; font-weight: 600; color: white; margin: 0; display: flex; align-items: center; gap: 8px; }
 
-    /* Form Groups */
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
     .form-row { display: flex; gap: 10px; }
@@ -211,14 +210,50 @@
 
     /* Loading Overlay */
     #loadingOverlay {
-        position: absolute; top:0; left:0; width:100%; height:100%;
-        background: rgba(9, 9, 11, 0.8);
+        position: fixed; top:0; left:0; width:100%; height:100%;
+        background: rgba(9, 9, 11, 0.9);
         display: flex; justify-content: center; align-items: center;
-        z-index: 100; backdrop-filter: blur(4px);
+        z-index: 1000; backdrop-filter: blur(4px);
     }
     .spinner { width: 40px; height: 40px; border: 4px solid var(--bg-input); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Mobile Backdrop */
+    .backdrop {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 40; display: none;
+        backdrop-filter: blur(2px);
+    }
+    .backdrop.active { display: block; }
+
+    /* --- RESPONSIVE MEDIA QUERIES --- */
+    @media (max-width: 900px) {
+        /* On Tablet/Mobile, Sidebar becomes a drawer */
+        .sidebar {
+            position: fixed; left: -280px; top: 0; height: 100%;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.5);
+        }
+        .sidebar.active { transform: translateX(280px); }
+        .menu-toggle { display: block; }
+        .topbar { padding: 0 20px; }
+        .content-area { padding: 20px; }
+        
+        .grid-2 { grid-template-columns: 1fr; } 
+        /* Specific Fix for User Manager Layout on Mobile */
+        #users .grid-2 { display: flex; flex-direction: column; height: auto; }
+        #userListContainer { max-height: 300px; min-height: 300px; }
+    }
+
+    @media (max-width: 480px) {
+        .grid-3 { grid-template-columns: 1fr; }
+        .topbar { padding: 0 15px; }
+        h2 { font-size: 16px; }
+        .btn span { display: none; } /* Hide text on small buttons if needed */
+        .card { padding: 15px; }
+        
+        /* Stack buttons in topbar */
+        .top-actions { display: none; } /* Or simplify */
+    }
   </style>
 </head>
 <body>
@@ -226,14 +261,16 @@
   <div id="loadingOverlay">
     <div style="text-align:center;">
         <div class="spinner"></div>
-        <p style="margin-top:15px; font-weight:600;">Connecting to Database...</p>
+        <p style="margin-top:15px; font-weight:600;">Connecting...</p>
     </div>
   </div>
 
-  <div class="sidebar">
+  <div class="backdrop" id="backdrop" onclick="toggleSidebar()"></div>
+
+  <div class="sidebar" id="sidebar">
     <div class="brand">
       <i class="fa-solid fa-layer-group"></i>
-      <span>XC Master Admin</span>
+      <span>XC Console</span>
     </div>
     
     <div class="nav-item active" onclick="showSection('dashboard', this)">
@@ -260,14 +297,17 @@
 
   <div class="main">
     <div class="topbar">
-        <h2 id="pageTitle">Dashboard</h2>
-        <div style="display:flex; gap:10px;">
+        <div style="display:flex; align-items:center;">
+            <i class="fa-solid fa-bars menu-toggle" onclick="toggleSidebar()"></i>
+            <h2 id="pageTitle">Dashboard</h2>
+        </div>
+        <div style="display:flex; gap:8px;">
             <label class="btn">
-                <i class="fa-solid fa-upload"></i> Import JSON (Offline)
+                <i class="fa-solid fa-upload"></i> <span class="hide-mobile">JSON</span>
                 <input type="file" id="jsonInput" style="display:none;" accept=".json" onchange="handleJsonUpload(this)">
             </label>
             <button class="btn btn-primary" onclick="exportData()">
-                <i class="fa-solid fa-download"></i> Backup Data
+                <i class="fa-solid fa-download"></i> <span class="hide-mobile">Backup</span>
             </button>
         </div>
     </div>
@@ -293,9 +333,9 @@
         </div>
 
         <div id="users" class="section">
-            <div class="grid-2" style="grid-template-columns: 350px 1fr; height: calc(100vh - 140px);">
+            <div class="grid-2">
                 
-                <div class="card" style="display:flex; flex-direction:column; padding:0; overflow:hidden;">
+                <div class="card" style="display:flex; flex-direction:column; padding:0; overflow:hidden; max-height: 500px;">
                     <div style="padding:15px; border-bottom:1px solid var(--border);">
                         <input type="text" id="userSearch" placeholder="Search Email, Name or UID..." onkeyup="renderUserList()">
                     </div>
@@ -324,10 +364,10 @@
 
                     <div class="card-header" style="margin-bottom:10px;">
                         <h3><i class="fa-solid fa-coins"></i> Crypto Holdings</h3>
-                        <button class="btn btn-sm" onclick="promptAddCoin()">+ Add Custom Coin</button>
+                        <button class="btn btn-sm" onclick="promptAddCoin()">+ Add Custom</button>
                     </div>
                     
-                    <div id="holdingsContainer" style="margin-top:15px;"></div>
+                    <div id="holdingsContainer" class="grid-2" style="margin-top:15px; grid-template-columns: 1fr 1fr;"></div>
                     <button class="btn btn-primary" style="margin-top:15px; width:100%;" onclick="saveAllHoldings()">Save All Holdings</button>
 
                     <hr style="border:0; border-top:1px solid var(--border); margin:20px 0;">
@@ -337,7 +377,7 @@
                     <button class="btn btn-primary" style="margin-top:15px;" onclick="savePrivAddresses()">Save Addresses</button>
                 </div>
                 
-                <div class="card" id="noUserSelected" style="display:flex; align-items:center; justify-content:center; color:var(--text-muted);">
+                <div class="card" id="noUserSelected" style="display:flex; align-items:center; justify-content:center; color:var(--text-muted); min-height: 200px;">
                     <p>Select a user from the list to edit details.</p>
                 </div>
             </div>
@@ -381,7 +421,9 @@
                         <h3><i class="fa-solid fa-database"></i> Address Pool</h3>
                         <span class="badge badge-blue" id="pool-count">0 Loaded</span>
                     </div>
-                    <input type="text" id="poolSearch" placeholder="Search Wallet, Email or Address..." style="width:250px; font-size:12px;" onkeyup="renderAddressPool()">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="poolSearch" placeholder="Search Wallet ID, Email or Address..." onkeyup="renderAddressPool()">
                 </div>
                 <div class="table-responsive" style="max-height: 600px;">
                     <table id="poolTable">
@@ -463,6 +505,14 @@
         }
     }
 
+    // --- MOBILE UI FUNCTIONS ---
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        const bd = document.getElementById('backdrop');
+        sb.classList.toggle('active');
+        bd.classList.toggle('active');
+    }
+
     function setupRealtimeListeners() {
         const connectedRef = db.ref(".info/connected");
         connectedRef.on("value", (snap) => {
@@ -542,6 +592,10 @@
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('pageTitle').innerText = btn.innerText.trim();
+        
+        // Auto close sidebar on mobile selection
+        document.getElementById('sidebar').classList.remove('active');
+        document.getElementById('backdrop').classList.remove('active');
     }
 
     function renderDashboard() {
@@ -626,7 +680,7 @@
             div.className = `holding-item ${hasBal ? 'has-balance' : ''}`;
             div.innerHTML = `
                 <div class="holding-label">${coin}</div>
-                <input type="number" class="holding-input" data-coin="${coin}" value="${h.hold || 0}" style="width:120px;">
+                <input type="number" class="holding-input" data-coin="${coin}" value="${h.hold || 0}" style="width:100px;">
             `;
             holdingsEl.appendChild(div);
         });
@@ -634,7 +688,6 @@
 
     function promptAddCoin() {
         if(!currentUserUid) return notify("Select a user first", "error");
-        
         const coinSymbol = prompt("Enter Coin Symbol (e.g. SHIB):");
         if(coinSymbol) {
             const symbol = coinSymbol.toUpperCase();
@@ -746,16 +799,13 @@
             // RESOLVE USER EMAIL
             let assignedDisplay = "-";
             if (data.assigned && data.assignedToUid) {
-                // Check if user exists in localData.users
                 if (localData.users && localData.users[data.assignedToUid]) {
                     assignedDisplay = localData.users[data.assignedToUid].email;
                 } else {
-                    // Fallback to UID if email not found
                     assignedDisplay = data.assignedToUid; 
                 }
             }
 
-            // SEARCH FILTER
             const searchString = `${id} ${assignedDisplay} ${data.eth || ''} ${data.btc || ''}`.toLowerCase();
             if (filter && !searchString.includes(filter)) return;
 
