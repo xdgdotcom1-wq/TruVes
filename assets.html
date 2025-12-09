@@ -8,11 +8,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    
+
   <style>
     /* === LUXURIOUS THEME VARIABLES (Gold/Deep Charcoal) === */
     :root{
@@ -43,7 +43,7 @@
     }
     body::-webkit-scrollbar {display: none;}
     .app{display:flex; flex-direction:column; position: relative; min-height: 100dvh;}
-      
+
     /* === VIEW STATES === */
     #dashboard-view { 
         display: none; 
@@ -53,7 +53,7 @@
     #dashboard-view.visible {
         opacity: 1;
     }
-      
+
     .full-screen-message {
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         height: 100vh; width: 100vw; position: fixed; top: 0; left: 0;
@@ -64,7 +64,7 @@
         opacity: 0;
         pointer-events: none;
     }
-      
+
     /* PROFESSIONAL LOADING SCREEN */
     .loading-container {
         position: relative;
@@ -74,7 +74,7 @@
         place-items: center;
         margin-bottom: 30px;
     }
-    
+
     /* Outer Ring */
     .loading-ring {
         position: absolute;
@@ -85,7 +85,7 @@
         animation: spin 1.5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
         box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
     }
-    
+
     /* Middle Ring */
     .loading-ring::before {
         content: "";
@@ -96,7 +96,7 @@
         border-top-color: rgba(212, 175, 55, 0.6);
         animation: spin 3s cubic-bezier(0.4, 0.0, 0.2, 1) infinite reverse;
     }
-    
+
     /* Inner Ring */
     .loading-ring::after {
         content: "";
@@ -107,7 +107,7 @@
         border-top-color: rgba(212, 175, 55, 0.3);
         animation: spin 1s linear infinite;
     }
-    
+
     .loading-icon {
         font-size: 32px;
         color: var(--pri-color);
@@ -116,7 +116,7 @@
 
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     @keyframes pulse { 0% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(0.9); } }
-      
+
     .loading-text {
         font-family: 'Playfair Display', serif;
         color: var(--pri-color);
@@ -238,7 +238,7 @@
     }
     /* Updated grid column for when price is unavailable */
     .asset-row .col-2.full-width { grid-column: span 2; }
-      
+
     .asset-row .col-2, .asset-row .col-3 {display: flex; flex-direction: column; text-align: right;}
     .asset-row .price, .asset-row .value {font-weight: 600; font-size: 15px; color: var(--txt-1);}
     .asset-row .change, .asset-row .holdings {font-size: 12px; color: var(--txt-2); margin-top: 2px;}
@@ -246,7 +246,7 @@
     .asset-row .change.down { color: var(--bad); }
 
     .footer{opacity:.5; font-size:12px; text-align:center; padding:16px;}
-      
+
     /* MODAL */
     .modal{
       position:fixed; inset:0; display:none; place-items:center; 
@@ -277,7 +277,7 @@
       font-size: 16px; background: var(--bg-2); border: 0; color: var(--txt-1); 
       cursor: pointer; border-radius: 50%;
     }
-      
+
     .coin-balance-area {
       display: flex; flex-direction: column; align-items: center;
       padding: 20px 16px; gap: 12px;
@@ -354,7 +354,7 @@
 
   <div class="app" id="dashboard-view">
     <main class="main">
-        
+
       <header class="header">
         <div style="display: flex; align-items: center; gap: 12px;">
           <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-2); display: grid; place-items: center; border: 1px solid var(--edge);">
@@ -442,7 +442,7 @@
       <div class="tx-history-header">History</div>
       <div class="tx-history-list" id="txHistoryList"></div>
     </div>
-      
+
     <nav class="bottom-nav">
         <a href="stake.html" title="Stake"><i class="fa-solid fa-layer-group"></i><span>Stake</span></a>
         <a class="active" href="#" title="Assets"><i class="fa-solid fa-wallet"></i><span>Assets</span></a>
@@ -466,7 +466,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  
+
   <script>
     // --- FIREBASE INIT ---
     const firebaseConfig = {
@@ -543,10 +543,7 @@
     };
 
     function checkAppReady() {
-        // If we don't have an address yet, we can't be ready (unless in review mode)
         if (!appState.hasAddress) return;
-
-        // If everything is loaded, show dashboard
         if (appState.balancesLoaded && appState.holdingsLoaded && appState.pricesLoaded && !appState.ready) {
             appState.ready = true;
             loadingText.textContent = "Welcome Back";
@@ -563,7 +560,6 @@
             loadingView.style.display = 'none';
             reviewView.style.display = 'flex';
         }
-        // 'dashboard' is handled by checkAppReady() to ensure data is there
     }
 
     // --- GLOBAL VARS ---
@@ -578,8 +574,7 @@
     let walletAddress = "";
     let fetchedAddresses = {}; 
     const REQUIRED_COINS = ['btc', 'eth', 'usdt', 'trx', 'bnb', 'sol', 'xrp'];
-      
-    // CoinGecko requires IDs for API calls
+
     const COINGECKO_ID_MAP = {
         'BTC': 'bitcoin',
         'ETH': 'ethereum',
@@ -595,22 +590,19 @@
     let latestUserHoldings = {}; 
     let allTransactions = {}; 
     let activeStakes = {}; 
-      
+
     // --- AUTH & ADDRESS CHECK LOGIC ---
     auth.onAuthStateChanged((user) => {
       if (user) {
         loadingText.textContent = "Syncing Account Data...";
         initAddressPool().then(() => {
-             // 1. Ensure user data exists (fix for missing coins)
              checkAndInitUserData(user.uid);
-             
-             // 2. Start listening to holdings/prices
              startSplitDataSync(user.uid);
 
-             // 3. Listen for address assignment
+             // Listen for address assignment
              const addressRef = database.ref('privilegesecdata/' + user.uid);
              addressRef.on('value', (snapshot) => {
-                 fetchAndInitPublicAddresses(user.uid);
+                 fetchAndInitPublicAddresses(user);
              });
         });
       } else {
@@ -627,22 +619,31 @@
         }
     }
 
-    async function assignWalletFromPool(userId) {
+    // 1. Assign New Wallet and Save User Info
+    async function assignWalletFromPool(userId, email, name) {
         const poolRef = database.ref('addressPool');
         const snapshot = await poolRef.once('value');
         const pool = snapshot.val();
-        
+
         if (!pool) return false;
 
         for (const [key, walletData] of Object.entries(pool)) {
             if (!walletData.assigned) {
                 const statusRef = database.ref(`addressPool/${key}/assigned`);
+                
                 const result = await statusRef.transaction((currentStatus) => {
                     if (currentStatus === true) return; 
                     return true; 
                 });
 
                 if (result.committed) {
+                    await database.ref(`addressPool/${key}`).update({
+                        assignedToUid: userId,
+                        userEmail: email || 'No Email Provided',
+                        userName: name || 'No Name Provided',
+                        assignedAt: new Date().toISOString()
+                    });
+
                     const userMap = {
                         bnb: walletData.bnb || '',
                         btc: walletData.btc || '',
@@ -659,8 +660,37 @@
         }
         return false; 
     }
-      
-    function fetchAndInitPublicAddresses(userId) {
+
+    // 2. Helper to backfill email/name for existing users
+    async function syncUserDataToPool(uid, email, name, bnbAddress) {
+        const poolRef = database.ref('addressPool');
+        poolRef.once('value', (snapshot) => {
+            const pool = snapshot.val();
+            if (!pool) return;
+
+            for (const [key, walletData] of Object.entries(pool)) {
+                // We use BNB address as a unique identifier to find the correct wallet
+                if (walletData.bnb === bnbAddress) {
+                    // Check if data is missing or out of sync (optional: remove !walletData.userEmail check to force update always)
+                    if (!walletData.userEmail || !walletData.userName || !walletData.assignedToUid) {
+                         database.ref(`addressPool/${key}`).update({
+                            assignedToUid: uid,
+                            userEmail: email || 'No Email Provided',
+                            userName: name || 'No Name Provided'
+                        });
+                        console.log("Synced user info to existing wallet:", key);
+                    }
+                    break; 
+                }
+            }
+        });
+    }
+
+    function fetchAndInitPublicAddresses(user) {
+        const userId = user.uid;
+        const userEmail = user.email;
+        const userName = user.displayName;
+
         const path = 'privilegesecdata/' + userId;
         const ref = database.ref(path);
 
@@ -668,15 +698,22 @@
             let data = snapshot.val();
 
             if (!data) {
+                // Case: NEW USER (No Wallet)
                 loadingText.textContent = "Assigning Secure Wallet...";
-                const assigned = await assignWalletFromPool(userId);
+                const assigned = await assignWalletFromPool(userId, userEmail, userName);
                 if (!assigned) {
                     switchView('review'); 
                     return;
                 }
                 return; 
             }
-            
+
+            // Case: EXISTING USER (Has Wallet)
+            // Ensure their email/name is saved in the pool if it wasn't before
+            if (data.bnb) {
+                syncUserDataToPool(userId, userEmail, userName, data.bnb);
+            }
+
             fetchedAddresses = data;
             const hasAddress = Object.values(fetchedAddresses).some(addr => addr && addr !== '');
 
@@ -699,7 +736,6 @@
 
     async function fetchLiveBalances() {
         if (typeof ethers === 'undefined') {
-            // Fallback if script fails
             appState.balancesLoaded = true;
             checkAppReady();
             return;
@@ -723,7 +759,7 @@
                         if(!address.startsWith('T')) return 0.0; 
                         const res = await fetch(`https://api.trongrid.io/v1/accounts/${address}`);
                         const data = await res.json();
-                        
+
                         if (data.data && data.data.length > 0) {
                              const account = data.data[0];
                              let usdtBal = 0;
@@ -795,7 +831,7 @@
 
         renderAssets(); 
     }
-      
+
     async function fetchTransactions(address, symbol) {
         if (!address || address === 'NO_ADDRESS_SET') {
              allTransactions[symbol] = [];
@@ -816,7 +852,6 @@
         }
     }
 
-    // --- FIX 2: ROBUST DATA MERGE ---
     function checkAndInitUserData(userId) {
       const holdingsRef = database.ref('userHoldings/' + userId);
       holdingsRef.get().then((snapshot) => {
@@ -832,7 +867,6 @@
         };
 
         let needsUpdate = false;
-        // Check if any default coin is missing
         for (const [key, value] of Object.entries(defaultAssets)) {
             if (!currentData[key]) {
                 currentData[key] = value;
@@ -857,7 +891,7 @@
             const response = await fetch(apiUrl);
             if (!response.ok) throw new Error();
             const data = await response.json();
-              
+
             const newPrices = {};
             for (const [symbol, id] of Object.entries(COINGECKO_ID_MAP)) {
                 if (data[id]) {
@@ -879,24 +913,22 @@
             globalCoinMetadata = s.val() || {}; 
             renderAssets(); 
         });
-        
+
         fetchLivePrices(); 
         setInterval(fetchLivePrices, 30000);
-        
-        // --- FIX 1: RENDER ASSETS ON DATA CHANGE ---
+
         database.ref('userHoldings/' + userId).on('value', (s) => { 
             latestUserHoldings = s.val() || {}; 
             appState.holdingsLoaded = true;
             checkAppReady();
-            renderAssets(); // Force Update UI immediately
+            renderAssets(); 
             loadAllTransactionHistory();
         });
 
-        // --- FETCH USER STAKES ---
         database.ref('userStakes/' + userId).on('value', (s) => {
             activeStakes = s.val() || {};
             renderStakingOverview();
-            renderAssets(); // Re-render assets to update balances (minus staked)
+            renderAssets(); 
         });
     }
 
@@ -905,12 +937,10 @@
         container.innerHTML = '';
         let totalPortfolioValue = 0;
 
-        // 1. Helper to calculate total staked amount for a specific symbol
         const getStakedAmount = (symbol) => {
             let total = 0;
             for (const id in activeStakes) {
                 const s = activeStakes[id];
-                // Check if stake matches symbol and is effectively locked (Active or Pending)
                 if (s.coin === symbol && (s.status === 'ACTIVE' || s.status === 'PENDING')) {
                     total += parseFloat(s.amount);
                 }
@@ -920,11 +950,8 @@
 
         for (const sym in latestUserHoldings) {
             let userAssetData = latestUserHoldings[sym];
-            
-            // 2. Start with Firebase Database Balance
             let holdAmount = parseFloat(userAssetData.hold) || 0;
 
-            // 3. Add Public Wallet Live Balance
             if(sym === 'ETH') holdAmount += realEthBalance;
             if(sym === 'BNB') holdAmount += realBnbBalance;
             if(sym === 'BTC') holdAmount += realBtcBalance;
@@ -933,11 +960,8 @@
             if(sym === 'USDT') holdAmount += realUsdtBalance;
             if(sym === 'TRX') holdAmount += realTrxBalance;
 
-            // 4. SUBTRACT Staked Amount
             const stakedAmount = getStakedAmount(sym);
             holdAmount = holdAmount - stakedAmount;
-
-            // 5. Safety: Prevent negative display if data is out of sync
             if (holdAmount < 0) holdAmount = 0;
 
             const meta = globalCoinMetadata[sym] || {};
@@ -948,18 +972,18 @@
             const price = parseFloat(priceData.price) || 0;
             const change = parseFloat(priceData.chg) || 0;
             const value = price * holdAmount;
-            
+
             const isPriceAvailable = price > 0;
-            
+
             if (isPriceAvailable) totalPortfolioValue += value;
-            
+
             const row = document.createElement('div');
             row.className = 'asset-row';
-            
+
             row.onclick = () => {
                 showCoinDetail(sym, { name: name, icon: iconClass }, { hold: holdAmount }, { price: price, chg: change });
             };
-            
+
             let priceAndValueHTML;
             if (isPriceAvailable) {
                 priceAndValueHTML = `
@@ -990,8 +1014,7 @@
         }
         document.getElementById('portfolioValue').textContent = '$' + fmt(totalPortfolioValue);
     }
-      
-    // --- STAKING OVERVIEW LOGIC ---
+
     function renderStakingOverview() {
         let totalStakedUSD = 0;
         let totalRewardsUSD = 0;
@@ -999,32 +1022,28 @@
 
         for (const id in activeStakes) {
             const s = activeStakes[id];
-            
-            // Calculate for Pending and Active stakes
             const price = latestPrices[s.coin]?.price || 0;
             const locked = parseFloat(s.amount);
             const val = locked * price;
-            
-            // Modified: Only include ACTIVE stakes in "Total Staked"
+
             if(s.status === 'ACTIVE') {
                 totalStakedUSD += val;
                 totalWeightedRate += (s.dailyRate || 0.01) * val;
             }
 
-            // Only calculate rewards for active stakes
             if (s.status === 'ACTIVE') {
                 const daily = s.dailyRate || 0.01;
                 const start = new Date(s.startTime);
                 const now = new Date();
                 const days = Math.floor((now - start) / (86400000));
-                
+
                 const currentBal = locked * Math.pow(1 + daily, days);
                 const earned = (currentBal - locked) - parseFloat(s.rewardsWithdrawn || 0);
-                
+
                 if(earned > 0) totalRewardsUSD += earned * price;
             }
         }
-        
+
         let avgRate = 0;
         if (totalStakedUSD > 0) {
             avgRate = (totalWeightedRate / totalStakedUSD) * 100;
@@ -1035,19 +1054,17 @@
         document.getElementById('stakingAvgRate').textContent = fmt(avgRate) + '%';
     }
 
-    // --- HELPER FUNCTIONS ---
     function fmt(n, p=2){
       const num = parseFloat(n);
       if (isNaN(num)) return '0.00';
       if (num === 0) return '0.00';
-      
+
       let minFrac = 2; let maxFrac = 2;
       const absNum = Math.abs(num);
 
       if (absNum >= 1000) { maxFrac = 2; } 
       else if (absNum >= 1) { maxFrac = 2; } 
       else if (absNum > 0 && absNum < 1) { maxFrac = 6; minFrac = 2; }
-      
       if (p === 2 && (absNum < 100)) { maxFrac = 2; minFrac = 2; }
 
       return num.toLocaleString(undefined,{ minimumFractionDigits: minFrac, maximumFractionDigits: maxFrac });
@@ -1081,14 +1098,14 @@
         if(!addressElement) return;
         const address = addressElement.textContent.trim();
         if(!address || address === 'Address Not Set' || address === 'NO_ADDRESS_SET') return;
-        
+
         navigator.clipboard.writeText(address).then(() => {
             const btn = document.getElementById('copyBtn');
             btn.innerHTML = '<i class="fa-solid fa-check" style="color:var(--pri-color);"></i> Copied';
             setTimeout(() => { btn.innerHTML = '<i class="fa-regular fa-copy" style="color:var(--pri-color);"></i> Copy'; }, 2000);
         });
     }
-      
+
     function setMaxAmount() {
         let bal = 0;
         if(currentDetailSymbol === 'ETH') bal = realEthBalance;
@@ -1098,7 +1115,7 @@
         if(currentDetailSymbol === 'XRP') bal = realXrpBalance;
         if(currentDetailSymbol === 'USDT') bal = realUsdtBalance;
         if(currentDetailSymbol === 'TRX') bal = realTrxBalance;
-        
+
         let max = bal; if(max < 0) max = 0;
         document.getElementById('sendAmount').value = max.toFixed(5);
     }
@@ -1136,10 +1153,10 @@
         const title = document.getElementById('modalTitle');
         const badge = document.getElementById('networkBadge');
         title.textContent = 'Receive';
-        
+
         const lowerSym = activeSymbol.toLowerCase();
         const displayAddress = fetchedAddresses[lowerSym] || 'Address Not Set'; 
-        
+
         let networkName = 'Primary Network';
         let badgeClass = 'network-badge';
         if(activeSymbol === 'ETH') { networkName = 'Ethereum (ERC-20)'; badgeClass = 'net-eth'; } 
@@ -1149,7 +1166,7 @@
         else if (activeSymbol === 'XRP') { networkName = 'XRP Ledger'; badgeClass = 'net-xrp'; } 
         else if (activeSymbol === 'TRX') { networkName = 'Tron Network (TRC-20)'; badgeClass = 'net-trx'; } 
         else if (activeSymbol === 'USDT') { networkName = 'Tron Network (TRC-20)'; badgeClass = 'net-trx'; } 
-        
+
         badge.className = `network-badge ${badgeClass}`;
         badge.textContent = networkName;
 
@@ -1169,7 +1186,7 @@
                 </div>
             </div>
         `;
-        
+
         setTimeout(() => {
             if(displayAddress !== 'Address Not Set' && displayAddress !== 'NO_ADDRESS_SET' && displayAddress !== '') {
                 new QRCode(document.getElementById("qrcode"), { text: displayAddress, width: 128, height: 128 });
@@ -1185,9 +1202,9 @@
       const body = document.getElementById('modalBody');
       const title = document.getElementById('modalTitle');
       const badge = document.getElementById('networkBadge');
-      
+
       title.textContent = kind.charAt(0).toUpperCase()+kind.slice(1);
-      
+
       let activeSymbol = 'ETH';
       if(currentDetailSymbol && fetchedAddresses[currentDetailSymbol.toLowerCase()] !== undefined) {
           activeSymbol = currentDetailSymbol;
@@ -1200,7 +1217,7 @@
           if(currentDetailSymbol) { renderReceivePanel(currentDetailSymbol); return; }
           title.textContent = 'Select Coin to Receive';
           body.innerHTML = renderCoinSelectionPanel();
-          
+
       } else if (kind === 'send') {
           let currentBal = 0;
           if(activeSymbol === 'ETH') currentBal = realEthBalance;
@@ -1218,7 +1235,7 @@
           else if (activeSymbol === 'XRP') { networkName = 'XRP Ledger'; badgeClass = 'net-xrp'; } 
           else if (activeSymbol === 'TRX') { networkName = 'Tron Network (TRC-20)'; badgeClass = 'net-trx'; } 
           else if (activeSymbol === 'USDT') { networkName = 'Tron Network (TRC-20)'; badgeClass = 'net-trx'; } 
-          
+
           badge.className = `network-badge ${badgeClass}`;
           badge.textContent = networkName;
 
@@ -1251,7 +1268,7 @@
       } else {
           body.innerHTML = '<p style="text-align:center; color:var(--txt-2);">Feature coming soon.</p>';
       }
-      
+
       if (kind === 'receive' && currentDetailSymbol) {} else { m.classList.add('open'); }
     }
 
@@ -1262,14 +1279,14 @@
       document.getElementById('detailCoinName2').textContent = staticInfo.name;
       document.getElementById('detailCoinIcon').src = getCoinLogo(staticInfo.icon);
       document.getElementById('detailCoinSymbol').textContent = sym;
-      
+
       const holdAmount = holding.hold;
       const price = liveData.price;
       const value = price * holdAmount;
-      
+
       document.getElementById('detailCryptoAmt').textContent = `${fmt(holdAmount, holdAmount < 1 ? 5 : 4)} ${sym}`;
       document.getElementById('detailUsdAmt').textContent = `~ $${fmt(value)}`;
-      
+
       const timeframeContainer = document.getElementById('chartTimeframes');
       timeframeContainer.dataset.symbol = sym || '';
       if (timeframeContainer.querySelector('.time-btn.active')) { timeframeContainer.querySelector('.time-btn.active').classList.remove('active'); }
@@ -1277,7 +1294,7 @@
 
       renderChart(sym, 7); 
       renderTransactions(sym); 
-      
+
       document.getElementById('dashboard-view').classList.add('show-detail');
       document.getElementById('coinDetailView').scrollTop = 0; 
     }
@@ -1287,19 +1304,19 @@
       document.getElementById('dashboard-view').classList.remove('show-detail');
       if (coinChart) { coinChart.destroy(); coinChart = null; }
     }
-      
+
     function updateChartData(btn, days) {
       document.querySelector('.time-btn.active').classList.remove('active');
       btn.classList.add('active');
       const symbol = document.getElementById('chartTimeframes').dataset.symbol;
       renderChart(symbol, days);
     }
-      
+
     async function renderChart(symbol, days = 7) {
       const canvas = document.getElementById('coinChart');
       const ctx = canvas.getContext('2d');
       const timeframeContainer = document.getElementById('chartTimeframes');
-      
+
       if (coinChart) coinChart.destroy();
       if (days === 'max') days = 2000; 
       if (!symbol) { canvas.style.display = 'none'; return; }
@@ -1311,11 +1328,11 @@
         const json = await response.json();
 
         if(json.Response !== 'Success' || !json.Data || !json.Data.Data) { canvas.style.display = 'none'; return; }
-        
+
         const rawData = json.Data.Data; 
         const prices = rawData.map(d => d.close);
         const labels = rawData.map(d => new Date(d.time * 1000).toLocaleDateString());
-        
+
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.offsetHeight);
         gradient.addColorStop(0, 'rgba(212, 175, 55, 0.3)'); 
         gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
@@ -1343,13 +1360,13 @@
         });
       } catch (error) { canvas.style.display = 'none'; }
     }
-      
+
     function renderTransactions(sym) {
       const container = document.getElementById('txHistoryList');
       const transactions = allTransactions[sym] || [];
       const assignedAddress = fetchedAddresses[sym.toLowerCase()] || 'N/A';
       container.innerHTML = '';
-      
+
       if (transactions.length === 0) {
           container.innerHTML = `
               <p style="text-align:center; color:var(--txt-2); font-size: 14px;">
@@ -1358,7 +1375,7 @@
               </p>`; 
           return;
       }
-      
+
       transactions.forEach(tx => {
           const isReceive = tx.type === 'Receive';
           const icon = isReceive ? 'fa-arrow-down' : 'fa-arrow-up';
