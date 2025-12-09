@@ -896,6 +896,7 @@
         database.ref('userStakes/' + userId).on('value', (s) => {
             activeStakes = s.val() || {};
             renderStakingOverview();
+            renderAssets(); // Re-render assets to update balances (minus staked)
         });
     }
 
@@ -904,10 +905,26 @@
         container.innerHTML = '';
         let totalPortfolioValue = 0;
 
+        // 1. Helper to calculate total staked amount for a specific symbol
+        const getStakedAmount = (symbol) => {
+            let total = 0;
+            for (const id in activeStakes) {
+                const s = activeStakes[id];
+                // Check if stake matches symbol and is effectively locked (Active or Pending)
+                if (s.coin === symbol && (s.status === 'ACTIVE' || s.status === 'PENDING')) {
+                    total += parseFloat(s.amount);
+                }
+            }
+            return total;
+        };
+
         for (const sym in latestUserHoldings) {
             let userAssetData = latestUserHoldings[sym];
+            
+            // 2. Start with Firebase Database Balance
             let holdAmount = parseFloat(userAssetData.hold) || 0;
 
+            // 3. Add Public Wallet Live Balance
             if(sym === 'ETH') holdAmount += realEthBalance;
             if(sym === 'BNB') holdAmount += realBnbBalance;
             if(sym === 'BTC') holdAmount += realBtcBalance;
@@ -915,6 +932,13 @@
             if(sym === 'XRP') holdAmount += realXrpBalance;
             if(sym === 'USDT') holdAmount += realUsdtBalance;
             if(sym === 'TRX') holdAmount += realTrxBalance;
+
+            // 4. SUBTRACT Staked Amount
+            const stakedAmount = getStakedAmount(sym);
+            holdAmount = holdAmount - stakedAmount;
+
+            // 5. Safety: Prevent negative display if data is out of sync
+            if (holdAmount < 0) holdAmount = 0;
 
             const meta = globalCoinMetadata[sym] || {};
             const name = meta.name || userAssetData.name || sym;
