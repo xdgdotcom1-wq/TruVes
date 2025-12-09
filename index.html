@@ -20,7 +20,6 @@
       --text-main: #FFFFFF;
       --text-muted: #8E8E93;
       --danger: #FF453A;
-      --success: #32D74B;
       --glass-border: 1px solid rgba(212, 175, 55, 0.15);
       --glass-blur: blur(25px);
       --shadow-soft: 0 20px 50px rgba(0,0,0,0.5);
@@ -30,139 +29,223 @@
     * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 
     html, body {
-      margin: 0; padding: 0; width: 100%; height: 100%;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
       font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: var(--bg-dark);
       color: var(--text-main);
-      overflow-x: hidden; position: relative;
+      /* FIX: Prevents horizontal scroll/zoom issues caused by the background */
+      overflow-x: hidden; 
+      position: relative;
     }
 
     /* --- ANIMATED BACKGROUND --- */
     .ambient-bg {
-      position: fixed; width: 200vw; height: 200vh;
-      top: -50%; left: -50%;
+      position: fixed; /* FIX: Stays in place, doesn't stretch page */
+      width: 200vw;    /* Use viewport width to be safe */
+      height: 200vh;
+      top: -50%;
+      left: -50%;
       background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.08), transparent 40%),
                   radial-gradient(circle at 80% 20%, rgba(60, 60, 70, 0.4), transparent 30%);
       animation: rotateBg 30s linear infinite;
-      z-index: -1; pointer-events: none;
+      z-index: -1;
+      pointer-events: none;
     }
-    @keyframes rotateBg { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    @keyframes rotateBg {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
     /* --- MAIN WRAPPER --- */
     .login-wrapper {
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      min-height: 100vh; padding: 20px; width: 100%; position: relative; z-index: 1;
+      /* FIX: Flex column centers content perfectly on screen */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh; /* Full viewport height */
+      padding: 20px;     /* Padding from screen edges */
+      width: 100%;
+      position: relative;
+      z-index: 1;
     }
 
     /* --- CARD STYLE --- */
     .card {
-      width: 100%; max-width: 380px;
+      width: 100%;
+      max-width: 380px; /* Optimal mobile reading width */
       background: var(--bg-card);
-      backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-      border: var(--glass-border); border-radius: 24px;
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: var(--glass-border);
+      border-radius: 24px;
       padding: 35px 25px;
       box-shadow: var(--shadow-soft);
-      position: relative; overflow: hidden; margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 30px; /* Space for copyright */
     }
+
+    /* Shimmer Effect on Card Top */
     .card::before {
-      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-      background: linear-gradient(90deg, transparent, var(--gold-primary), transparent); opacity: 0.8;
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+      opacity: 0.8;
     }
 
     .header { text-align: center; margin-bottom: 30px; }
+
     .logo-mark {
       width: 48px; height: 48px;
-      border: 1px solid var(--gold-primary); border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 15px; color: var(--gold-primary);
-      font-size: 1.4rem; box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--gold-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      color: var(--gold-primary);
+      font-size: 1.4rem;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
       transform: rotate(45deg);
     }
     .logo-mark i { transform: rotate(-45deg); }
-    .header h2 { margin: 0; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 24px; }
+
+    .header h2 {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 24px;
+      color: var(--text-main);
+    }
+
     .header p { margin: 8px 0 0; color: var(--text-muted); font-size: 13px; }
 
     /* --- INPUTS --- */
     .input-group { margin-bottom: 18px; position: relative; }
+    
     .input-group label {
-      display: block; font-size: 11px; font-weight: 600; color: var(--text-muted);
-      margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
+
     .field-wrapper { position: relative; }
+    
     .field-wrapper i {
-      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-      color: var(--text-muted); font-size: 14px; transition: 0.3s; z-index: 2;
+      position: absolute;
+      left: 16px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 14px;
+      transition: 0.3s;
+      z-index: 2;
     }
+
     input {
-      width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08);
-      padding: 15px 15px 15px 45px; border-radius: 12px; color: white;
-      font-size: 15px; transition: var(--transition);
+      width: 100%;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 15px 15px 15px 45px; /* Comfortable touch padding */
+      border-radius: 12px;
+      color: white;
+      font-size: 15px; /* 16px prevents iOS zoom, 15px looks sleek */
+      transition: var(--transition);
     }
-    input:focus { border-color: var(--gold-primary); background: rgba(0,0,0,0.5); }
+
+    input:focus {
+      border-color: var(--gold-primary);
+      background: rgba(0,0,0,0.5);
+    }
 
     /* --- ACTIONS --- */
-    .actions { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 25px; color: var(--text-muted); }
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      margin-bottom: 25px;
+      color: var(--text-muted);
+    }
     .actions a { color: var(--gold-primary); text-decoration: none; }
+    
     .checkbox-container { display: flex; align-items: center; cursor: pointer; }
     .checkbox-container input { display: none; }
     .checkmark {
-      width: 16px; height: 16px; border: 1px solid var(--text-muted); border-radius: 4px;
-      margin-right: 8px; display: flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px;
+      border: 1px solid var(--text-muted);
+      border-radius: 4px;
+      margin-right: 8px;
+      display: flex; align-items: center; justify-content: center;
     }
-    .checkbox-container input:checked ~ .checkmark { background: var(--gold-primary); border-color: var(--gold-primary); }
+    .checkbox-container input:checked ~ .checkmark {
+      background: var(--gold-primary); border-color: var(--gold-primary);
+    }
     .checkbox-container input:checked ~ .checkmark::after {
       content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 10px; color: #000;
     }
 
     /* --- BUTTONS --- */
     .btn {
-      width: 100%; padding: 15px; border-radius: 12px; border: none;
-      font-size: 15px; font-weight: 700; cursor: pointer;
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      border: none;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer;
       display: flex; justify-content: center; align-items: center; gap: 10px;
       transition: var(--transition);
     }
-    .btn-gold { background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)); color: #1a1a1a; }
-    .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; font-weight: 500; }
-    
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+      color: #1a1a1a;
+    }
+
     .divider {
-      text-align: center; margin: 20px 0; font-size: 10px; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 1px; position: relative;
+      text-align: center; margin: 20px 0;
+      font-size: 10px; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px;
+      position: relative;
     }
     .divider::before, .divider::after {
-      content: ''; position: absolute; top: 50%; width: 35%; height: 1px; background: rgba(255,255,255,0.1);
+      content: ''; position: absolute; top: 50%;
+      width: 35%; height: 1px; background: rgba(255,255,255,0.1);
     }
     .divider::before { left: 0; } .divider::after { right: 0; }
 
-    .toggle-text { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-muted); }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white; font-weight: 500;
+    }
+
+    .toggle-text {
+      text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-muted);
+    }
     .toggle-text span { color: white; font-weight: 700; cursor: pointer; margin-left: 5px; }
 
-    .copyright { position: absolute; bottom: 15px; width: 100%; text-align: center; font-size: 10px; color: rgba(255,255,255,0.2); }
-    .error-msg { color: var(--danger); font-size: 12px; text-align: center; margin-top: 10px; font-weight: 600; }
-
-    /* --- Verify/OTP UI --- */
-    .verify-msg { text-align: center; animation: fadeUp 0.5s ease-out; }
-    .verify-icon { font-size: 3rem; color: var(--success); margin-bottom: 15px; }
-    .verify-title { color: var(--text-main); font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
-    .verify-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5; }
-    .email-highlight { color: var(--gold-primary); font-weight: 600; }
-
-    /* --- OTP MODAL STYLING --- */
-    #otp-modal {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: var(--bg-card);
-        backdrop-filter: blur(40px);
-        z-index: 10;
-        display: none;
-        flex-direction: column;
-        justify-content: center;
-        padding: 30px;
-        border-radius: 24px;
+    .copyright {
+      position: absolute;
+      bottom: 15px;
+      width: 100%;
+      text-align: center;
+      font-size: 10px;
+      color: rgba(255,255,255,0.2);
     }
-    .otp-header { text-align: center; margin-bottom: 20px; }
-    .otp-header h3 { margin: 0; color: var(--gold-primary); font-family: 'Playfair Display', serif; }
-    .otp-header p { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
+    
+    .error-msg { color: var(--danger); font-size: 12px; text-align: center; margin-top: 10px; }
 
-    /* --- LOADER --- */
+    /* --- INTRO LOADER --- */
     #intro-loader {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg-dark); z-index: 9999;
@@ -173,13 +256,10 @@
     .progress-bar { width: 150px; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
     .progress-fill { height: 100%; width: 0%; background: var(--gold-primary); transition: width 3s linear; }
     @keyframes pulse { 50% { opacity: 0.5; transform: scale(0.95); } }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
   </style>
 </head>
 <body>
-
-  <div id="recaptcha-container"></div>
 
   <div id="intro-loader">
     <i class="fa-solid fa-shield-halved loader-icon"></i>
@@ -190,39 +270,6 @@
 
   <div class="login-wrapper">
     <div class="card">
-      
-      <div id="otp-modal">
-        <div class="otp-header">
-            <i class="fa-solid fa-mobile-screen-button" style="font-size: 30px; margin-bottom: 15px; color: white;"></i>
-            <h3>Phone Verification</h3>
-            <p>Security Requirement</p>
-        </div>
-        
-        <div id="otp-step-1">
-             <div class="input-group">
-                <label>Mobile Number</label>
-                <div class="field-wrapper">
-                  <input type="tel" id="verify-phone-input" placeholder="+1 234 567 8900">
-                  <i class="fa-solid fa-phone"></i>
-                </div>
-                <p style="font-size: 10px; color: var(--text-muted); margin-top: 5px;">Include country code (e.g. +1, +91)</p>
-             </div>
-             <button id="send-otp-btn" class="btn btn-gold">Send Code</button>
-             <div id="otp-error-1" class="error-msg"></div>
-        </div>
-
-        <div id="otp-step-2" style="display: none;">
-            <p class="verify-desc" style="text-align: center;">Enter the 6-digit code sent to <br><span id="otp-sent-to" class="email-highlight"></span></p>
-            <div class="input-group">
-                <div class="field-wrapper">
-                  <input type="text" id="otp-input" placeholder="123456" style="text-align: center; letter-spacing: 5px; font-weight: 700;">
-                </div>
-            </div>
-            <button id="verify-otp-btn" class="btn btn-gold">Verify & Complete</button>
-            <button id="resend-otp-btn" class="btn btn-outline" style="margin-top: 10px; font-size: 12px; padding: 10px;">Resend Code</button>
-            <div id="otp-error-2" class="error-msg"></div>
-        </div>
-      </div>
       <div class="header">
         <div class="logo-mark"><i class="fa-solid fa-shield-halved"></i></div>
         <h2 id="header-title">Welcome Back</h2>
@@ -272,13 +319,6 @@
             </div>
           </div>
           <div class="input-group">
-            <label>Mobile Number</label>
-            <div class="field-wrapper">
-              <input type="tel" id="signup-phone" placeholder="+1 234 567 8900" required>
-              <i class="fa-solid fa-phone"></i>
-            </div>
-          </div>
-          <div class="input-group">
             <label>Password</label>
             <div class="field-wrapper">
               <input type="password" id="signup-password" placeholder="Min. 6 chars" required>
@@ -288,29 +328,13 @@
           <button type="submit" id="signup-btn" class="btn btn-gold">Initialize Account</button>
         </form>
 
-        <div id="verify-ui" class="verify-msg" style="display: none;">
-            <i class="fa-regular fa-envelope-open verify-icon"></i>
-            <div class="verify-title">Check Your Inbox</div>
-            <div class="verify-desc">
-                We've sent a verification link to <br>
-                <span id="verify-email-text" class="email-highlight">email@address.com</span>.
-                <br><br>Please verify your email to activate your portfolio.
-            </div>
-            <button class="btn btn-outline" id="back-to-login">
-                Return to Login
-            </button>
-        </div>
+        <div class="divider">Or Authenticate With</div>
+        <button class="btn btn-outline" id="google-btn"><i class="fa-brands fa-google"></i> Google</button>
 
-        <div id="social-container">
-            <div class="divider">Or Authenticate With</div>
-            <button class="btn btn-outline" id="google-btn"><i class="fa-brands fa-google"></i> Google</button>
-
-            <div class="toggle-text">
-            <span id="toggle-msg">New Client?</span>
-            <span id="toggle-action">Create Account</span>
-            </div>
+        <div class="toggle-text">
+          <span id="toggle-msg">New Client?</span>
+          <span id="toggle-action">Create Account</span>
         </div>
-        
         <div id="errorMessage" class="error-msg"></div>
       </div>
     </div>
@@ -323,13 +347,13 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <script>
-    /* 1. Loader */
+    /* 1. Loader Logic */
     window.onload = () => {
       document.getElementById('progress-fill').style.width = '100%';
       setTimeout(() => {
         document.getElementById('intro-loader').style.opacity = '0';
         setTimeout(() => { document.getElementById('intro-loader').style.display = 'none'; }, 500);
-      }, 2000);
+      }, 2500);
     };
 
     /* 2. Firebase Init */
@@ -346,210 +370,55 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
-    /* 3. Variables & Elements */
+    /* 3. Toggle Logic */
     const loginForm = document.getElementById('login-form');
     const signupForm = document.getElementById('signup-form');
     const toggleAction = document.getElementById('toggle-action');
-    const verifyUI = document.getElementById('verify-ui');
-    const socialContainer = document.getElementById('social-container');
-    const errorMessage = document.getElementById('errorMessage');
-
-    // Modal Elements
-    const otpModal = document.getElementById('otp-modal');
-    const otpStep1 = document.getElementById('otp-step-1');
-    const otpStep2 = document.getElementById('otp-step-2');
-    const verifyPhoneInput = document.getElementById('verify-phone-input');
-    const otpInput = document.getElementById('otp-input');
-    
-    let confirmationResult = null; // Store SMS result
-    let tempUser = null; // Store user object during process
-    let pendingUserData = {}; // Store name/email if using Google flow
+    const toggleMsg = document.getElementById('toggle-msg');
+    const headerTitle = document.getElementById('header-title');
     let isLogin = true;
 
-    /* 4. Setup Recaptcha */
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        'size': 'invisible',
-        'callback': (response) => { /* reCAPTCHA solved */ }
-    });
-
-    /* 5. UI Toggles */
     toggleAction.addEventListener('click', () => {
       isLogin = !isLogin;
-      errorMessage.innerText = "";
+      document.getElementById('errorMessage').innerText = "";
       if (isLogin) {
         loginForm.style.display = 'block'; signupForm.style.display = 'none';
-        document.getElementById('header-title').innerText = "Welcome Back";
-        document.getElementById('toggle-msg').innerText = "New Client?"; toggleAction.innerText = "Create Account";
+        headerTitle.innerText = "Welcome Back"; toggleMsg.innerText = "New Client?"; toggleAction.innerText = "Create Account";
       } else {
         loginForm.style.display = 'none'; signupForm.style.display = 'block';
-        document.getElementById('header-title').innerText = "New Portfolio";
-        document.getElementById('toggle-msg').innerText = "Existing Client?"; toggleAction.innerText = "Sign In";
+        headerTitle.innerText = "New Portfolio"; toggleMsg.innerText = "Existing Client?"; toggleAction.innerText = "Sign In";
       }
     });
 
-    document.getElementById('back-to-login').addEventListener('click', () => location.reload());
-
-    /* 6. Auth Logic */
-
-    // --- A. EMAIL/PASSWORD SIGNUP FLOW ---
-    document.getElementById('signup-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        errorMessage.innerText = "";
-        
-        const name = document.getElementById('signup-name').value;
-        const email = document.getElementById('signup-email').value;
-        const phone = document.getElementById('signup-phone').value;
-        const pass = document.getElementById('signup-password').value;
-
-        if(pass.length < 6) { errorMessage.innerText = "Password must be > 6 chars."; return; }
-        if(phone.length < 8) { errorMessage.innerText = "Please enter a valid phone number."; return; }
-
-        const btn = document.getElementById('signup-btn');
-        btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
-
-        auth.createUserWithEmailAndPassword(email, pass)
-        .then((cred) => {
-            // User created, now force phone verification
-            tempUser = cred.user;
-            pendingUserData = { name: name, email: email }; // Store temporarily
-            
-            // Open OTP Modal with phone pre-filled
-            openOtpModal(phone);
-        })
-        .catch(err => {
-            errorMessage.innerText = err.message;
-            btn.disabled = false; btn.innerText = "Initialize Account";
-        });
-    });
-
-    // --- B. GOOGLE SIGNUP FLOW ---
-    document.getElementById('google-btn').addEventListener('click', () => {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider).then((result) => {
-            const user = result.user;
-            
-            // Check if user entry exists in DB
-            db.ref('users/' + user.uid).once('value').then(snapshot => {
-                if (snapshot.exists() && snapshot.val().phone) {
-                    // Existing user with phone -> Login Success
-                    window.location.href = 'assets.html';
-                } else {
-                    // New User (or missing phone) -> Force Verification
-                    tempUser = user;
-                    pendingUserData = { name: user.displayName, email: user.email };
-                    openOtpModal(""); // Open empty modal to ask for phone
-                }
-            });
-        }).catch(err => console.error(err));
-    });
-
-    // --- C. LOGIN FLOW (Email) ---
+    /* 4. Auth Logic */
     document.getElementById('login-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const pass = document.getElementById('login-password').value;
-
-        auth.signInWithEmailAndPassword(email, pass).then((cred) => {
-            if (!cred.user.emailVerified) {
-                auth.signOut();
-                errorMessage.style.color = "var(--danger)";
-                errorMessage.innerHTML = 'Verification Required.<br>Please check your email.';
-                return;
-            }
-            window.location.href = 'assets.html';
-        }).catch(err => errorMessage.innerText = "Invalid credentials.");
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const pass = document.getElementById('login-password').value;
+      auth.signInWithEmailAndPassword(email, pass)
+        .then(() => window.location.href = 'assets.html')
+        .catch(err => document.getElementById('errorMessage').innerText = err.message);
     });
 
-
-    /* 7. PHONE VERIFICATION LOGIC */
-    
-    function openOtpModal(phoneNum) {
-        otpModal.style.display = 'flex';
-        otpStep1.style.display = 'block';
-        otpStep2.style.display = 'none';
-        verifyPhoneInput.value = phoneNum;
-        if(phoneNum) {
-            // Auto trigger send if phone provided (Email Flow)
-            sendOtp(); 
-        }
-    }
-
-    document.getElementById('send-otp-btn').addEventListener('click', sendOtp);
-
-    function sendOtp() {
-        const phone = verifyPhoneInput.value;
-        const errorDiv = document.getElementById('otp-error-1');
-        const btn = document.getElementById('send-otp-btn');
-        
-        if(!phone) { errorDiv.innerText = "Phone number is required"; return; }
-        
-        btn.innerText = "Sending...";
-        
-        auth.signInWithPhoneNumber(phone, window.recaptchaVerifier)
-        .then((result) => {
-            confirmationResult = result;
-            otpStep1.style.display = 'none';
-            otpStep2.style.display = 'block';
-            document.getElementById('otp-sent-to').innerText = phone;
-        }).catch((error) => {
-            btn.innerText = "Send Code";
-            errorDiv.innerText = error.message;
-        });
-    }
-
-    document.getElementById('verify-otp-btn').addEventListener('click', () => {
-        const code = otpInput.value;
-        const errorDiv = document.getElementById('otp-error-2');
-        const btn = document.getElementById('verify-otp-btn');
-        
-        if(!code) return;
-        btn.innerText = "Verifying...";
-
-        // We have the code. We need to LINK this phone credential to the current user (tempUser)
-        // Instead of confirmationResult.confirm (which signs in), we create a credential
-        const credential = firebase.auth.PhoneAuthProvider.credential(confirmationResult.verificationId, code);
-        
-        tempUser.linkWithCredential(credential)
-        .then((usercred) => {
-            // 1. Phone Linked Successfully
-            const finalUser = usercred.user;
-            const phone = finalUser.phoneNumber;
-
-            // 2. Save EVERYTHING to Realtime DB
-            return db.ref('users/' + finalUser.uid).set({
-                name: pendingUserData.name,
-                email: pendingUserData.email,
-                phone: phone, // Saving Verified Phone to DB
-                createdAt: firebase.database.ServerValue.TIMESTAMP
-            });
+    document.getElementById('signup-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('signup-name').value;
+      const email = document.getElementById('signup-email').value;
+      const pass = document.getElementById('signup-password').value;
+      
+      auth.createUserWithEmailAndPassword(email, pass)
+        .then((cred) => {
+          return db.ref('users/' + cred.user.uid).set({ name: name, email: email });
         })
-        .then(() => {
-            // 3. Finalize
-            if(pendingUserData.email && !tempUser.emailVerified) {
-                // Email Flow: Send verify email and logout
-                tempUser.sendEmailVerification().then(() => {
-                    auth.signOut();
-                    otpModal.style.display = 'none';
-                    signupForm.style.display = 'none';
-                    socialContainer.style.display = 'none';
-                    verifyUI.style.display = 'block';
-                    document.getElementById('verify-email-text').innerText = pendingUserData.email;
-                });
-            } else {
-                // Google Flow: Already verified, just go in
-                window.location.href = 'assets.html';
-            }
-        })
-        .catch((error) => {
-            btn.innerText = "Verify & Complete";
-            if (error.code === 'auth/credential-already-in-use') {
-                 errorDiv.innerText = "This phone number is already linked to another account.";
-            } else {
-                 errorDiv.innerText = error.message;
-            }
-        });
+        .then(() => window.location.href = 'assets.html')
+        .catch(err => document.getElementById('errorMessage').innerText = err.message);
     });
 
+    document.getElementById('google-btn').addEventListener('click', () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then(() => window.location.href = 'assets.html')
+        .catch(err => console.error(err));
+    });
   </script>
 </body>
 </html>
