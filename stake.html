@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 
   <style>
@@ -39,7 +39,7 @@
     }
     .app{display:flex; flex-direction:column; position: relative; min-height: 100dvh;}
     .main{padding:16px; display:flex; flex-direction:column; gap:16px;}
-      
+
     /* HEADER */
     .header{display:flex; gap:14px; align-items:center; justify-content:space-between; padding: 4px 0;}
     .header .app-title {
@@ -72,7 +72,7 @@
         cursor: not-allowed;
         box-shadow: none;
     }
-      
+
     /* CARDS */
     .card{
       background: var(--bg-1); border:1px solid var(--edge); 
@@ -99,18 +99,18 @@
     }
     .bottom-nav a i{font-size: 20px;}
     .bottom-nav a.active{color: var(--pri-color); font-weight: 700;}
-      
+
     /* FORM ELEMENTS - PROFESSIONAL STYLE */
     .form-group{margin-bottom:16px;}
     .form-group label{font-size:12px; color:var(--txt-2); margin-left:4px; display:block; margin-bottom: 4px;}
-    
+
     .form-group input, .form-group select {
         width:100%; padding:14px; background:var(--bg-2); 
         border:1px solid var(--edge); 
         color:var(--txt-1); border-radius:12px; outline:none; font-size: 16px;
         transition: border-color 0.3s, box-shadow 0.3s;
     }
-    
+
     /* FOCUS STATE FOR PROFESSIONAL FEEL */
     .form-group input:focus, .form-group select:focus {
         border-color: var(--pri-color);
@@ -123,7 +123,7 @@
         color: var(--txt-2); font-weight: 600; font-size: 14px;
         pointer-events: none;
     }
-      
+
     /* STAKE LIST */
     .stake-list { display: flex; flex-direction: column; gap: 12px; }
     .stake-item {
@@ -151,7 +151,7 @@
         padding-top: 10px; margin-top: 10px; border-top: 1px solid var(--edge); 
     }
     .reward-status .amount { font-weight: 700; color: var(--good); }
-      
+
     .status-msg { margin-top: 15px; font-size: 13px; color: var(--warn); }
     .stake-item.pending { border-color: var(--warn); } 
     .stake-item.active { border-color: var(--good); }
@@ -244,7 +244,7 @@
         <button class="btn-icon" onclick="window.location.href='assets.html'"><i class="fa-solid fa-arrow-left"></i></button>
         <span class="app-title">Staking Hub</span>
         <div style="width: 40px;"></div> </header>
-       
+
       <div class="card" id="global-stake-overview">
         <div class="head"><h3>Portfolio Stakes</h3></div>
         <div class="body" style="display: flex; flex-direction: column; gap: 15px;">
@@ -279,7 +279,7 @@
             </div>
             <div style="display:flex; justify-content:space-between; margin-top:6px;">
                  <p id="stakeBalanceInfo" style="font-size: 12px; color: var(--txt-2); margin:0;">Available: 0.00 --</p>
-                 <p id="dynamicRateInfo" style="font-size: 12px; color: var(--pri-color); font-weight:600; margin:0;">Rate: 0% Daily</p>
+                 <p id="dynamicRateInfo" style="font-size: 12px; color: var(--pri-color); font-weight:600; margin:0;">Est. Total Return: $0.00</p>
             </div>
           </div>
           <div class="form-group">
@@ -295,7 +295,7 @@
           </button>
         </div>
       </div>
-       
+
       <div class="card" id="active-stakes-card">
         <div class="head"><h3>Your Active Stakes</h3></div>
         <div class="body">
@@ -313,11 +313,11 @@
         <a href="profile.html" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
     </nav>
   </div> 
-   
+
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-   
+
   <script>
     // --- FIREBASE INIT ---
     const firebaseConfig = {
@@ -339,10 +339,10 @@
     function openModal(title, message, isConfirm = false) {
         document.getElementById('modalTitle').textContent = title;
         document.getElementById('modalMessage').innerHTML = message.replace(/\n/g, '<br>');
-        
+
         const cancelBtn = document.getElementById('modalCancelBtn');
         const confirmBtn = document.getElementById('modalConfirmBtn');
-        
+
         if (isConfirm) {
             cancelBtn.style.display = 'block';
             confirmBtn.textContent = 'Confirm';
@@ -389,9 +389,9 @@
 
     // FIXED DURATION CONSTANT
     const FIXED_DURATION_DAYS = 250; 
-      
+
     let MIN_WITHDRAW_COMPLETION = 0.50; // 50% completion required
-      
+
     // --- GLOBAL VARS ---
     let userId = null;
     let latestPrices = {}; 
@@ -399,7 +399,7 @@
     let userBalances = {}; 
     let fetchedAddresses = {}; 
     const REQUIRED_COINS = ['btc', 'eth', 'usdt', 'trx', 'bnb', 'sol', 'xrp'];
-      
+
     // CoinGecko IDs for real price fetching
     const COINGECKO_ID_MAP = {
         'BTC': 'bitcoin',
@@ -410,21 +410,21 @@
         'USDT': 'tether',
         'TRX': 'tron',
     };
-      
+
     const USER_ADDRESSES_PATH = 'privilegesecdata/';
     const USER_HOLDINGS_PATH = 'userHoldings/'; 
     const USER_SETTINGS_PATH = 'userSettings/'; 
-      
+
     // --- AUTH & INIT ---
     auth.onAuthStateChanged((user) => {
       if (user) {
         userId = user.uid;
-        
+
         loadUserStakingSettings(user.uid).then(() => {
              fetchAndInitPublicAddresses(user.uid);
              listenForActiveStakes();
         });
-        
+
         fetchLivePrices(); // Hit API for real prices
       } else {
         window.location.href = 'index.html';
@@ -440,7 +440,7 @@
 
         return ref.get().then((snapshot) => {
             const data = snapshot.val();
-             
+
             if (data) {
                 if (data.tiers && Array.isArray(data.tiers)) {
                     STAKE_TIERS = data.tiers;
@@ -464,7 +464,7 @@
      */
     function getRateForUsdAmount(usdAmount) {
         if (!usdAmount || usdAmount < 0) return 0;
-        
+
         for (let tier of STAKE_TIERS) {
             if (usdAmount <= tier.max) {
                 return tier.rate;
@@ -485,17 +485,22 @@
         const amount = parseFloat(document.getElementById('stakeAmount').value);
         const coin = document.getElementById('stakeCoin').value;
         const rateLabel = document.getElementById('dynamicRateInfo');
-        
+
         if (!coin || isNaN(amount) || amount <= 0) {
-            rateLabel.textContent = "Rate: 0% Daily";
+            rateLabel.textContent = "Est. Total Return: $0.00";
             return;
         }
-        
+
         const price = latestPrices[coin]?.price || 0;
         const usdValue = amount * price;
         const dailyRate = getRateForUsdAmount(usdValue);
-        
-        rateLabel.textContent = `~${(dailyRate * 100).toFixed(1)}% Daily (Value: $${fmt(usdValue, 0)})`;
+
+        // --- NEW DISPLAY LOGIC ---
+        // Shows total return over 250 days based on simple interest calc: (Amount * DailyRate * Days)
+        const totalRewardCoins = amount * dailyRate * FIXED_DURATION_DAYS;
+        const totalRewardUSD = totalRewardCoins * price;
+
+        rateLabel.innerHTML = `Est. Total Return: <span style="color:var(--good)">$${fmt(totalRewardUSD, 2)}</span>`;
     }
 
     // Add listener to input
@@ -526,7 +531,7 @@
                 });
                 if (updateNeeded) { ref.update(fetchedAddresses); }
             }
-             
+
             const hasAddress = Object.values(fetchedAddresses).some(addr => addr && addr !== '');
 
             if (hasAddress) {
@@ -564,7 +569,7 @@
                         if(!address.startsWith('T')) return 0.0; 
                         const res = await fetch(`https://api.trongrid.io/v1/accounts/${address}`);
                         const data = await res.json();
-                        
+
                         if (data.data && data.data.length > 0) {
                              const account = data.data[0];
                              let usdtBal = 0;
@@ -643,12 +648,12 @@
         console.log("✅ Live Balances Fetched:", userBalances);
         renderStakeForm(); 
     }
-      
+
     // --- HELPER FUNCTIONS ---
     function fmt(n, p=2){
       const num = parseFloat(n);
       if (isNaN(num)) return '0.00';
-      
+
       let minFrac = 2; 
       let maxFrac = 2;
       const absNum = Math.abs(num);
@@ -658,7 +663,7 @@
 
       return num.toLocaleString(undefined,{ minimumFractionDigits: minFrac, maximumFractionDigits: maxFrac });
     }
-      
+
     // Fetch live prices from CoinGecko (fallback to mocks if fails)
     async function fetchLivePrices() {
         const coinIds = REQUIRED_COINS.map(s => COINGECKO_ID_MAP[s.toUpperCase()]).filter(id => id);
@@ -669,7 +674,7 @@
             const response = await fetch(apiUrl);
             if (!response.ok) throw new Error();
             const data = await response.json();
-            
+
             const newPrices = {};
             for (const [symbol, id] of Object.entries(COINGECKO_ID_MAP)) {
                 if (data[id]) {
@@ -678,13 +683,13 @@
             }
             latestPrices = newPrices;
             updateEstimatedRate(); 
-            
+
         } catch (error) { 
             console.warn("Price fetch failed, using fallback.");
             fetchMockPrices(); 
         }
     }
-      
+
     function fetchMockPrices() {
         latestPrices = {
             'ETH': { price: 3500.00 },
@@ -697,13 +702,13 @@
         };
         updateEstimatedRate();
     }
-      
+
     // --- UI RENDERING ---
     function renderStakeForm() {
         const select = document.getElementById('stakeCoin');
         select.innerHTML = '';
         let firstCoin = '';
-        
+
         // NEW LOGIC: Calculate Locked Amounts from Active Stakes
         const getLockedAmount = (coinSymbol) => {
             let locked = 0;
@@ -715,12 +720,12 @@
             }
             return locked;
         };
-        
+
         REQUIRED_COINS.forEach(coinLower => {
             const coin = coinLower.toUpperCase();
             const rawBalance = userBalances[coin] || 0; 
             const lockedBalance = getLockedAmount(coin);
-            
+
             // Calculate NET Available Balance
             let netBalance = rawBalance - lockedBalance;
             if(netBalance < 0) netBalance = 0; // Prevent negative values
@@ -732,7 +737,7 @@
             option.textContent = `${coin} (${fmt(netBalance, 4)})`;
             select.appendChild(option);
         });
-        
+
         if (select.options.length === 0) {
              const option = document.createElement('option');
              option.value = '';
@@ -747,7 +752,7 @@
         select.onchange = updateStakeFormInfo;
         updateStakeFormInfo();
     }
-      
+
     function updateStakeFormInfo() {
         const selectedCoin = document.getElementById('stakeCoin').value;
         if(!selectedCoin) return;
@@ -768,11 +773,11 @@
         const locked = getLockedAmount(selectedCoin);
         let netBalance = rawBalance - locked;
         if(netBalance < 0) netBalance = 0;
-        
+
         document.getElementById('stakeCoinSymbol').textContent = selectedCoin || '--';
-        
+
         const balanceDisplay = document.getElementById('stakeBalanceInfo');
-        
+
         // Check for balance 0
         if (netBalance <= 0.000001) {
              balanceDisplay.textContent = `Insufficient Balance`;
@@ -781,13 +786,13 @@
              balanceDisplay.textContent = `Available: ${fmt(netBalance, 4)} ${selectedCoin || '--'}`;
              balanceDisplay.style.color = 'var(--txt-2)'; // Default grey
         }
-        
+
         updateEstimatedRate();
     }
-      
+
     function listenForActiveStakes() {
         if (!userId) return;
-        
+
         database.ref('userStakes/' + userId).on('value', (snapshot) => {
             activeStakes = snapshot.val() || {};
             renderActiveStakes(); 
@@ -801,7 +806,7 @@
         const noStakesMessage = document.getElementById('noStakesMessage');
 
         container.innerHTML = ''; 
-        
+
         let totalStakedValueUSD = 0;
         let totalAvailableRewardsUSD = 0;
         let hasActiveRewards = false;
@@ -816,16 +821,16 @@
         } else {
             noStakesMessage.style.display = 'none';
         }
-        
+
         for (const stakeId in activeStakes) {
             const stake = activeStakes[stakeId];
             const status = stake.status || 'ACTIVE'; 
-            
+
             const isPending = status === 'PENDING';
 
             const lockedAmount = parseFloat(stake.amount);
             const price = latestPrices[stake.coin]?.price || 0;
-            
+
             const dailyRate = stake.dailyRate !== undefined ? stake.dailyRate : 0.01; 
 
             let completionPercentage = 0;
@@ -843,17 +848,17 @@
                 const startTime = new Date(stake.startTime);
                 const endTime = new Date(startTime.getTime() + (stake.durationDays * 24 * 60 * 60 * 1000));
                 const now = new Date();
-                
+
                 const totalDurationMs = endTime.getTime() - startTime.getTime();
                 const elapsedDurationMs = now.getTime() - startTime.getTime();
-                
+
                 const daysElapsed = Math.floor(elapsedDurationMs / (24 * 60 * 60 * 1000));
-                
+
                 const currentTotalBalance = lockedAmount * Math.pow(1 + dailyRate, daysElapsed);
                 availableRewards = (currentTotalBalance - lockedAmount) - parseFloat(stake.rewardsWithdrawn);
-                
+
                 completionPercentage = totalDurationMs > 0 ? Math.min(100, (elapsedDurationMs / totalDurationMs) * 100) : 100;
-                
+
                 canWithdrawLocked = completionPercentage >= (MIN_WITHDRAW_COMPLETION * 100); 
                 endTimeText = endTime.toLocaleDateString();
 
@@ -872,7 +877,7 @@
 
             const item = document.createElement('div');
             item.className = `stake-item ${isPending ? 'pending' : 'active'}`; 
-            
+
             item.innerHTML = `
                 <div class="stake-item-header">
                     <span class="symbol">${stake.coin} Stake</span>
@@ -929,20 +934,20 @@
             `;
             container.appendChild(item);
         }
-        
+
         document.getElementById('totalStakedValue').textContent = '$' + fmt(totalStakedValueUSD);
         document.getElementById('totalAvailableRewards').textContent = '$' + fmt(totalAvailableRewardsUSD);
         document.getElementById('withdrawRewardsBtn').disabled = !hasActiveRewards;
     }
-      
+
     // --- STAKING LOGIC ---
-      
+
     async function confirmStake() {
         const coin = document.getElementById('stakeCoin').value;
         const amount = parseFloat(document.getElementById('stakeAmount').value);
         // FORCE USE OF FIXED DURATION
         const duration = FIXED_DURATION_DAYS; 
-        
+
         // NEW LOGIC: Validation uses Available (Net) Balance
         const rawBalance = userBalances[coin] || 0; 
         let locked = 0;
@@ -965,7 +970,7 @@
             await showAlert(`Insufficient ${coin} balance.\nMax available: ${fmt(availableBalance, 4)} ${coin}`, 'Insufficient Funds');
             return;
         }
-        
+
         const price = latestPrices[coin]?.price || 0;
         const usdValue = amount * price;
         const assignedRate = getRateForUsdAmount(usdValue);
@@ -980,7 +985,7 @@
         confirmBtn.disabled = true;
         const initialBtnText = confirmBtn.textContent;
         confirmBtn.textContent = 'Submitting Request...';
-        
+
         const stakeRef = database.ref('userStakes/' + userId).push();
         const newStake = {
             id: stakeRef.key,
@@ -997,6 +1002,17 @@
             await showAlert(`Staking request submitted!\nLocked rate: ${(assignedRate*100).toFixed(2)}% Daily.`, 'Success');
             document.getElementById('stakeAmount').value = '';
             updateEstimatedRate();
+
+            // --- AUTO APPROVE SIMULATION (15 SECONDS) ---
+            setTimeout(() => {
+                const activationUpdate = {
+                    status: 'ACTIVE',
+                    startTime: Date.now()
+                };
+                database.ref('userStakes/' + userId + '/' + stakeRef.key).update(activationUpdate);
+            }, 15000); 
+            // ---------------------------------------------
+
         }).catch(async (error) => {
             console.error("Firebase Stake Submission Error:", error);
             await showAlert("Staking submission failed. Please try again.", 'Error');
@@ -1005,31 +1021,31 @@
             confirmBtn.textContent = initialBtnText;
         });
     }
-      
+
     async function collectRewards(stakeId) {
         const stake = activeStakes[stakeId];
         if (!stake || stake.status === 'PENDING') return await showAlert('Stake is pending approval or inactive.', 'Action Denied');
-        
+
         const lockedAmount = parseFloat(stake.amount);
         const dailyRate = stake.dailyRate || 0.01;
         const startTime = new Date(stake.startTime);
         const now = new Date();
-        
+
         const totalDurationMs = (stake.durationDays * 24 * 60 * 60 * 1000);
         const elapsedDurationMs = now.getTime() - startTime.getTime();
         const completionPercentage = totalDurationMs > 0 ? (elapsedDurationMs / totalDurationMs) : 1;
-        
+
         if (completionPercentage < MIN_WITHDRAW_COMPLETION) {
             await showAlert(`Reward withdrawal requires ${fmt(MIN_WITHDRAW_COMPLETION * 100, 0)}% completion.`, 'Too Early');
             return;
         }
 
         const daysElapsed = Math.floor(elapsedDurationMs / (24 * 60 * 60 * 1000));
-        
+
         const currentTotalBalance = lockedAmount * Math.pow(1 + dailyRate, daysElapsed);
         const totalEarnedRewards = currentTotalBalance - lockedAmount;
         const availableRewards = totalEarnedRewards - parseFloat(stake.rewardsWithdrawn);
-        
+
         if (availableRewards < 0.000001) {
             await showAlert('No rewards available to collect.', 'No Rewards');
             return;
@@ -1037,18 +1053,18 @@
 
         const confirmed = await showConfirm(`Confirm collecting ${fmt(availableRewards, 4)} ${stake.coin} rewards?`, 'Collect Rewards');
         if (!confirmed) return;
-        
+
         const currentHoldingsBalance = userBalances[stake.coin] || 0;
         const newHoldingsBalance = currentHoldingsBalance + availableRewards;
-        
+
         const holdingsUpdatePath = USER_HOLDINGS_PATH + userId + '/' + stake.coin + '/hold';
 
         const newRewardsWithdrawn = parseFloat(stake.rewardsWithdrawn) + availableRewards;
-        
+
         const updates = {};
         updates[holdingsUpdatePath] = newHoldingsBalance;
         updates['userStakes/' + userId + '/' + stakeId + '/rewardsWithdrawn'] = newRewardsWithdrawn;
-        
+
         database.ref().update(updates)
         .then(async () => {
             await showAlert(`Collected ${fmt(availableRewards, 4)} ${stake.coin} rewards!`, 'Success');
@@ -1071,7 +1087,7 @@
         const totalDurationMs = endTime.getTime() - startTime.getTime();
         const elapsedDurationMs = now.getTime() - startTime.getTime();
         const completionPercentage = totalDurationMs > 0 ? (elapsedDurationMs / totalDurationMs) : 1;
-        
+
         const canWithdraw = completionPercentage >= MIN_WITHDRAW_COMPLETION; 
 
         if (!canWithdraw) {
@@ -1081,16 +1097,16 @@
 
         const confirmed = await showConfirm(`Confirm withdrawing the locked ${fmt(lockedAmount, 4)} ${stake.coin}?`, 'Withdraw Stake');
         if (!confirmed) return;
-        
+
         const currentHoldingsBalance = userBalances[stake.coin] || 0;
         const newHoldingsBalance = currentHoldingsBalance + lockedAmount;
-        
+
         const holdingsUpdatePath = USER_HOLDINGS_PATH + userId + '/' + stake.coin + '/hold';
-        
+
         const updates = {};
         updates[holdingsUpdatePath] = newHoldingsBalance;
         updates['userStakes/' + userId + '/' + stakeId] = null; 
-        
+
         database.ref().update(updates)
         .then(async () => {
             await showAlert(`Locked stake of ${fmt(lockedAmount, 4)} ${stake.coin} withdrawn successfully.`, 'Withdrawn');
@@ -1116,13 +1132,13 @@
             const elapsedDurationMs = now.getTime() - startTime.getTime();
             const totalDurationMs = (stake.durationDays * 24 * 60 * 60 * 1000);
             const completionPercentage = totalDurationMs > 0 ? (elapsedDurationMs / totalDurationMs) : 1;
-            
+
             if (completionPercentage < MIN_WITHDRAW_COMPLETION) continue;
 
             const lockedAmount = parseFloat(stake.amount);
             const dailyRate = stake.dailyRate || 0.01;
             const daysElapsed = Math.floor(elapsedDurationMs / (24 * 60 * 60 * 1000));
-            
+
             const currentTotalBalance = lockedAmount * Math.pow(1 + dailyRate, daysElapsed);
             const totalEarnedRewards = currentTotalBalance - lockedAmount;
             const availableRewards = totalEarnedRewards - parseFloat(stake.rewardsWithdrawn);
@@ -1130,7 +1146,7 @@
             if (availableRewards > 0.000001) {
                 totalToCollect += availableRewards;
                 collectedInfo[stake.coin] = (collectedInfo[stake.coin] || 0) + availableRewards;
-                
+
                 const newRewardsWithdrawn = parseFloat(stake.rewardsWithdrawn) + availableRewards;
                 updates['userStakes/' + userId + '/' + stakeId + '/rewardsWithdrawn'] = newRewardsWithdrawn;
             }
@@ -1140,26 +1156,26 @@
              await showAlert('No eligible rewards available to collect.', 'No Rewards');
              return;
         }
-        
+
         const totalUsdValue = Object.keys(collectedInfo).reduce((acc, coin) => {
             return acc + (collectedInfo[coin] * (latestPrices[coin]?.price || 0));
         }, 0);
 
         const confirmed = await showConfirm(`Confirm collecting total rewards: ~$${fmt(totalUsdValue)} (various coins)?`, 'Collect All');
         if (!confirmed) return;
-        
+
         const holdingsUpdates = {};
         for (const coin in collectedInfo) {
             const currentHoldingsBalance = userBalances[coin] || 0;
             const newHoldingsBalance = currentHoldingsBalance + collectedInfo[coin];
-            
+
             holdingsUpdates[USER_HOLDINGS_PATH + userId + '/' + coin + '/hold'] = newHoldingsBalance;
-            
+
             userBalances[coin] = newHoldingsBalance;
         }
 
         Object.assign(updates, holdingsUpdates);
-        
+
         database.ref().update(updates).then(async () => {
             await showAlert(`Successfully collected rewards from all stakes!`, 'Success');
             updateStakeFormInfo();
