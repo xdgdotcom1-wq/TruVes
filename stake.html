@@ -583,16 +583,33 @@
         select.innerHTML = '';
         let firstCoin = '';
         
+        // NEW LOGIC: Calculate Locked Amounts from Active Stakes
+        const getLockedAmount = (coinSymbol) => {
+            let locked = 0;
+            for(const id in activeStakes) {
+                const s = activeStakes[id];
+                if(s.coin === coinSymbol && (s.status === 'ACTIVE' || s.status === 'PENDING')) {
+                    locked += parseFloat(s.amount);
+                }
+            }
+            return locked;
+        };
+        
         REQUIRED_COINS.forEach(coinLower => {
             const coin = coinLower.toUpperCase();
-            const balance = userBalances[coin] || 0; 
+            const rawBalance = userBalances[coin] || 0; 
+            const lockedBalance = getLockedAmount(coin);
+            
+            // Calculate NET Available Balance
+            let netBalance = rawBalance - lockedBalance;
+            if(netBalance < 0) netBalance = 0; // Prevent negative values
 
-            // Show coin if balance > 0 (or very small amount)
-            if (balance > 0.000001) { 
+            // Show coin if NET balance > 0 (or very small amount)
+            if (netBalance > 0.000001) { 
                 if (!firstCoin) firstCoin = coin;
                 const option = document.createElement('option');
                 option.value = coin;
-                option.textContent = `${coin} (${fmt(balance, 4)})`;
+                option.textContent = `${coin} (${fmt(netBalance, 4)})`;
                 select.appendChild(option);
             }
         });
@@ -614,10 +631,27 @@
     
     function updateStakeFormInfo() {
         const selectedCoin = document.getElementById('stakeCoin').value;
-        const balance = userBalances[selectedCoin] || 0; 
+        if(!selectedCoin) return;
+
+        // NEW LOGIC: Recalculate Available Balance for selected coin
+        const getLockedAmount = (coinSymbol) => {
+            let locked = 0;
+            for(const id in activeStakes) {
+                const s = activeStakes[id];
+                if(s.coin === coinSymbol && (s.status === 'ACTIVE' || s.status === 'PENDING')) {
+                    locked += parseFloat(s.amount);
+                }
+            }
+            return locked;
+        };
+
+        const rawBalance = userBalances[selectedCoin] || 0;
+        const locked = getLockedAmount(selectedCoin);
+        let netBalance = rawBalance - locked;
+        if(netBalance < 0) netBalance = 0;
         
         document.getElementById('stakeCoinSymbol').textContent = selectedCoin || '--';
-        document.getElementById('stakeBalanceInfo').textContent = `Available: ${fmt(balance, 4)} ${selectedCoin || '--'}`;
+        document.getElementById('stakeBalanceInfo').textContent = `Available: ${fmt(netBalance, 4)} ${selectedCoin || '--'}`;
         
         updateEstimatedRate();
     }
@@ -628,6 +662,8 @@
         database.ref('userStakes/' + userId).on('value', (snapshot) => {
             activeStakes = snapshot.val() || {};
             renderActiveStakes(); 
+            // Re-render form to update "Available" balances dynamically
+            renderStakeForm(); 
         });
     }
 
@@ -778,7 +814,17 @@
         // FORCE USE OF FIXED DURATION
         const duration = FIXED_DURATION_DAYS; 
         
-        const balance = userBalances[coin] || 0; 
+        // NEW LOGIC: Validation uses Available (Net) Balance
+        const rawBalance = userBalances[coin] || 0; 
+        let locked = 0;
+        for(const id in activeStakes) {
+            const s = activeStakes[id];
+            if(s.coin === coin && (s.status === 'ACTIVE' || s.status === 'PENDING')) {
+                locked += parseFloat(s.amount);
+            }
+        }
+        const availableBalance = rawBalance - locked;
+
         const confirmBtn = document.getElementById('confirmStakeBtn');
 
         if (isNaN(amount) || amount <= 0) {
@@ -786,8 +832,8 @@
             return;
         }
 
-        if (amount > balance) {
-            alert(`Insufficient ${coin} balance. Max available: ${fmt(balance, 4)} ${coin}`);
+        if (amount > availableBalance) {
+            alert(`Insufficient ${coin} balance. Max available: ${fmt(availableBalance, 4)} ${coin}`);
             return;
         }
         
