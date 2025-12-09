@@ -26,11 +26,27 @@
       --edge: rgba(212, 175, 55, .2);
       --glow: 0 4px 15px rgba(0,0,0,.5);
       --radius: 14px;
+      --input-bg: #404043;
     }
+
+    /* === LIGHT THEME OVERRIDES === */
+    body.light-theme {
+        --bg-0: #F2F2F7;
+        --bg-1: #FFFFFF;
+        --bg-2: #E5E5EA;
+        --txt-1: #1C1C1E;
+        --txt-2: #8E8E93;
+        --edge: rgba(0, 0, 0, 0.1);
+        --glow: 0 4px 15px rgba(0,0,0,0.08);
+        --input-bg: #E5E5EA;
+        --btn-txt: #1C1C1E; 
+    }
+
     *{box-sizing:border-box}
     body{
       margin:0; padding-bottom: 90px; font-family: Inter, sans-serif;
       color:var(--txt-1); background-color: var(--bg-0); min-height: 100dvh;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
     body::-webkit-scrollbar {display: none;}
     
@@ -42,6 +58,7 @@
         color: var(--pri-color); font-family: 'Playfair Display', serif; 
         letter-spacing: 1px; margin: 0; font-size: 26px;
     }
+    .header-actions { display: flex; gap: 15px; align-items: center; }
     
     /* PROFILE CARD */
     .profile-card{
@@ -87,7 +104,7 @@
     .menu-group{background: var(--bg-1); border:1px solid var(--edge); border-radius: var(--radius); overflow: hidden;}
     .menu-item{
       display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background .2s;
+      padding: 16px 20px; border-bottom: 1px solid var(--edge); cursor: pointer; transition: background .2s;
     }
     .menu-item:last-child{border-bottom: none;}
     .menu-item:hover{background: var(--bg-2);}
@@ -154,32 +171,50 @@
     .bottom-nav a.active{color: var(--pri-color); font-weight: 700;}
     .bottom-nav a:hover{color: var(--txt-1);}
 
-    /* ADDRESS MANAGER MODAL */
+    /* MODAL BASICS */
     .modal {
       position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3000;
       display: none; place-items: center; padding: 20px;
+      backdrop-filter: blur(4px);
     }
     .modal.open { display: grid; }
     .modal-content {
-        background: var(--bg-1); border: 1px solid var(--pri-color); border-radius: 16px;
+        background: var(--bg-1); border: 1px solid var(--edge); border-radius: 16px;
         width: 100%; max-width: 400px; box-shadow: var(--glow); overflow: hidden;
     }
     .modal-header {
         padding: 16px; border-bottom: 1px solid var(--edge); display: flex; justify-content: space-between; align-items: center;
     }
     .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; max-height: 60vh; overflow-y: auto; }
+    
+    /* ADDRESS MANAGER STYLES */
     .address-field label { font-size: 12px; color: var(--txt-2); margin-left: 4px; display: block; margin-bottom: 4px;}
-    .address-input-group { display: flex; align-items: center; gap: 8px; }
+    .address-input-group { display: flex; align-items: center; gap: 8px; position: relative; }
     .address-input-group img { width: 24px; height: 24px; border-radius: 50%; }
     .address-input-group input { 
         flex: 1; background: var(--bg-2); border: 1px solid var(--edge); color: var(--txt-1);
-        padding: 10px; border-radius: 8px; outline: none; font-family: monospace; font-size: 12px;
+        padding: 10px; padding-right: 35px; border-radius: 8px; outline: none; font-family: monospace; font-size: 12px;
+        cursor: not-allowed;
     }
-    .address-input-group input:focus { border-color: var(--pri-color); }
-    .btn-save {
-        width: 100%; padding: 12px; background: var(--btn-bg); color: var(--btn-txt);
-        border: none; border-radius: 10px; font-weight: 700; margin-top: 10px; cursor: pointer;
+    .address-input-group .copy-btn {
+        position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+        background: none; border: none; color: var(--pri-color); cursor: pointer; padding: 5px;
     }
+
+    /* OTP MODAL STYLES */
+    .otp-input-container { text-align: center; margin: 20px 0; }
+    .otp-input {
+        width: 100%; padding: 15px; font-size: 24px; letter-spacing: 5px; text-align: center;
+        background: var(--bg-2); border: 1px solid var(--edge); color: var(--pri-color);
+        border-radius: 12px; outline: none; font-family: monospace;
+    }
+    .otp-input:focus { border-color: var(--pri-color); box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+    .verify-btn {
+        width: 100%; padding: 14px; background: var(--btn-bg); color: var(--btn-txt);
+        border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 15px;
+        transition: transform 0.1s;
+    }
+    .verify-btn:active { transform: scale(0.98); }
 
   </style>
 </head>
@@ -190,9 +225,14 @@
   <div class="app">
     <header class="header">
       <h1>Profile</h1>
-      <button onclick="logout()" style="background: none; border: none; color: var(--txt-2); font-size: 18px; cursor: pointer;">
-          <i class="fa-solid fa-power-off"></i>
-      </button>
+      <div class="header-actions">
+          <button onclick="toggleTheme()" id="themeToggleBtn" style="background: none; border: none; color: var(--txt-2); font-size: 18px; cursor: pointer;">
+             <i class="fa-solid fa-moon"></i>
+          </button>
+          <button onclick="logout()" style="background: none; border: none; color: var(--txt-2); font-size: 18px; cursor: pointer;">
+              <i class="fa-solid fa-power-off"></i>
+          </button>
+      </div>
     </header>
     
     <div class="profile-card">
@@ -219,7 +259,10 @@
       <div class="menu-item" onclick="openAddressModal()">
         <div class="menu-left">
           <div class="icon-box icon-wallet"><i class="fa-solid fa-wallet"></i></div>
-          <span class="menu-text">Address Manager</span>
+          <div style="display:flex; flex-direction:column;">
+              <span class="menu-text">Address Manager</span>
+              <span style="font-size:10px; color:var(--txt-2);">View Public Keys</span>
+          </div>
         </div>
         <div class="menu-right"><i class="fa-solid fa-chevron-right"></i></div>
       </div>
@@ -231,7 +274,7 @@
         </div>
         <div class="menu-right">
             <label class="switch">
-                <input type="checkbox" id="2fa-toggle" onchange="toggleSetting('twoFactor', this.checked)">
+                <input type="checkbox" id="2fa-toggle" onchange="handle2FAToggle(this)">
                 <span class="slider"></span>
             </label>
         </div>
@@ -312,54 +355,82 @@
   <div class="modal" id="addressModal">
       <div class="modal-content">
           <div class="modal-header">
-              <strong style="font-size:16px;">Manage Addresses</strong>
+              <strong style="font-size:16px;">Assigned Addresses</strong>
               <button onclick="document.getElementById('addressModal').classList.remove('open')" style="background:none; border:none; color:var(--txt-2); cursor:pointer;"><i class="fa-solid fa-xmark fa-lg"></i></button>
           </div>
           <div class="modal-body">
-              <p style="font-size:12px; color:var(--warn); background: rgba(251, 191, 36, 0.1); padding:8px; border-radius:6px; margin:0;">
-                  <i class="fa-solid fa-triangle-exclamation"></i> Only enter public addresses you control. These are used to generate your QR codes.
+              <p style="font-size:12px; color:var(--txt-2); background: var(--bg-2); padding:8px; border-radius:6px; margin:0; border: 1px solid var(--edge);">
+                  <i class="fa-solid fa-lock" style="color:var(--pri-color)"></i> These are your permanently assigned deposit addresses. They cannot be changed.
               </p>
               
               <div class="address-field">
                   <label>Bitcoin (BTC)</label>
                   <div class="address-input-group">
                       <img src="https://assets.coincap.io/assets/icons/btc@2x.png">
-                      <input type="text" id="addr-btc" placeholder="Enter BTC Address">
+                      <input type="text" id="addr-btc" readonly>
+                      <button class="copy-btn" onclick="copyAddressField('addr-btc')"><i class="fa-regular fa-copy"></i></button>
                   </div>
               </div>
               <div class="address-field">
                   <label>Ethereum (ETH/ERC20)</label>
                   <div class="address-input-group">
                       <img src="https://assets.coincap.io/assets/icons/eth@2x.png">
-                      <input type="text" id="addr-eth" placeholder="Enter ETH Address">
+                      <input type="text" id="addr-eth" readonly>
+                      <button class="copy-btn" onclick="copyAddressField('addr-eth')"><i class="fa-regular fa-copy"></i></button>
                   </div>
               </div>
               <div class="address-field">
                   <label>BNB Smart Chain (BNB)</label>
                   <div class="address-input-group">
                       <img src="https://assets.coincap.io/assets/icons/bnb@2x.png">
-                      <input type="text" id="addr-bnb" placeholder="Enter BNB Address">
+                      <input type="text" id="addr-bnb" readonly>
+                      <button class="copy-btn" onclick="copyAddressField('addr-bnb')"><i class="fa-regular fa-copy"></i></button>
                   </div>
               </div>
               <div class="address-field">
                   <label>Tether (USDT)</label>
                   <div class="address-input-group">
                       <img src="https://assets.coincap.io/assets/icons/usdt@2x.png">
-                      <input type="text" id="addr-usdt" placeholder="Enter USDT Address">
+                      <input type="text" id="addr-usdt" readonly>
+                      <button class="copy-btn" onclick="copyAddressField('addr-usdt')"><i class="fa-regular fa-copy"></i></button>
                   </div>
               </div>
               <div class="address-field">
                 <label>Solana (SOL)</label>
                 <div class="address-input-group">
                     <img src="https://assets.coincap.io/assets/icons/sol@2x.png">
-                    <input type="text" id="addr-sol" placeholder="Enter SOL Address">
+                    <input type="text" id="addr-sol" readonly>
+                    <button class="copy-btn" onclick="copyAddressField('addr-sol')"><i class="fa-regular fa-copy"></i></button>
                 </div>
             </div>
-
-              <button class="btn-save" onclick="saveAddresses()">Save Addresses</button>
           </div>
       </div>
   </div>
+
+  <div class="modal" id="otpModal">
+    <div class="modal-content" style="max-width: 320px;">
+        <div class="modal-header">
+            <strong style="font-size:16px;">Security Verification</strong>
+            <button onclick="closeOtpModal()" style="background:none; border:none; color:var(--txt-2); cursor:pointer;"><i class="fa-solid fa-xmark fa-lg"></i></button>
+        </div>
+        <div class="modal-body" style="text-align:center;">
+            <div style="width:50px; height:50px; background:var(--bg-2); border-radius:50%; display:grid; place-items:center; margin:0 auto; color:var(--pri-color); font-size:24px;">
+                <i class="fa-solid fa-envelope-circle-check"></i>
+            </div>
+            <h3 style="margin:10px 0 0 0; font-size:18px; color:var(--txt-1);">Enter OTP</h3>
+            <p style="font-size:13px; color:var(--txt-2); margin:0; line-height:1.4;">
+                A 6-digit verification code has been sent to your registered email address.
+            </p>
+            
+            <div class="otp-input-container">
+                <input type="text" id="otpInput" class="otp-input" placeholder="000000" maxlength="6">
+            </div>
+
+            <button id="verifyOtpBtn" class="verify-btn" onclick="verifyOtp()">Verify & Enable 2FA</button>
+            <p style="font-size:12px; color:var(--txt-2); margin-top:10px; cursor:pointer;">Resend Code</p>
+        </div>
+    </div>
+</div>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -382,6 +453,34 @@
     const database = firebase.database();
     
     let currentUserUid = null;
+
+    // --- THEME LOGIC ---
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+        }
+        updateThemeIcon();
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('light-theme');
+        const isLight = document.body.classList.contains('light-theme');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+        const btn = document.getElementById('themeToggleBtn');
+        const isLight = document.body.classList.contains('light-theme');
+        if (isLight) {
+            btn.innerHTML = '<i class="fa-solid fa-sun" style="color: var(--pri-color);"></i>';
+        } else {
+            btn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+        }
+    }
+    
+    initTheme(); // Run on load
 
     // --- AUTH STATE & DATA LOADING ---
     auth.onAuthStateChanged((user) => {
@@ -411,6 +510,7 @@
         // Load Toggle Settings
         database.ref('privilegesecdata/' + user.uid + '/settings').once('value', (snap) => {
             const settings = snap.val() || {};
+            // Set initial state without triggering the handle2FAToggle event
             document.getElementById('2fa-toggle').checked = settings.twoFactor === true;
             document.getElementById('notif-toggle').checked = settings.notifications !== false; 
         });
@@ -422,7 +522,7 @@
 
     // --- FEATURES IMPLEMENTATION ---
 
-    // 1. Toggle Settings (Real Persistence)
+    // 1. Toggle Settings (Notifications)
     window.toggleSetting = function(key, value) {
         if(!currentUserUid) return;
         
@@ -430,12 +530,63 @@
         .then(() => {
             const status = value ? 'Enabled' : 'Disabled';
             const icon = value ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>';
-            showToast(`${icon} Preference Saved: ${status}`);
+            showToast(`${icon} Preference Saved`);
         })
         .catch((e) => showToast('<i class="fa-solid fa-triangle-exclamation"></i> Save Failed'));
     }
 
-    // 2. Address Manager (Real Read/Write)
+    // 2. 2FA Toggle Handler (with OTP Simulation)
+    window.handle2FAToggle = function(checkbox) {
+        if(checkbox.checked) {
+            // User is trying to turn ON
+            checkbox.checked = false; // Reset visually immediately
+            showToast('<i class="fa-solid fa-paper-plane"></i> Sending OTP...');
+            setTimeout(() => {
+                openOtpModal();
+            }, 1000);
+        } else {
+            // User is turning OFF (Directly allow for this demo, or add OTP here too if needed)
+            toggleSetting('twoFactor', false);
+        }
+    }
+
+    function openOtpModal() {
+        document.getElementById('otpModal').classList.add('open');
+        document.getElementById('otpInput').value = '';
+        document.getElementById('otpInput').focus();
+    }
+
+    function closeOtpModal() {
+        document.getElementById('otpModal').classList.remove('open');
+    }
+
+    window.verifyOtp = function() {
+        const input = document.getElementById('otpInput').value;
+        const btn = document.getElementById('verifyOtpBtn');
+        
+        if(input.length !== 6) {
+            showToast('<i class="fa-solid fa-circle-exclamation"></i> Invalid Code');
+            return;
+        }
+
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+        
+        // Simulate API verification delay
+        setTimeout(() => {
+            closeOtpModal();
+            btn.innerHTML = 'Verify & Enable 2FA'; // Reset btn text
+            
+            // Turn the switch ON visually
+            document.getElementById('2fa-toggle').checked = true;
+            
+            // Save to DB
+            toggleSetting('twoFactor', true);
+            
+            showToast('<i class="fa-solid fa-shield-halved"></i> 2FA Enabled Successfully');
+        }, 1500);
+    }
+
+    // 3. Address Manager (Read Only)
     window.openAddressModal = function() {
         if(!currentUserUid) return;
         const modal = document.getElementById('addressModal');
@@ -443,45 +594,30 @@
         // Load current addresses into inputs
         database.ref('privilegesecdata/' + currentUserUid).once('value', (snap) => {
             const data = snap.val() || {};
-            document.getElementById('addr-btc').value = data.btc || '';
-            document.getElementById('addr-eth').value = data.eth || '';
-            document.getElementById('addr-bnb').value = data.bnb || '';
-            document.getElementById('addr-usdt').value = data.usdt || '';
-            document.getElementById('addr-sol').value = data.sol || '';
+            document.getElementById('addr-btc').value = data.btc || 'Not Assigned';
+            document.getElementById('addr-eth').value = data.eth || 'Not Assigned';
+            document.getElementById('addr-bnb').value = data.bnb || 'Not Assigned';
+            document.getElementById('addr-usdt').value = data.usdt || 'Not Assigned';
+            document.getElementById('addr-sol').value = data.sol || 'Not Assigned';
             modal.classList.add('open');
         });
     }
 
-    window.saveAddresses = function() {
-        const btn = document.querySelector('.btn-save');
-        btn.textContent = "Saving...";
-        
-        const updates = {
-            btc: document.getElementById('addr-btc').value.trim(),
-            eth: document.getElementById('addr-eth').value.trim(),
-            bnb: document.getElementById('addr-bnb').value.trim(),
-            usdt: document.getElementById('addr-usdt').value.trim(),
-            sol: document.getElementById('addr-sol').value.trim()
-        };
-
-        database.ref('privilegesecdata/' + currentUserUid).update(updates)
-        .then(() => {
-            btn.textContent = "Save Addresses";
-            document.getElementById('addressModal').classList.remove('open');
-            showToast('<i class="fa-solid fa-check"></i> Addresses Updated');
-        })
-        .catch(e => {
-            btn.textContent = "Try Again";
-            alert("Error saving addresses: " + e.message);
-        });
+    window.copyAddressField = function(elementId) {
+        const val = document.getElementById(elementId).value;
+        if(val && val !== 'Not Assigned') {
+            navigator.clipboard.writeText(val).then(() => {
+                showToast('<i class="fa-regular fa-copy"></i> Address Copied');
+            });
+        }
     }
 
-    // 3. Coming Soon Handler (Professional Feedback)
+    // 4. Coming Soon Handler
     window.showComingSoon = function(feature) {
         showToast(`<i class="fa-solid fa-clock"></i> ${feature} coming soon`);
     }
 
-    // 4. Utilities
+    // 5. Utilities
     window.copyUserId = function() {
         if(!currentUserUid) return;
         navigator.clipboard.writeText(currentUserUid).then(() => {
