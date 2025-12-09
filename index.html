@@ -1,1105 +1,493 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8" />
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
   <title>TruVesta Wallet - Secure Login</title>
 
-
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
-
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-
-
   <style>
-
     :root {
-
       --bg-dark: #0f0f11;
-
       --bg-card: rgba(30, 30, 35, 0.65);
-
       --gold-primary: #D4AF37;
-
       --gold-light: #F3E5AB;
-
       --gold-dark: #AA8C2C;
-
       --text-main: #FFFFFF;
-
       --text-muted: #8E8E93;
-
       --danger: #FF453A;
-
-      --success: #32D74B; /* Added Green for Success */
-
+      --success: #32D74B;
       --glass-border: 1px solid rgba(212, 175, 55, 0.15);
-
       --glass-blur: blur(25px);
-
       --shadow-soft: 0 20px 50px rgba(0,0,0,0.5);
-
       --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-
     }
-
-
 
     * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 
-
-
     html, body {
-
-      margin: 0;
-
-      padding: 0;
-
-      width: 100%;
-
-      height: 100%;
-
+      margin: 0; padding: 0; width: 100%; height: 100%;
       font-family: 'Plus Jakarta Sans', sans-serif;
-
       background-color: var(--bg-dark);
-
       color: var(--text-main);
-
-      overflow-x: hidden; 
-
-      position: relative;
-
+      overflow-x: hidden; position: relative;
     }
 
-
-
-    /* --- ANIMATED BACKGROUND --- */
-
+    /* --- AMBIENT BG --- */
     .ambient-bg {
-
-      position: fixed; 
-
-      width: 200vw;    
-
-      height: 200vh;
-
-      top: -50%;
-
-      left: -50%;
-
+      position: fixed; width: 200vw; height: 200vh; top: -50%; left: -50%;
       background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.08), transparent 40%),
-
                   radial-gradient(circle at 80% 20%, rgba(60, 60, 70, 0.4), transparent 30%);
-
-      animation: rotateBg 30s linear infinite;
-
-      z-index: -1;
-
-      pointer-events: none;
-
+      animation: rotateBg 30s linear infinite; z-index: -1; pointer-events: none;
     }
+    @keyframes rotateBg { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-
-
-    @keyframes rotateBg {
-
-      0% { transform: rotate(0deg); }
-
-      100% { transform: rotate(360deg); }
-
-    }
-
-
-
-    /* --- MAIN WRAPPER --- */
-
+    /* --- WRAPPER & CARD --- */
     .login-wrapper {
-
-      display: flex;
-
-      flex-direction: column;
-
-      justify-content: center;
-
-      align-items: center;
-
-      min-height: 100vh; 
-
-      padding: 20px;     
-
-      width: 100%;
-
-      position: relative;
-
-      z-index: 1;
-
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 20px; width: 100%; position: relative; z-index: 1;
     }
-
-
-
-    /* --- CARD STYLE --- */
-
     .card {
-
-      width: 100%;
-
-      max-width: 380px; 
-
+      width: 100%; max-width: 380px;
       background: var(--bg-card);
-
-      backdrop-filter: var(--glass-blur);
-
-      -webkit-backdrop-filter: var(--glass-blur);
-
-      border: var(--glass-border);
-
-      border-radius: 24px;
-
-      padding: 35px 25px;
-
-      box-shadow: var(--shadow-soft);
-
-      position: relative;
-
-      overflow: hidden;
-
-      margin-bottom: 30px; 
-
+      backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      border: var(--glass-border); border-radius: 24px;
+      padding: 35px 25px; box-shadow: var(--shadow-soft);
+      position: relative; overflow: hidden; margin-bottom: 30px;
     }
-
-
-
     .card::before {
-
-      content: '';
-
-      position: absolute;
-
-      top: 0; left: 0; width: 100%; height: 2px;
-
-      background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
-
-      opacity: 0.8;
-
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold-primary), transparent); opacity: 0.8;
     }
-
-
 
     .header { text-align: center; margin-bottom: 30px; }
-
-
-
     .logo-mark {
-
-      width: 48px; height: 48px;
-
-      border: 1px solid var(--gold-primary);
-
-      border-radius: 12px;
-
-      display: flex;
-
-      align-items: center;
-
-      justify-content: center;
-
-      margin: 0 auto 15px;
-
-      color: var(--gold-primary);
-
-      font-size: 1.4rem;
-
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
-
+      width: 48px; height: 48px; border: 1px solid var(--gold-primary); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;
+      color: var(--gold-primary); font-size: 1.4rem; box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
       transform: rotate(45deg);
-
     }
-
     .logo-mark i { transform: rotate(-45deg); }
-
-
-
-    .header h2 {
-
-      margin: 0;
-
-      font-family: 'Playfair Display', serif;
-
-      font-weight: 700;
-
-      font-size: 24px;
-
-      color: var(--text-main);
-
-    }
-
-
-
+    .header h2 { margin: 0; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 24px; color: var(--text-main); }
     .header p { margin: 8px 0 0; color: var(--text-muted); font-size: 13px; }
 
-
-
     /* --- INPUTS --- */
-
     .input-group { margin-bottom: 18px; position: relative; }
-
-    
-
     .input-group label {
-
-      display: block;
-
-      font-size: 11px;
-
-      font-weight: 600;
-
-      color: var(--text-muted);
-
-      margin-bottom: 6px;
-
-      text-transform: uppercase;
-
-      letter-spacing: 0.5px;
-
+      display: block; font-size: 11px; font-weight: 600; color: var(--text-muted);
+      margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
     }
-
-
-
     .field-wrapper { position: relative; }
-
-    
-
     .field-wrapper i {
-
-      position: absolute;
-
-      left: 16px; top: 50%;
-
-      transform: translateY(-50%);
-
-      color: var(--text-muted);
-
-      font-size: 14px;
-
-      transition: 0.3s;
-
-      z-index: 2;
-
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); font-size: 14px; transition: 0.3s; z-index: 2;
     }
-
-
-
     input {
-
-      width: 100%;
-
-      background: rgba(0,0,0,0.3);
-
-      border: 1px solid rgba(255,255,255,0.08);
-
-      padding: 15px 15px 15px 45px; 
-
-      border-radius: 12px;
-
-      color: white;
-
-      font-size: 15px; 
-
-      transition: var(--transition);
-
+      width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08);
+      padding: 15px 15px 15px 45px; border-radius: 12px; color: white; font-size: 15px; transition: var(--transition);
     }
+    input:focus { border-color: var(--gold-primary); background: rgba(0,0,0,0.5); }
 
-
-
-    input:focus {
-
-      border-color: var(--gold-primary);
-
-      background: rgba(0,0,0,0.5);
-
-    }
-
-
-
-    /* --- ACTIONS --- */
-
-    .actions {
-
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: center;
-
-      font-size: 12px;
-
-      margin-bottom: 25px;
-
-      color: var(--text-muted);
-
-    }
-
+    /* --- BUTTONS & ACTIONS --- */
+    .actions { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 25px; color: var(--text-muted); }
     .actions a { color: var(--gold-primary); text-decoration: none; }
-
-    
-
     .checkbox-container { display: flex; align-items: center; cursor: pointer; }
-
     .checkbox-container input { display: none; }
-
     .checkmark {
-
-      width: 16px; height: 16px;
-
-      border: 1px solid var(--text-muted);
-
-      border-radius: 4px;
-
-      margin-right: 8px;
-
-      display: flex; align-items: center; justify-content: center;
-
+      width: 16px; height: 16px; border: 1px solid var(--text-muted); border-radius: 4px;
+      margin-right: 8px; display: flex; align-items: center; justify-content: center;
     }
-
-    .checkbox-container input:checked ~ .checkmark {
-
-      background: var(--gold-primary); border-color: var(--gold-primary);
-
-    }
-
+    .checkbox-container input:checked ~ .checkmark { background: var(--gold-primary); border-color: var(--gold-primary); }
     .checkbox-container input:checked ~ .checkmark::after {
-
       content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 10px; color: #000;
-
     }
-
-
-
-    /* --- BUTTONS --- */
 
     .btn {
-
-      width: 100%;
-
-      padding: 15px;
-
-      border-radius: 12px;
-
-      border: none;
-
-      font-size: 15px; font-weight: 700;
-
-      cursor: pointer;
-
-      display: flex; justify-content: center; align-items: center; gap: 10px;
-
-      transition: var(--transition);
-
+      width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 15px; font-weight: 700;
+      cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: var(--transition);
     }
-
-
-
-    .btn-gold {
-
-      background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
-
-      color: #1a1a1a;
-
-    }
-
-
-
-    .divider {
-
-      text-align: center; margin: 20px 0;
-
-      font-size: 10px; color: var(--text-muted);
-
-      text-transform: uppercase; letter-spacing: 1px;
-
-      position: relative;
-
-    }
-
-    .divider::before, .divider::after {
-
-      content: ''; position: absolute; top: 50%;
-
-      width: 35%; height: 1px; background: rgba(255,255,255,0.1);
-
-    }
-
+    .btn-gold { background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)); color: #1a1a1a; }
+    .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; font-weight: 500; }
+    
+    .divider { text-align: center; margin: 20px 0; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; position: relative; }
+    .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 35%; height: 1px; background: rgba(255,255,255,0.1); }
     .divider::before { left: 0; } .divider::after { right: 0; }
 
-
-
-    .btn-outline {
-
-      background: transparent;
-
-      border: 1px solid rgba(255,255,255,0.2);
-
-      color: white; font-weight: 500;
-
-    }
-
-
-
-    .toggle-text {
-
-      text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-muted);
-
-    }
-
+    .toggle-text { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-muted); }
     .toggle-text span { color: white; font-weight: 700; cursor: pointer; margin-left: 5px; }
-
-
-
-    .copyright {
-
-      position: absolute;
-
-      bottom: 15px;
-
-      width: 100%;
-
-      text-align: center;
-
-      font-size: 10px;
-
-      color: rgba(255,255,255,0.2);
-
-    }
-
-    
-
+    .copyright { position: absolute; bottom: 15px; width: 100%; text-align: center; font-size: 10px; color: rgba(255,255,255,0.2); }
     .error-msg { color: var(--danger); font-size: 12px; text-align: center; margin-top: 10px; font-weight: 600; }
 
-    
+    /* --- VERIFY MSG --- */
+    .verify-msg { text-align: center; animation: fadeUp 0.5s ease-out; }
+    .verify-icon { font-size: 3rem; color: var(--success); margin-bottom: 15px; }
+    .verify-title { color: var(--text-main); font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
+    .verify-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5; }
+    .email-highlight { color: var(--gold-primary); font-weight: 600; }
 
-    /* --- NEW: Verification Message Styling --- */
-
-    .verify-msg {
-
-        text-align: center;
-
-        animation: fadeUp 0.5s ease-out;
-
-    }
-
-    .verify-icon {
-
-        font-size: 3rem;
-
-        color: var(--success);
-
-        margin-bottom: 15px;
-
-    }
-
-    .verify-title {
-
-        color: var(--text-main);
-
-        font-size: 1.2rem;
-
-        font-weight: 700;
-
-        margin-bottom: 10px;
-
-    }
-
-    .verify-desc {
-
-        color: var(--text-muted);
-
-        font-size: 0.9rem;
-
-        margin-bottom: 20px;
-
-        line-height: 1.5;
-
-    }
-
-    .email-highlight {
-
-        color: var(--gold-primary);
-
-        font-weight: 600;
-
-    }
-
-
-
-    /* --- INTRO LOADER --- */
-
+    /* --- LOADERS --- */
     #intro-loader {
-
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-
-      background: var(--bg-dark); z-index: 9999;
-
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-
-      transition: opacity 0.5s;
-
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9999;
+      display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s;
     }
-
     .loader-icon { font-size: 3rem; color: var(--gold-primary); margin-bottom: 15px; animation: pulse 1.5s infinite; }
-
     .progress-bar { width: 150px; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
-
     .progress-fill { height: 100%; width: 0%; background: var(--gold-primary); transition: width 3s linear; }
-
     @keyframes pulse { 50% { opacity: 0.5; transform: scale(0.95); } }
-
     @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+    /* --- NEW: CHANGELOG MODAL STYLES --- */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px);
+      z-index: 9000; display: flex; justify-content: center; align-items: center;
+      padding: 20px; opacity: 0; visibility: hidden; transition: 0.3s ease;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    
+    .modal-content {
+      width: 100%; max-width: 450px;
+      background: #141416;
+      border: 1px solid var(--gold-primary);
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+      border-radius: 20px; padding: 0; overflow: hidden;
+      transform: scale(0.9); transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-overlay.active .modal-content { transform: scale(1); }
 
+    .modal-header {
+      background: linear-gradient(90deg, rgba(212, 175, 55, 0.1), transparent);
+      padding: 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-badge {
+      background: var(--gold-primary); color: #000; font-size: 10px; font-weight: 800;
+      padding: 4px 8px; border-radius: 4px; text-transform: uppercase;
+    }
+    .modal-date { font-size: 11px; color: var(--text-muted); }
+    
+    .modal-body { padding: 25px; }
+    .modal-title { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 15px; color: white; }
+    .modal-list { color: #ccc; font-size: 14px; line-height: 1.6; max-height: 250px; overflow-y: auto; }
+    .modal-list ul { padding-left: 20px; margin: 0; }
+    .modal-list li { margin-bottom: 8px; }
+
+    .modal-footer { padding: 20px 25px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
+    .btn-modal-close {
+      background: transparent; border: 1px solid var(--text-muted); color: white;
+      padding: 12px 30px; border-radius: 8px; cursor: pointer; font-size: 13px;
+      transition: 0.2s;
+    }
+    .btn-modal-close:hover { border-color: var(--gold-primary); color: var(--gold-primary); }
 
   </style>
-
 </head>
-
 <body>
 
-
-
   <div id="intro-loader">
-
     <i class="fa-solid fa-shield-halved loader-icon"></i>
-
     <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-
   </div>
 
-
+  <div id="changelog-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-badge" id="cl-version">NEW UPDATE</span>
+        <span class="modal-date" id="cl-date">...</span>
+      </div>
+      <div class="modal-body">
+        <h3 class="modal-title" id="cl-title">System Notice</h3>
+        <div class="modal-list" id="cl-details">
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-close" onclick="closeChangeLog()">Acknowledge & Continue</button>
+      </div>
+    </div>
+  </div>
 
   <div class="ambient-bg"></div>
 
-
-
   <div class="login-wrapper">
-
     <div class="card">
-
       <div class="header">
-
         <div class="logo-mark"><i class="fa-solid fa-shield-halved"></i></div>
-
         <h2 id="header-title">Welcome Back</h2>
-
         <p id="header-desc">Access your premium asset portfolio</p>
-
       </div>
-
-
 
       <div id="form-container">
-
         <form id="login-form">
-
           <div class="input-group">
-
             <label>Email Address</label>
-
             <div class="field-wrapper">
-
               <input type="email" id="login-email" placeholder="client@truvesta.com" required>
-
               <i class="fa-regular fa-envelope"></i>
-
             </div>
-
           </div>
-
           <div class="input-group">
-
             <label>Password</label>
-
             <div class="field-wrapper">
-
               <input type="password" id="login-password" placeholder="••••••••" required>
-
               <i class="fa-solid fa-lock"></i>
-
             </div>
-
           </div>
-
           <div class="actions">
-
             <label class="checkbox-container">
-
               <input type="checkbox"> <span class="checkmark"></span> Remember me
-
             </label>
-
             <a href="#">Forgot Password?</a>
-
           </div>
-
           <button type="submit" id="login-btn" class="btn btn-gold">
-
             <span>Secure Login</span> <i class="fa-solid fa-arrow-right"></i>
-
           </button>
-
         </form>
-
-
 
         <form id="signup-form" style="display: none;">
-
           <div class="input-group">
-
             <label>Full Name</label>
-
             <div class="field-wrapper">
-
               <input type="text" id="signup-name" placeholder=" Patek Hawk" required>
-
               <i class="fa-regular fa-user"></i>
-
             </div>
-
           </div>
-
           <div class="input-group">
-
             <label>Email Address</label>
-
             <div class="field-wrapper">
-
               <input type="email" id="signup-email" placeholder="client@truvesta.com" required>
-
               <i class="fa-regular fa-envelope"></i>
-
             </div>
-
           </div>
-
           <div class="input-group">
-
             <label>Password</label>
-
             <div class="field-wrapper">
-
               <input type="password" id="signup-password" placeholder="Min. 6 chars" required>
-
               <i class="fa-solid fa-key"></i>
-
             </div>
-
           </div>
-
           <button type="submit" id="signup-btn" class="btn btn-gold">Initialize Account</button>
-
         </form>
 
-
-
         <div id="verify-ui" class="verify-msg" style="display: none;">
-
             <i class="fa-regular fa-envelope-open verify-icon"></i>
-
             <div class="verify-title">Check Your Inbox</div>
-
             <div class="verify-desc">
-
                 We've sent a verification link to <br>
-
                 <span id="verify-email-text" class="email-highlight">email@address.com</span>.
-
                 <br><br>Please verify your email to activate your portfolio.
-
             </div>
-
-            <button class="btn btn-outline" id="back-to-login">
-
-                Return to Login
-
-            </button>
-
+            <button class="btn btn-outline" id="back-to-login">Return to Login</button>
         </div>
-
-
 
         <div id="social-container">
-
             <div class="divider">Or Authenticate With</div>
-
             <button class="btn btn-outline" id="google-btn"><i class="fa-brands fa-google"></i> Google</button>
-
-
-
             <div class="toggle-text">
-
-            <span id="toggle-msg">New Client?</span>
-
-            <span id="toggle-action">Create Account</span>
-
+                <span id="toggle-msg">New Client?</span>
+                <span id="toggle-action">Create Account</span>
             </div>
-
         </div>
-
         
-
         <div id="errorMessage" class="error-msg"></div>
-
       </div>
-
     </div>
 
-
-
     <div class="copyright">© 2025 TruVesta Wallet. Secured System.</div>
-
   </div>
 
-
-
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-
-
   <script>
-
-    /* 1. Loader Logic */
-
-    window.onload = () => {
-
-      document.getElementById('progress-fill').style.width = '100%';
-
-      setTimeout(() => {
-
-        document.getElementById('intro-loader').style.opacity = '0';
-
-        setTimeout(() => { document.getElementById('intro-loader').style.display = 'none'; }, 500);
-
-      }, 2500);
-
-    };
-
-
-
-    /* 2. Firebase Init */
-
+    /* --- CONFIGURATION --- */
     const firebaseConfig = {
-
       apiKey: "AIzaSyByvett5gGhga0jx2pBChmg41IKaTvbY24",
-
       authDomain: "bustrack-e4f8f.firebaseapp.com",
-
       databaseURL: "https://bustrack-e4f8f-default-rtdb.firebaseio.com",
-
       projectId: "bustrack-e4f8f",
-
       storageBucket: "bustrack-e4f8f.firebasestorage.app",
-
       messagingSenderId: "544737954134",
-
       appId: "1:544737954134:web:91a197cc88d0a67c43eef7"
-
     };
-
+    
+    // Initialize Firebase
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-
     const auth = firebase.auth();
-
     const db = firebase.database();
 
-
-
-    /* 3. Toggle Logic */
-
-    const loginForm = document.getElementById('login-form');
-
-    const signupForm = document.getElementById('signup-form');
-
-    const toggleAction = document.getElementById('toggle-action');
-
-    const toggleMsg = document.getElementById('toggle-msg');
-
-    const headerTitle = document.getElementById('header-title');
-
-    const verifyUI = document.getElementById('verify-ui');
-
-    const socialContainer = document.getElementById('social-container');
-
-    
-
-    let isLogin = true;
-
-
-
-    toggleAction.addEventListener('click', () => {
-
-      isLogin = !isLogin;
-
-      document.getElementById('errorMessage').innerText = "";
-
-      if (isLogin) {
-
-        loginForm.style.display = 'block'; signupForm.style.display = 'none';
-
-        headerTitle.innerText = "Welcome Back"; toggleMsg.innerText = "New Client?"; toggleAction.innerText = "Create Account";
-
-      } else {
-
-        loginForm.style.display = 'none'; signupForm.style.display = 'block';
-
-        headerTitle.innerText = "New Portfolio"; toggleMsg.innerText = "Existing Client?"; toggleAction.innerText = "Sign In";
-
-      }
-
-    });
-
-
-
-    document.getElementById('back-to-login').addEventListener('click', () => {
-
-        // Reset UI to login state
-
-        verifyUI.style.display = 'none';
-
-        loginForm.style.display = 'block';
-
-        socialContainer.style.display = 'block';
-
-        headerTitle.innerText = "Welcome Back";
-
-        document.getElementById('header-desc').innerText = "Access your premium asset portfolio";
-
-        isLogin = true;
-
-    });
-
-
-
-    /* 4. Auth Logic */
-
-    
-
-    // --- LOGIN (With Verification Check) ---
-
-    document.getElementById('login-btn').addEventListener('click', (e) => {
-
-      e.preventDefault();
-
-      const email = document.getElementById('login-email').value;
-
-      const pass = document.getElementById('login-password').value;
-
-      const errorDiv = document.getElementById('errorMessage');
-
-
-
-      auth.signInWithEmailAndPassword(email, pass)
-
-        .then((userCredential) => {
-
-            const user = userCredential.user;
-
-            
-
-            // CHECK IF EMAIL IS VERIFIED
-
-            if (!user.emailVerified) {
-
-                // If not verified, sign them out immediately
-
-                auth.signOut();
-
-                errorDiv.style.color = "var(--danger)";
-
-                errorDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Verification Required.<br>Please check your email inbox.';
-
-                return;
-
-            }
-
-
-
-            // If verified, proceed
-
-            window.location.href = 'assets.html';
-
-        })
-
-        .catch(err => {
-
-            errorDiv.style.color = "var(--danger)";
-
-            errorDiv.innerText = mapAuthError(err.code);
-
-        });
-
-    });
-
-
-
-    // --- SIGNUP (With Verification Send) ---
-
-    const signupBtn = document.getElementById('signup-btn');
-
-    
-
-    document.getElementById('signup-btn').addEventListener('click', (e) => {
-
-      e.preventDefault();
-
-      const name = document.getElementById('signup-name').value;
-
-      const email = document.getElementById('signup-email').value;
-
-      const pass = document.getElementById('signup-password').value;
-
-      const errorDiv = document.getElementById('errorMessage');
-
-
-
-      if(pass.length < 6) { errorDiv.innerText = "Password must be at least 6 characters."; return; }
-
+    /* --- 1. LOADER & INITIALIZATION --- */
+    window.onload = () => {
+      // Animate Loader
+      document.getElementById('progress-fill').style.width = '100%';
       
-
-      signupBtn.disabled = true;
-
-      signupBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
-
-
-
-      auth.createUserWithEmailAndPassword(email, pass)
-
-        .then((cred) => {
-
-            // 1. Create DB Entry
-
-            return db.ref('users/' + cred.user.uid).set({ name: name, email: email })
-
-            .then(() => {
-
-                // 2. Send Verification Email
-
-                return cred.user.sendEmailVerification();
-
-            });
-
-        })
-
-        .then(() => {
-
-            // 3. Sign Out (Don't let them in yet)
-
-            return auth.signOut();
-
-        })
-
-        .then(() => {
-
-            // 4. Update UI to Show Success Message
-
-            signupForm.style.display = 'none';
-
-            socialContainer.style.display = 'none';
-
-            verifyUI.style.display = 'block';
-
+      setTimeout(() => {
+        document.getElementById('intro-loader').style.opacity = '0';
+        setTimeout(() => { 
+            document.getElementById('intro-loader').style.display = 'none'; 
             
+            // CHECK FIREBASE FOR NOTICE AFTER LOADER FINISHES
+            checkSystemNotice(); 
 
-            document.getElementById('verify-email-text').innerText = email;
+        }, 500);
+      }, 2500);
+    };
 
-            document.getElementById('header-desc').innerText = "Account Initialization";
-
+    /* --- 2. CHANGE LOG SYSTEM LOGIC --- */
+    function checkSystemNotice() {
+        const modal = document.getElementById('changelog-modal');
+        
+        // Fetch from Firebase node: "system_notice"
+        db.ref('system_notice').once('value')
+        .then((snapshot) => {
+            const data = snapshot.val();
             
-
-            signupBtn.disabled = false;
-
-            signupBtn.innerText = "Initialize Account";
-
+            // Only show if data exists and isEnabled is true
+            if (data && data.isEnabled === true) {
+                
+                // Populate Modal Data
+                document.getElementById('cl-version').innerText = data.version || "UPDATE";
+                document.getElementById('cl-date').innerText = data.date || "";
+                document.getElementById('cl-title').innerText = data.title || "System Notice";
+                document.getElementById('cl-details').innerHTML = data.message || "Security updates applied.";
+                
+                // Show Modal (Small delay for smooth effect)
+                setTimeout(() => {
+                    modal.classList.add('active');
+                }, 500);
+            }
         })
-
-        .catch(err => {
-
-            errorDiv.innerText = mapAuthError(err.code);
-
-            signupBtn.disabled = false;
-
-            signupBtn.innerText = "Initialize Account";
-
+        .catch((error) => {
+            console.log("Notice fetch error:", error);
         });
-
-    });
-
-
-
-    // --- GOOGLE AUTH ---
-
-    document.getElementById('google-btn').addEventListener('click', () => {
-
-      const provider = new firebase.auth.GoogleAuthProvider();
-
-      auth.signInWithPopup(provider)
-
-      .then((result) => {
-
-          // Google accounts are auto-verified, so we can usually just let them in.
-
-          // But we should create the DB entry if it's a new user.
-
-           if (result.additionalUserInfo.isNewUser) {
-
-                const user = result.user;
-
-                db.ref('users/' + user.uid).set({ name: user.displayName, email: user.email });
-
-           }
-
-           window.location.href = 'assets.html';
-
-      })
-
-      .catch(err => console.error(err));
-
-    });
-
-
-
-    function mapAuthError(code) {
-
-        switch(code) {
-
-            case 'auth/invalid-email': return 'Invalid email address.';
-
-            case 'auth/user-not-found': return 'Account not found.';
-
-            case 'auth/wrong-password': return 'Incorrect password.';
-
-            case 'auth/email-already-in-use': return 'Email is already registered.';
-
-            default: return 'Authentication failed. Please try again.';
-
-        }
-
     }
 
+    // Global function to close modal
+    window.closeChangeLog = function() {
+        document.getElementById('changelog-modal').classList.remove('active');
+    }
+
+    /* --- 3. LOGIN/SIGNUP TOGGLE LOGIC --- */
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const toggleAction = document.getElementById('toggle-action');
+    const toggleMsg = document.getElementById('toggle-msg');
+    const headerTitle = document.getElementById('header-title');
+    const verifyUI = document.getElementById('verify-ui');
+    const socialContainer = document.getElementById('social-container');
+    
+    let isLogin = true;
+
+    toggleAction.addEventListener('click', () => {
+      isLogin = !isLogin;
+      document.getElementById('errorMessage').innerText = "";
+      if (isLogin) {
+        loginForm.style.display = 'block'; signupForm.style.display = 'none';
+        headerTitle.innerText = "Welcome Back"; toggleMsg.innerText = "New Client?"; toggleAction.innerText = "Create Account";
+      } else {
+        loginForm.style.display = 'none'; signupForm.style.display = 'block';
+        headerTitle.innerText = "New Portfolio"; toggleMsg.innerText = "Existing Client?"; toggleAction.innerText = "Sign In";
+      }
+    });
+
+    document.getElementById('back-to-login').addEventListener('click', () => {
+        verifyUI.style.display = 'none';
+        loginForm.style.display = 'block';
+        socialContainer.style.display = 'block';
+        headerTitle.innerText = "Welcome Back";
+        document.getElementById('header-desc').innerText = "Access your premium asset portfolio";
+        isLogin = true;
+    });
+
+    /* --- 4. AUTHENTICATION LOGIC --- */
+    
+    // LOGIN
+    document.getElementById('login-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const pass = document.getElementById('login-password').value;
+      const errorDiv = document.getElementById('errorMessage');
+
+      auth.signInWithEmailAndPassword(email, pass)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            if (!user.emailVerified) {
+                auth.signOut();
+                errorDiv.style.color = "var(--danger)";
+                errorDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Verification Required.<br>Please check your email inbox.';
+                return;
+            }
+            window.location.href = 'assets.html';
+        })
+        .catch(err => {
+            errorDiv.style.color = "var(--danger)";
+            errorDiv.innerText = mapAuthError(err.code);
+        });
+    });
+
+    // SIGNUP
+    const signupBtn = document.getElementById('signup-btn');
+    document.getElementById('signup-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('signup-name').value;
+      const email = document.getElementById('signup-email').value;
+      const pass = document.getElementById('signup-password').value;
+      const errorDiv = document.getElementById('errorMessage');
+
+      if(pass.length < 6) { errorDiv.innerText = "Password must be at least 6 characters."; return; }
+      
+      signupBtn.disabled = true;
+      signupBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+
+      auth.createUserWithEmailAndPassword(email, pass)
+        .then((cred) => {
+            return db.ref('users/' + cred.user.uid).set({ name: name, email: email })
+            .then(() => cred.user.sendEmailVerification());
+        })
+        .then(() => auth.signOut())
+        .then(() => {
+            signupForm.style.display = 'none';
+            socialContainer.style.display = 'none';
+            verifyUI.style.display = 'block';
+            document.getElementById('verify-email-text').innerText = email;
+            document.getElementById('header-desc').innerText = "Account Initialization";
+            signupBtn.disabled = false;
+            signupBtn.innerText = "Initialize Account";
+        })
+        .catch(err => {
+            errorDiv.innerText = mapAuthError(err.code);
+            signupBtn.disabled = false;
+            signupBtn.innerText = "Initialize Account";
+        });
+    });
+
+    // GOOGLE AUTH
+    document.getElementById('google-btn').addEventListener('click', () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+      .then((result) => {
+           if (result.additionalUserInfo.isNewUser) {
+                const user = result.user;
+                db.ref('users/' + user.uid).set({ name: user.displayName, email: user.email });
+           }
+           window.location.href = 'assets.html';
+      })
+      .catch(err => console.error(err));
+    });
+
+    function mapAuthError(code) {
+        switch(code) {
+            case 'auth/invalid-email': return 'Invalid email address.';
+            case 'auth/user-not-found': return 'Account not found.';
+            case 'auth/wrong-password': return 'Incorrect password.';
+            case 'auth/email-already-in-use': return 'Email is already registered.';
+            default: return 'Authentication failed. Please try again.';
+        }
+    }
   </script>
-
 </body>
-
 </html>
