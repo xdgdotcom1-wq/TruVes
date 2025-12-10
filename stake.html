@@ -12,31 +12,50 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 
   <style>
-    /* === LUXURIOUS THEME VARIABLES (Gold/Deep Charcoal) === */
+    /* === LUXURIOUS THEME VARIABLES (Matches Profile & Assets) === */
     :root{
       --bg-0: #1C1C1E; /* Deep Charcoal */
       --bg-1: #2C2C2E; /* Dark Grey */
       --bg-2: #404043; /* Medium Dark Grey */
-      --txt-1: #E0E0E0; /* Off-White for contrast */
+      --txt-1: #E0E0E0; /* Off-White */
       --txt-2: #A0A0A0; /* Soft Grey */
       --pri-color: #D4AF37; /* Classic Gold */
-      --pri-gradient: linear-gradient(90deg, #D4AF37, #FFD700); /* Gold Gradient */
-      --btn-bg: #D4AF37; /* Solid Gold Button */
-      --btn-txt: #1C1C1E; /* Dark text on Gold */
-      --good: #34D399; /* Emerald Green for positive */
-      --bad: #F87171; /* Soft Red for negative */
-      --warn: #FBBF24; /* Amber */
-      --edge: rgba(212, 175, 55, .2); /* Soft Gold border/edge */
-      --glow: 0 4px 15px rgba(0,0,0,.5); /* Darker, subtle glow */
-      --radius: 14px; /* Slightly softer corners */
+      --pri-gradient: linear-gradient(90deg, #D4AF37, #FFD700);
+      --btn-bg: #D4AF37;
+      --btn-txt: #1C1C1E;
+      --good: #34D399; 
+      --bad: #F87171;
+      --warn: #FBBF24; /* Unique to Stake */
+      --edge: rgba(212, 175, 55, .2);
+      --glow: 0 4px 15px rgba(0,0,0,.5);
+      --radius: 14px;
+      --input-bg: #404043;
     }
+
+    /* === LIGHT THEME OVERRIDES === */
+    body.light-theme {
+        --bg-0: #F2F2F7;
+        --bg-1: #FFFFFF;
+        --bg-2: #E5E5EA;
+        --txt-1: #1C1C1E;
+        --txt-2: #8E8E93;
+        --edge: rgba(0, 0, 0, 0.1);
+        --glow: 0 4px 15px rgba(0,0,0,0.08);
+        --input-bg: #E5E5EA;
+        --btn-txt: #1C1C1E; 
+    }
+
     *{box-sizing:border-box}
     body{
       margin:0; padding-bottom: 80px;
       font-family: Inter, system-ui, sans-serif;
       color:var(--txt-1); background-color: var(--bg-0);
       letter-spacing:.2px; min-height: 100dvh;
+      /* Smooth transition for theme switching */
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
+    body::-webkit-scrollbar {display: none;}
+
     .app{display:flex; flex-direction:column; position: relative; min-height: 100dvh;}
     .main{padding:16px; display:flex; flex-direction:column; gap:16px;}
 
@@ -52,9 +71,11 @@
     .header .btn-icon {
       width: 40px; height: 40px;
       display: grid; place-items: center;
-      font-size: 16px;
+      font-size: 18px; /* Slightly larger for icons */
       background: transparent; border: 0; color: var(--txt-2); cursor: pointer;
+      transition: color 0.2s;
     }
+    .header .btn-icon:hover { color: var(--pri-color); }
 
     /* BUTTONS */
     .btn{
@@ -100,7 +121,7 @@
     .bottom-nav a i{font-size: 20px;}
     .bottom-nav a.active{color: var(--pri-color); font-weight: 700;}
 
-    /* FORM ELEMENTS - PROFESSIONAL STYLE */
+    /* FORM ELEMENTS */
     .form-group{margin-bottom:16px;}
     .form-group label{font-size:12px; color:var(--txt-2); margin-left:4px; display:block; margin-bottom: 4px;}
 
@@ -111,7 +132,6 @@
         transition: border-color 0.3s, box-shadow 0.3s;
     }
 
-    /* FOCUS STATE FOR PROFESSIONAL FEEL */
     .form-group input:focus, .form-group select:focus {
         border-color: var(--pri-color);
         box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15);
@@ -158,13 +178,13 @@
 
     /* Custom Readonly Input Style */
     input[readonly] {
-        background-color: #252527; 
+        background-color: var(--bg-1); 
         color: var(--txt-2);
         cursor: not-allowed;
-        border-color: rgba(255,255,255,0.05);
+        border-color: var(--edge);
     }
     input[readonly]:focus {
-        border-color: rgba(255,255,255,0.05);
+        border-color: var(--edge);
         box-shadow: none;
     }
 
@@ -243,7 +263,11 @@
       <header class="header">
         <button class="btn-icon" onclick="window.location.href='assets.html'"><i class="fa-solid fa-arrow-left"></i></button>
         <span class="app-title">Staking Hub</span>
-        <div style="width: 40px;"></div> </header>
+        
+        <button onclick="toggleTheme()" id="themeToggleBtn" class="btn-icon">
+            <i class="fa-solid fa-moon"></i>
+        </button>
+      </header>
 
       <div class="card" id="global-stake-overview">
         <div class="head"><h3>Portfolio Stakes</h3></div>
@@ -338,6 +362,34 @@
     const auth = firebase.auth();
     const database = firebase.database();
 
+    // --- THEME LOGIC (SYNCED WITH PROFILE) ---
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+        }
+        updateThemeIcon();
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('light-theme');
+        const isLight = document.body.classList.contains('light-theme');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+        const btn = document.getElementById('themeToggleBtn');
+        const isLight = document.body.classList.contains('light-theme');
+        if (isLight) {
+            btn.innerHTML = '<i class="fa-solid fa-sun" style="color: var(--pri-color);"></i>';
+        } else {
+            btn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+        }
+    }
+    
+    initTheme(); // Run on load
+
     // --- CUSTOM MODAL LOGIC ---
     let modalResolver = null;
 
@@ -381,16 +433,31 @@
 
     // --- CONFIG & DEFAULTS ---
     
-    // Default Fallbacks (used only if Firebase fails to load or empty)
+    const GLOBAL_RULES_PATH = 'globalStakingRules';
+
+    // UPDATED: Default Tiers (MATCHES YOUR REQUEST EXACTLY)
     let STAKE_TIERS = [
-        { max: 50, rate: 0.01 },        // Fallback: 1%
-        { max: 999999999, rate: 0.03 }  // Fallback: 3%
+        { max: 49, rate: 0.01 },        // $0 - $49: 1%
+        { max: 99, rate: 0.012 },       // $50 - $99: 1.2%
+        { max: 249, rate: 0.015 },      // $100 - $249: 1.5%
+        { max: 499, rate: 0.017 },      // $250 - $499: 1.7%
+        { max: 999, rate: 0.02 },       // $500 - $999: 2%
+        { max: 1499, rate: 0.022 },     // $1000 - $1499: 2.2%
+        { max: 2499, rate: 0.025 },     // $1500 - $2499: 2.5%
+        { max: 5000, rate: 0.027 },     // $2500 - $5000: 2.7%
+        { max: 99999999999, rate: 0.03 } // $5000+: 3%
     ];
 
-    let currentWithdrawLimits = [
-        { max: 250, percent: 0.10 },    // Fallback: 10%
-        { max: 999999999, percent: 0.30 } // Fallback: 30%
+    // Default Withdrawal Limits
+    let DEFAULT_WITHDRAW_LIMITS = [
+        { max: 249, percent: 0.10 },
+        { max: 999, percent: 0.15 },
+        { max: 2499, percent: 0.20 },
+        { max: 4999, percent: 0.25 },
+        { max: Infinity, percent: 0.30 }
     ];
+
+    let currentWithdrawLimits = [...DEFAULT_WITHDRAW_LIMITS];
 
     // FIXED DURATION CONSTANT
     const FIXED_DURATION_DAYS = 250; 
@@ -422,8 +489,11 @@
       if (user) {
         userId = user.uid;
 
-        // Start Listeners
-        listenToPlatformSettings(); // NEW: Listen to global settings
+        // 1. Initialize Global Rules (Checks DB, if empty, uploads defaults)
+        checkAndInitGlobalRules();
+
+        // 2. Start Listeners
+        listenToGlobalRules();
         fetchAndInitPublicAddresses(user.uid);
         listenForActiveStakes();
         
@@ -434,70 +504,86 @@
     });
 
     /**
-     * 1. Listen to Global Platform Settings from Firebase (platformSettings/rewardTiers & platformSettings/withdrawalLimits)
+     * Checks /globalStakingRules
+     * If no data exists, saves the requested list.
      */
-    function listenToPlatformSettings() {
-        const ref = database.ref('platformSettings');
+    function checkAndInitGlobalRules() {
+        const ref = database.ref(GLOBAL_RULES_PATH);
 
-        ref.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                // Update Interest Tiers
-                if (data.rewardTiers && Array.isArray(data.rewardTiers)) {
-                    STAKE_TIERS = data.rewardTiers.sort((a, b) => a.max - b.max);
-                    console.log("✅ Updated Global Rates:", STAKE_TIERS);
-                }
+        ref.get().then((snapshot) => {
+            if (!snapshot.exists()) {
+                console.log("Global rules not found. Initializing specific tiers to DB...");
                 
-                // Update Withdrawal Limits
-                if (data.withdrawalLimits && Array.isArray(data.withdrawalLimits)) {
-                    currentWithdrawLimits = data.withdrawalLimits.sort((a, b) => a.max - b.max);
-                    console.log("✅ Updated Withdrawal Limits:", currentWithdrawLimits);
-                }
+                // FORCE THE REQUESTED TIERS
+                const defaultRules = {
+                    tiers: STAKE_TIERS, // Uses the variable defined above
+                    withdrawLimits: DEFAULT_WITHDRAW_LIMITS
+                };
 
-                // Refresh UI if user is already typing or has stakes
-                updateEstimatedRate();
-                if(Object.keys(activeStakes).length > 0) renderActiveStakes();
+                ref.set(defaultRules).then(() => {
+                    console.log("Global staking rules initialized with requested tiers.");
+                });
             }
         });
     }
 
     /**
-     * 2. Function to Get Daily Reward % based on Amount (uses STAKE_TIERS)
+     * Real-time Listener for GLOBAL Rules
+     */
+    function listenToGlobalRules() {
+        const ref = database.ref(GLOBAL_RULES_PATH);
+
+        ref.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // Update Interest Tiers if exist
+                if (data.tiers && Array.isArray(data.tiers)) {
+                    STAKE_TIERS = data.tiers.map(t => {
+                        // Handle infinity or very large numbers
+                        return { max: t.max > 90000000000 ? Infinity : t.max, rate: t.rate };
+                    });
+                }
+                
+                // Update Withdrawal Limits if exist
+                if (data.withdrawLimits && Array.isArray(data.withdrawLimits)) {
+                    currentWithdrawLimits = data.withdrawLimits;
+                } else {
+                    currentWithdrawLimits = [...DEFAULT_WITHDRAW_LIMITS];
+                }
+                console.log("Global Rules Synced:", STAKE_TIERS);
+            }
+            // Trigger UI refresh
+            if(Object.keys(activeStakes).length > 0) renderActiveStakes();
+            updateEstimatedRate(); 
+        });
+    }
+
+    /**
+     * Helper: Get Interest Rate based on USD Amount
+     * ITERATES THROUGH TIERS defined in DB (or default)
      */
     function getRateForUsdAmount(usdAmount) {
         if (!usdAmount || usdAmount < 0) return 0.01;
         
-        // Loop through the tiers fetched from Firebase
+        // Loop through the tiers (e.g., 49, 99, 249...)
         for (let tier of STAKE_TIERS) {
             if (usdAmount <= tier.max) {
-                return parseFloat(tier.rate);
+                return tier.rate;
             }
         }
-        
-        // If amount is higher than all tiers (or matches last high number), return the highest rate
-        if(STAKE_TIERS.length > 0) {
-            return parseFloat(STAKE_TIERS[STAKE_TIERS.length - 1].rate);
-        }
-        return 0.01; // absolute fallback
+        // Fallback max rate (3%) if somehow above infinity
+        return 0.03; 
     }
 
     /**
-     * 3. Function to Get Required Withdrawal % based on Amount (uses currentWithdrawLimits)
+     * Helper: Get Minimum Withdrawal % based on USD Amount
      */
     function getMinWithdrawPercentage(usdAmount) {
-        if (!usdAmount || usdAmount < 0) return 0.10; // Default safety
-        
+        if (!usdAmount || usdAmount < 0) return 0.10; // Default lowest
         for (let limit of currentWithdrawLimits) {
-            if (usdAmount <= limit.max) {
-                return parseFloat(limit.percent);
-            }
+            if (usdAmount <= limit.max) return limit.percent;
         }
-        
-        // Default to the last (highest) setting
-        if(currentWithdrawLimits.length > 0) {
-            return parseFloat(currentWithdrawLimits[currentWithdrawLimits.length - 1].percent);
-        }
-        return 0.30;
+        return 0.30; // Max default
     }
 
     // --- REAL TIME RATE CALCULATION UI ---
