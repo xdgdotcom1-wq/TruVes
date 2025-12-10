@@ -3,8 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>TruVesta Wallet - Secure Login</title>
+  
+  <title>TruVesta Wallet | Secure Asset & Wealth Management Login</title>
+  <meta name="description" content="Securely access your TruVesta premium portfolio. The leading digital wallet for high-net-worth asset management, real-time crypto tracking, and wealth security.">
+  <meta name="keywords" content="TruVesta, TruVesta Wallet, Digital Wallet, Secure Login, Asset Management, Crypto Portfolio, Wealth Management, Fintech, Premium Wallet, Gold Assets">
+  <meta name="author" content="TruVesta Financial">
+  <meta name="robots" content="index, follow">
 
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://truvesta.com/login">
+  <meta property="og:title" content="TruVesta Wallet - Secure Wealth Access">
+  <meta property="og:description" content="Login to manage your premium assets. Next-generation security for your digital wealth.">
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TruVesta Wallet Login">
+  <meta name="twitter:description" content="Securely manage your assets and portfolio.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
@@ -35,6 +48,14 @@
       background-color: var(--bg-dark);
       color: var(--text-main);
       overflow-x: hidden; position: relative;
+    }
+
+    /* --- SEO UTILITY CLASS (Hidden from humans, seen by bots) --- */
+    .sr-only {
+        position: absolute;
+        width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0, 0, 0, 0);
+        white-space: nowrap; border-width: 0;
     }
 
     /* --- AMBIENT BG --- */
@@ -112,15 +133,28 @@
     }
     .btn-gold { background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)); color: #1a1a1a; }
     .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; font-weight: 500; }
-    
+     
     .divider { text-align: center; margin: 20px 0; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; position: relative; }
     .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 35%; height: 1px; background: rgba(255,255,255,0.1); }
     .divider::before { left: 0; } .divider::after { right: 0; }
 
     .toggle-text { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-muted); }
     .toggle-text span { color: white; font-weight: 700; cursor: pointer; margin-left: 5px; }
-    .copyright { position: absolute; bottom: 15px; width: 100%; text-align: center; font-size: 10px; color: rgba(255,255,255,0.2); }
+    
     .error-msg { color: var(--danger); font-size: 12px; text-align: center; margin-top: 10px; font-weight: 600; }
+
+    /* --- UPDATED FOOTER SEO STYLES --- */
+    .footer-seo {
+        position: absolute; bottom: 15px; width: 100%; text-align: center; z-index: 2;
+    }
+    .footer-seo p {
+        font-size: 10px; color: rgba(255,255,255,0.2); margin: 0; letter-spacing: 0.5px;
+    }
+    .footer-links { margin-top: 4px; }
+    .footer-links a {
+        color: rgba(255,255,255,0.3); text-decoration: none; font-size: 9px; margin: 0 5px; transition: color 0.3s;
+    }
+    .footer-links a:hover { color: var(--gold-primary); }
 
     /* --- VERIFY MSG --- */
     .verify-msg { text-align: center; animation: fadeUp 0.5s ease-out; }
@@ -148,7 +182,7 @@
       padding: 20px; opacity: 0; visibility: hidden; transition: 0.3s ease;
     }
     .modal-overlay.active { opacity: 1; visibility: visible; }
-    
+     
     .modal-content {
       width: 100%; max-width: 450px;
       background: #141416;
@@ -169,7 +203,7 @@
       padding: 4px 8px; border-radius: 4px; text-transform: uppercase;
     }
     .modal-date { font-size: 11px; color: var(--text-muted); }
-    
+     
     .modal-body { padding: 25px; }
     .modal-title { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 15px; color: white; }
     .modal-list { color: #ccc; font-size: 14px; line-height: 1.6; max-height: 250px; overflow-y: auto; }
@@ -215,6 +249,8 @@
   <div class="login-wrapper">
     <div class="card">
       <div class="header">
+        <h1 class="sr-only">TruVesta Digital Asset Wallet Login</h1> 
+
         <div class="logo-mark"><i class="fa-solid fa-shield-halved"></i></div>
         <h2 id="header-title">Welcome Back</h2>
         <p id="header-desc">Access your premium asset portfolio</p>
@@ -296,7 +332,15 @@
       </div>
     </div>
 
-    <div class="copyright">© 2025 TruVesta Wallet. Secured System.</div>
+    <div class="footer-seo">
+      <p>© 2025 TruVesta Wallet. Premium Digital Asset Management.</p>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a> • 
+        <a href="#">Security</a> • 
+        <a href="#">Wealth Services</a>
+      </div>
+    </div>
+
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -314,7 +358,7 @@
       messagingSenderId: "544737954134",
       appId: "1:544737954134:web:91a197cc88d0a67c43eef7"
     };
-    
+     
     // Initialize Firebase
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -471,8 +515,8 @@
       auth.signInWithPopup(provider)
       .then((result) => {
            if (result.additionalUserInfo.isNewUser) {
-                const user = result.user;
-                db.ref('users/' + user.uid).set({ name: user.displayName, email: user.email });
+               const user = result.user;
+               db.ref('users/' + user.uid).set({ name: user.displayName, email: user.email });
            }
            window.location.href = 'assets.html';
       })
@@ -488,6 +532,22 @@
             default: return 'Authentication failed. Please try again.';
         }
     }
+  </script>
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "TruVesta Wallet",
+    "operatingSystem": "Web, iOS, Android",
+    "applicationCategory": "FinanceApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "A premium digital wallet for tracking assets, crypto, and wealth portfolios securely."
+  }
   </script>
 </body>
 </html>
