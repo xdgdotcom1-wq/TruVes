@@ -381,30 +381,16 @@
 
     // --- CONFIG & DEFAULTS ---
     
-    // Default Interest Rates (Can be overridden by DB)
+    // Default Fallbacks (used only if Firebase fails to load or empty)
     let STAKE_TIERS = [
-        { max: 49, rate: 0.01 },        // $0-$49: 1%
-        { max: 99, rate: 0.012 },       // $50-$99: 1.2%
-        { max: 249, rate: 0.015 },      // $100-$249: 1.5%
-        { max: 499, rate: 0.017 },      // $250-$499: 1.7%
-        { max: 999, rate: 0.02 },       // $500-$999: 2%
-        { max: 1499, rate: 0.022 },     // $1000-$1499: 2.2%
-        { max: 2499, rate: 0.025 },     // $1500-$2499: 2.5%
-        { max: 5000, rate: 0.027 },     // $2500-$5000: 2.7%
-        { max: Infinity, rate: 0.03 }   // $5000+: 3%
+        { max: 50, rate: 0.01 },        // Fallback: 1%
+        { max: 999999999, rate: 0.03 }  // Fallback: 3%
     ];
 
-    // Default Withdrawal Limits (Tiered by USD Value)
-    // 0-249: 10%, 250-999: 15%, 1000-2499: 20%, 2500-4999: 25%, 5000+: 30%
-    let DEFAULT_WITHDRAW_LIMITS = [
-        { max: 249, percent: 0.10 },
-        { max: 999, percent: 0.15 },
-        { max: 2499, percent: 0.20 },
-        { max: 4999, percent: 0.25 },
-        { max: Infinity, percent: 0.30 }
+    let currentWithdrawLimits = [
+        { max: 250, percent: 0.10 },    // Fallback: 10%
+        { max: 999999999, percent: 0.30 } // Fallback: 30%
     ];
-
-    let currentWithdrawLimits = [...DEFAULT_WITHDRAW_LIMITS];
 
     // FIXED DURATION CONSTANT
     const FIXED_DURATION_DAYS = 250; 
@@ -430,7 +416,6 @@
 
     const USER_ADDRESSES_PATH = 'privilegesecdata/';
     const USER_HOLDINGS_PATH = 'userHoldings/'; 
-    const USER_SETTINGS_PATH = 'userSettings/'; 
 
     // --- AUTH & INIT ---
     auth.onAuthStateChanged((user) => {
@@ -438,7 +423,7 @@
         userId = user.uid;
 
         // Start Listeners
-        listenToUserSettings(user.uid);
+        listenToPlatformSettings(); // NEW: Listen to global settings
         fetchAndInitPublicAddresses(user.uid);
         listenForActiveStakes();
         
@@ -449,53 +434,70 @@
     });
 
     /**
-     * Real-time Listener for User Settings (Tiers & Limits)
+     * 1. Listen to Global Platform Settings from Firebase (platformSettings/rewardTiers & platformSettings/withdrawalLimits)
      */
-    function listenToUserSettings(userId) {
-        const path = USER_SETTINGS_PATH + userId;
-        const ref = database.ref(path);
+    function listenToPlatformSettings() {
+        const ref = database.ref('platformSettings');
 
         ref.on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                // Update Interest Tiers if exist
-                if (data.tiers && Array.isArray(data.tiers)) {
-                    STAKE_TIERS = data.tiers;
+                // Update Interest Tiers
+                if (data.rewardTiers && Array.isArray(data.rewardTiers)) {
+                    STAKE_TIERS = data.rewardTiers.sort((a, b) => a.max - b.max);
+                    console.log("✅ Updated Global Rates:", STAKE_TIERS);
                 }
                 
-                // Update Withdrawal Limits if exist
-                if (data.withdrawLimits && Array.isArray(data.withdrawLimits)) {
-                    currentWithdrawLimits = data.withdrawLimits;
-                    console.log("Updated Withdrawal Limits from DB:", currentWithdrawLimits);
-                } else {
-                    currentWithdrawLimits = [...DEFAULT_WITHDRAW_LIMITS];
+                // Update Withdrawal Limits
+                if (data.withdrawalLimits && Array.isArray(data.withdrawalLimits)) {
+                    currentWithdrawLimits = data.withdrawalLimits.sort((a, b) => a.max - b.max);
+                    console.log("✅ Updated Withdrawal Limits:", currentWithdrawLimits);
                 }
+
+                // Refresh UI if user is already typing or has stakes
+                updateEstimatedRate();
+                if(Object.keys(activeStakes).length > 0) renderActiveStakes();
             }
-            // Trigger UI refresh to show new limits immediately
-            if(Object.keys(activeStakes).length > 0) renderActiveStakes();
         });
     }
 
     /**
-     * Helper: Get Interest Rate based on USD Amount
+     * 2. Function to Get Daily Reward % based on Amount (uses STAKE_TIERS)
      */
     function getRateForUsdAmount(usdAmount) {
-        if (!usdAmount || usdAmount < 0) return 0;
+        if (!usdAmount || usdAmount < 0) return 0.01;
+        
+        // Loop through the tiers fetched from Firebase
         for (let tier of STAKE_TIERS) {
-            if (usdAmount <= tier.max) return tier.rate;
+            if (usdAmount <= tier.max) {
+                return parseFloat(tier.rate);
+            }
         }
-        return 0.01; 
+        
+        // If amount is higher than all tiers (or matches last high number), return the highest rate
+        if(STAKE_TIERS.length > 0) {
+            return parseFloat(STAKE_TIERS[STAKE_TIERS.length - 1].rate);
+        }
+        return 0.01; // absolute fallback
     }
 
     /**
-     * Helper: Get Minimum Withdrawal % based on USD Amount
+     * 3. Function to Get Required Withdrawal % based on Amount (uses currentWithdrawLimits)
      */
     function getMinWithdrawPercentage(usdAmount) {
-        if (!usdAmount || usdAmount < 0) return 0.10; // Default lowest
+        if (!usdAmount || usdAmount < 0) return 0.10; // Default safety
+        
         for (let limit of currentWithdrawLimits) {
-            if (usdAmount <= limit.max) return limit.percent;
+            if (usdAmount <= limit.max) {
+                return parseFloat(limit.percent);
+            }
         }
-        return 0.30; // Max default
+        
+        // Default to the last (highest) setting
+        if(currentWithdrawLimits.length > 0) {
+            return parseFloat(currentWithdrawLimits[currentWithdrawLimits.length - 1].percent);
+        }
+        return 0.30;
     }
 
     // --- REAL TIME RATE CALCULATION UI ---
