@@ -188,6 +188,80 @@
         box-shadow: none;
     }
 
+    /* === PROMO REFERRAL CARD === */
+    .referral-promo {
+        background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
+        border: 1px solid var(--edge);
+        border-radius: var(--radius);
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: var(--glow);
+    }
+    .referral-promo:active { transform: scale(0.98); }
+    .referral-content { display: flex; align-items: center; gap: 15px; }
+    .ref-icon-box {
+        width: 45px; height: 45px;
+        background: rgba(212, 175, 55, 0.1);
+        border-radius: 12px;
+        display: grid; place-items: center;
+        color: var(--pri-color); font-size: 20px;
+    }
+    .ref-text h4 { margin: 0 0 2px 0; color: var(--txt-1); font-size: 16px; }
+    .ref-text p { margin: 0; color: var(--txt-2); font-size: 12px; }
+    .ref-arrow { color: var(--txt-2); font-size: 14px; }
+
+    /* === REFERRAL PAGE STYLES === */
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .feature-item {
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
+        padding: 12px;
+        background: var(--bg-2);
+        border-radius: 10px;
+        border: 1px solid var(--edge);
+    }
+    .feature-icon {
+        color: var(--pri-color);
+        font-size: 20px;
+        margin-top: 3px;
+    }
+    .feature-text h4 {
+        margin: 0 0 4px 0;
+        font-size: 15px;
+        color: var(--txt-1);
+    }
+    .feature-text p {
+        margin: 0;
+        font-size: 12px;
+        color: var(--txt-2);
+        line-height: 1.4;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: rgba(251, 191, 36, 0.15);
+        color: var(--warn);
+        border: 1px solid var(--warn);
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+
     /* === CUSTOM MODAL / DIALOG BOX STYLES === */
     .modal-overlay {
         position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -290,6 +364,17 @@
         </div>
       </div>
 
+      <div class="referral-promo" onclick="openReferralView()">
+          <div class="referral-content">
+              <div class="ref-icon-box"><i class="fa-solid fa-user-group"></i></div>
+              <div class="ref-text">
+                  <h4>Affiliate Program</h4>
+                  <p>Build your network & earn.</p>
+              </div>
+          </div>
+          <div class="ref-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+
       <div class="card" id="create-stake-card">
         <div class="head"><h3>New Stake</h3></div>
         <div class="body">
@@ -337,21 +422,99 @@
             </div>
         </div>
       </div>
-
     </main>
-
-    <nav class="bottom-nav">
-        <a class="active" href="#" title="Stake"><i class="fa-solid fa-layer-group"></i><span>Stake</span></a>
-        <a href="assets.html" title="Assets"><i class="fa-solid fa-wallet"></i><span>Assets</span></a>
-        <a href="profile.html" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
-    </nav>
   </div> 
+
+  <div class="app" id="referral-view" style="display: none;">
+    <main class="main">
+        <header class="header">
+            <button class="btn-icon" onclick="closeReferralView()"><i class="fa-solid fa-arrow-left"></i></button>
+            <span class="app-title">Affiliate</span>
+            <div style="width: 40px;"></div> </header>
+
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px 0;">
+            <div style="width: 80px; height: 80px; background: var(--bg-1); border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--edge); box-shadow: var(--glow); margin-bottom: 20px;">
+                <i class="fa-solid fa-rocket" style="font-size: 32px; color: var(--pri-color);"></i>
+            </div>
+            
+            <span class="status-badge">Work In Progress</span>
+            <h2 style="font-family: 'Playfair Display'; color: var(--txt-1); margin: 10px 0 5px 0; font-size: 24px;">Referral Program</h2>
+            <p style="color: var(--txt-2); font-size: 14px; max-width: 300px; margin-bottom: 30px;">
+                Our new tiered commission ecosystem is currently in the final stages of development.
+            </p>
+
+            <div class="card" style="width: 100%; text-align: left;">
+                <div class="head"><h3>Upcoming Features</h3></div>
+                <div class="body">
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <i class="fa-solid fa-users-viewfinder feature-icon"></i>
+                            <div class="feature-text">
+                                <h4>3-Tier Earning Architecture</h4>
+                                <p>Earn varying percentages from direct referrals, secondary, and tertiary network connections.</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fa-solid fa-bolt feature-icon"></i>
+                            <div class="feature-text">
+                                <h4>Instant USDT Settlement</h4>
+                                <p>Commissions are settled in real-time directly to your wallet upon network staking events.</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fa-solid fa-chart-pie feature-icon"></i>
+                            <div class="feature-text">
+                                <h4>Deep Analytics Ledger</h4>
+                                <p>Comprehensive dashboard to track network growth, active nodes, and cumulative yields.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" style="width: 100%; text-align: left; margin-top: 15px; border-color: var(--warn);">
+                <div class="head" style="border-bottom-color: rgba(251, 191, 36, 0.2);">
+                    <h3 style="color: var(--warn);"><i class="fa-solid fa-triangle-exclamation"></i> Engineering Status</h3>
+                </div>
+                <div class="body">
+                    <p style="font-size: 13px; color: var(--txt-1); line-height: 1.6;">
+                        The Referral Module is currently undergoing <strong>smart contract auditing</strong> and <strong>stress-testing</strong> of the attribution ledger. 
+                    </p>
+                    <p style="font-size: 13px; color: var(--txt-2); line-height: 1.6; margin-top: 10px;">
+                        To ensure 100% accuracy in commission distribution and prevent latency during high-volume concurrency, we are optimizing the cross-chain synchronization protocol before the public rollout.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+  </div>
+
+  <nav class="bottom-nav">
+      <a class="active" href="#" title="Stake"><i class="fa-solid fa-layer-group"></i><span>Stake</span></a>
+      <a href="assets.html" title="Assets"><i class="fa-solid fa-wallet"></i><span>Assets</span></a>
+      <a href="profile.html" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+  </nav>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <script>
+    // --- VIEW SWITCHING LOGIC ---
+    function openReferralView() {
+        document.getElementById('stake-view').style.display = 'none';
+        document.getElementById('referral-view').style.display = 'flex';
+        // Hide nav on referral page to keep it clean, or keep it. Let's hide it to mimic a sub-page.
+        document.querySelector('.bottom-nav').style.display = 'none';
+        window.scrollTo(0,0);
+    }
+
+    function closeReferralView() {
+        document.getElementById('stake-view').style.display = 'flex';
+        document.getElementById('referral-view').style.display = 'none';
+        document.querySelector('.bottom-nav').style.display = 'flex';
+    }
+
     // --- FIREBASE INIT ---
     const firebaseConfig = {
       apiKey: "AIzaSyByvett5gGhga0jx2pBChmg41IKaTvbY24",
@@ -383,7 +546,10 @@
     }
 
     function updateThemeIcon() {
+        // Only update if on stake view (referral view doesn't have toggle, keeps UI clean)
         const btn = document.getElementById('themeToggleBtn');
+        if(!btn) return; 
+
         const isLight = document.body.classList.contains('light-theme');
         if (isLight) {
             btn.innerHTML = '<i class="fa-solid fa-sun" style="color: var(--pri-color);"></i>';
