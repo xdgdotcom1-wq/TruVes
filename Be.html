@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Tier Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #1C1C1E;
+      --card-bg: #2C2C2E;
+      --text: #E0E0E0;
+      --gold: #D4AF37;
+      --red: #F87171;
+      --green: #34D399;
+      --border: rgba(255,255,255,0.1);
+    }
+    body {
+      background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif;
+      margin: 0; padding: 20px; display: flex; justify-content: center;
+    }
+    .admin-container {
+      width: 100%; max-width: 500px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    h2 { margin: 0; color: var(--gold); text-align: center; }
+    
+    .card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+
+    /* INPUT ROW */
+    .input-row { display: flex; gap: 10px; align-items: flex-end; }
+    .input-group { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+    .input-group label { font-size: 12px; color: #888; }
+    .input-group input {
+      background: #151515; border: 1px solid var(--border);
+      color: white; padding: 10px; border-radius: 8px; font-size: 16px;
+    }
+    .input-group input:focus { border-color: var(--gold); outline: none; }
+
+    /* BUTTONS */
+    .btn {
+      padding: 10px 15px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-add { background: var(--gold); color: #000; height: 42px; }
+    .btn-save { background: var(--green); color: #000; width: 100%; font-size: 16px; padding: 15px; }
+    .btn-delete { background: rgba(248, 113, 113, 0.2); color: var(--red); padding: 6px 10px; font-size: 12px;}
+
+    /* LIST */
+    .tier-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+    .tier-item {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      padding: 12px; border-radius: 8px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .tier-info { display: flex; flex-direction: column; gap: 2px; }
+    .tier-info span { font-size: 14px; }
+    .tier-info small { font-size: 11px; color: #888; }
+    .highlight { color: var(--gold); font-weight: bold; }
+
+    .status { text-align: center; font-size: 13px; min-height: 20px; }
+  </style>
+</head>
+<body>
+
+  <div class="admin-container">
+    <h2><i class="fa-solid fa-layer-group"></i> Manage Reward Tiers</h2>
+
+    <div class="card">
+      <div class="input-row">
+        <div class="input-group">
+          <label>Max Amount ($)</label>
+          <input type="number" id="newMax" placeholder="e.g. 199">
+        </div>
+        <div class="input-group">
+          <label>Daily Rate (%)</label>
+          <input type="number" id="newRate" placeholder="e.g. 10">
+        </div>
+        <button class="btn btn-add" onclick="addTier()">Add Rule</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4 style="margin-top:0; margin-bottom:15px; color:#aaa;">Current Logic Chain</h4>
+      <ul id="tierList" class="tier-list">
+        <li style="text-align:center; color:#555;">Loading...</li>
+      </ul>
+    </div>
+
+    <button class="btn btn-save" onclick="saveToDatabase()">SAVE CHANGES TO DATABASE</button>
+    <div id="statusMsg" class="status"></div>
+
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script>
+    // 1. FIREBASE CONFIG
+    const firebaseConfig = {
+      apiKey: "AIzaSyByvett5gGhga0jx2pBChmg41IKaTvbY24",
+      authDomain: "bustrack-e4f8f.firebaseapp.com",
+      databaseURL: "https://bustrack-e4f8f-default-rtdb.firebaseio.com",
+      projectId: "bustrack-e4f8f",
+      storageBucket: "bustrack-e4f8f.firebasestorage.app",
+      messagingSenderId: "544737954134",
+      appId: "1:544737954134:web:91a197cc88d0a67c43eef7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // 2. STATE
+    let localTiers = [];
+
+    // 3. FETCH DATA
+    const ref = database.ref('platformSettings/rewardTiers');
+    ref.on('value', (snapshot) => {
+      const data = snapshot.val();
+      if(data) {
+        // Ensure format and sort
+        const raw = Array.isArray(data) ? data : Object.values(data);
+        localTiers = raw.map(t => ({
+            max: parseFloat(t.max),
+            rate: parseFloat(t.rate)
+        })).sort((a,b) => a.max - b.max);
+        
+        renderList();
+      } else {
+        localTiers = [];
+        renderList();
+      }
+    });
+
+    // 4. RENDER LIST
+    function renderList() {
+      const list = document.getElementById('tierList');
+      list.innerHTML = '';
+
+      if(localTiers.length === 0) {
+        list.innerHTML = '<li style="text-align:center; color:#555;">No rules set. Default is 1%.</li>';
+        return;
+      }
+
+      localTiers.forEach((tier, index) => {
+        const li = document.createElement('li');
+        li.className = 'tier-item';
+
+        // Convert 0.10 -> 10 for display
+        const percent = (tier.rate * 100).toFixed(2).replace('.00',''); 
+
+        li.innerHTML = `
+          <div class="tier-info">
+            <span>
+              Amounts ≤ <span class="highlight">$${tier.max.toLocaleString()}</span>
+            </span>
+            <small>Recieve <span style="color:var(--green);">${percent}%</span> Daily Reward</small>
+          </div>
+          <button class="btn btn-delete" onclick="removeTier(${index})">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    // 5. ADD TIER (LOCAL ONLY)
+    function addTier() {
+      const maxInput = document.getElementById('newMax');
+      const rateInput = document.getElementById('newRate');
+
+      const maxVal = parseFloat(maxInput.value);
+      const rateVal = parseFloat(rateInput.value);
+
+      if(isNaN(maxVal) || isNaN(rateVal) || maxVal <= 0 || rateVal <= 0) {
+        showStatus('Please enter valid positive numbers', 'red');
+        return;
+      }
+
+      // Logic Check: Does this max already exist?
+      const exists = localTiers.find(t => t.max === maxVal);
+      if(exists) {
+        showStatus('A rule for this exact amount already exists. Delete it first.', 'red');
+        return;
+      }
+
+      // Convert percentage (10) to decimal (0.10)
+      const decimalRate = rateVal / 100;
+
+      localTiers.push({ max: maxVal, rate: decimalRate });
+      
+      // Sort immediately so logic makes sense
+      localTiers.sort((a,b) => a.max - b.max);
+
+      renderList();
+      
+      // Clear inputs
+      maxInput.value = '';
+      rateInput.value = '';
+      showStatus('Rule added to list (Not saved yet)', '#aaa');
+    }
+
+    // 6. REMOVE TIER (LOCAL ONLY)
+    function removeTier(index) {
+      localTiers.splice(index, 1);
+      renderList();
+      showStatus('Rule removed (Not saved yet)', '#aaa');
+    }
+
+    // 7. SAVE TO DB
+    function saveToDatabase() {
+      const btn = document.querySelector('.btn-save');
+      btn.innerText = 'SAVING...';
+      btn.disabled = true;
+
+      // Ensure we explicitly save it as an Array to avoid Firebase Object confusion
+      ref.set(localTiers)
+        .then(() => {
+          showStatus('✅ Settings Saved Successfully!', 'var(--green)');
+          setTimeout(() => btn.innerText = 'SAVE CHANGES TO DATABASE', 2000);
+          btn.disabled = false;
+        })
+        .catch((e) => {
+          showStatus('Error saving: ' + e.message, 'var(--red)');
+          btn.innerText = 'SAVE CHANGES TO DATABASE';
+          btn.disabled = false;
+        });
+    }
+
+    function showStatus(msg, color) {
+      const el = document.getElementById('statusMsg');
+      el.textContent = msg;
+      el.style.color = color || 'white';
+    }
+  </script>
+</body>
+</html>
