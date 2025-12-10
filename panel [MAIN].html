@@ -7,7 +7,6 @@
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
   <style>
@@ -138,6 +137,9 @@
     .btn-sm { padding: 4px 10px; font-size: 11px; }
     .btn-primary { background: var(--accent); border-color: var(--accent); color: white; }
     .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    
+    .btn-danger { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: var(--danger); }
+    .btn-danger:hover { background: var(--danger); color: white; }
 
     input, select, textarea {
       background: var(--bg-body);
@@ -200,6 +202,30 @@
     .holding-label { font-weight: 600; font-size: 13px; color: var(--text-muted); width: 60px; }
     .holding-item.has-balance .holding-label { color: var(--success); }
 
+    /* Dynamic Row Styles (For Rules) */
+    .dynamic-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 40px;
+        gap: 8px;
+        margin-bottom: 10px;
+        align-items: center;
+    }
+    .dynamic-list-container {
+        max-height: 250px;
+        overflow-y: auto;
+        padding-right: 5px;
+        margin-bottom: 15px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px;
+        background: var(--bg-body);
+    }
+    .section-divider {
+        margin: 20px 0;
+        border: 0;
+        border-top: 1px solid var(--border);
+    }
+
     /* Table */
     .table-responsive { overflow-x: auto; border: 1px solid var(--border); border-radius: 6px; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -228,7 +254,6 @@
 
     /* --- RESPONSIVE MEDIA QUERIES --- */
     @media (max-width: 900px) {
-        /* On Tablet/Mobile, Sidebar becomes a drawer */
         .sidebar {
             position: fixed; left: -280px; top: 0; height: 100%;
             box-shadow: 5px 0 20px rgba(0,0,0,0.5);
@@ -239,7 +264,6 @@
         .content-area { padding: 20px; }
         
         .grid-2 { grid-template-columns: 1fr; } 
-        /* Specific Fix for User Manager Layout on Mobile */
         #users .grid-2 { display: flex; flex-direction: column; height: auto; }
         #userListContainer { max-height: 300px; min-height: 300px; }
     }
@@ -248,11 +272,9 @@
         .grid-3 { grid-template-columns: 1fr; }
         .topbar { padding: 0 15px; }
         h2 { font-size: 16px; }
-        .btn span { display: none; } /* Hide text on small buttons if needed */
+        .btn span { display: none; } 
         .card { padding: 15px; }
-        
-        /* Stack buttons in topbar */
-        .top-actions { display: none; } /* Or simplify */
+        .top-actions { display: none; }
     }
   </style>
 </head>
@@ -397,19 +419,56 @@
 
                 <div class="card">
                     <div class="card-header"><h3><i class="fa-solid fa-layer-group"></i> Global Staking Rules</h3></div>
+                    
                     <div class="form-group">
-                        <label>Estimated APY (%)</label>
+                        <label>Display APY (Fallback text)</label>
                         <input type="number" id="rule-apy">
                     </div>
+
                     <div class="form-group">
-                        <label>Min. Withdrawal Amount</label>
-                        <input type="number" id="rule-min">
+                        <label style="color:var(--accent);">⏳ Reward Frequency</label>
+                        <div style="display:flex; gap:10px;">
+                            <select id="reward-freq" onchange="toggleCustomFreq()" style="flex:1;">
+                                <option value="60000">1 Minute</option>
+                                <option value="600000">10 Minutes</option>
+                                <option value="1800000">30 Minutes</option>
+                                <option value="3600000">1 Hour</option>
+                                <option value="43200000">12 Hours</option>
+                                <option value="86400000">24 Hours (Daily)</option>
+                                <option value="172800000">2 Days</option>
+                                <option value="604800000">1 Week</option>
+                                <option value="2592000000">1 Month (30 Days)</option>
+                                <option value="custom">Custom...</option>
+                            </select>
+                            <input type="number" id="reward-freq-custom" placeholder="Minutes" style="display:none; width:100px;">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Min. Withdrawal Coin Symbol</label>
-                        <input type="text" id="rule-coin">
+
+                    <hr class="section-divider">
+
+                    <div style="margin-bottom: 20px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <label style="color:var(--accent);">💰 Reward Tiers (Logic)</label>
+                            <small style="color:var(--text-muted);">Max $ / Reward %</small>
+                        </div>
+                        <div id="tier-list-container" class="dynamic-list-container">
+                            </div>
+                        <button class="btn btn-sm" onclick="addTierRow()">+ Add Tier</button>
                     </div>
-                    <button class="btn btn-primary" onclick="saveStakingRules()">Save Rules</button>
+
+                    <hr class="section-divider">
+
+                    <div style="margin-bottom: 20px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <label style="color:var(--accent);">🔓 Withdrawal Limits</label>
+                            <small style="color:var(--text-muted);">Max $ / Req %</small>
+                        </div>
+                        <div id="limit-list-container" class="dynamic-list-container">
+                            </div>
+                        <button class="btn btn-sm" onclick="addLimitRow()">+ Add Limit</button>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="saveStakingRules()">Save All Rules</button>
                 </div>
             </div>
         </div>
@@ -735,8 +794,20 @@
         updateDBRoot(updates);
     }
 
-    // --- 5. MARKET & RULES ---
+    // --- 5. MARKET & STAKING RULES (Updated with Frequency) ---
+    function toggleCustomFreq() {
+        const val = document.getElementById('reward-freq').value;
+        const inp = document.getElementById('reward-freq-custom');
+        if(val === 'custom') {
+            inp.style.display = 'block';
+            inp.focus();
+        } else {
+            inp.style.display = 'none';
+        }
+    }
+
     function renderWalletMarket() {
+        // Market Data
         if (localData.walletData) {
             document.getElementById('market-change').value = localData.walletData.portfolioChange || 0;
             const list = document.getElementById('market-coins-list');
@@ -757,11 +828,83 @@
             });
         }
 
+        // Staking Rules
         if (localData.globalStakingRules) {
+            // Basic Fields
             document.getElementById('rule-apy').value = localData.globalStakingRules.estAPY || 0;
-            document.getElementById('rule-min').value = localData.globalStakingRules.minWithdrawal || 0;
-            document.getElementById('rule-coin').value = localData.globalStakingRules.minWithdrawalCoin || '';
+            
+            // Frequency Handler
+            const freq = localData.globalStakingRules.rewardPeriodMs || 86400000;
+            const select = document.getElementById('reward-freq');
+            const customInput = document.getElementById('reward-freq-custom');
+            let found = false;
+            for(let opt of select.options){
+                if(opt.value == freq) found = true;
+            }
+            
+            if(found) {
+                select.value = freq;
+                customInput.style.display = 'none';
+            } else {
+                select.value = 'custom';
+                customInput.style.display = 'block';
+                customInput.value = (freq / 60000).toFixed(0); // Show minutes
+            }
+
+            // Render Dynamic Lists
+            renderStakingRows('tier-list-container', localData.globalStakingRules.tiers, 'tier');
+            renderStakingRows('limit-list-container', localData.globalStakingRules.withdrawLimits, 'limit');
+        } else {
+            // Defaults if empty
+            document.getElementById('tier-list-container').innerHTML = '<small style="color:#666">No tiers set.</small>';
+            document.getElementById('limit-list-container').innerHTML = '<small style="color:#666">No limits set.</small>';
         }
+    }
+
+    function renderStakingRows(containerId, dataArray, type) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+
+        if (!dataArray || !Array.isArray(dataArray)) return;
+
+        dataArray.forEach(item => {
+            const div = document.createElement('div');
+            div.className = `dynamic-row ${type}-row`;
+            
+            let val1 = item.max; 
+            let val2 = type === 'tier' ? (item.rate * 100).toFixed(2) : (item.percent * 100).toFixed(0);
+
+            div.innerHTML = `
+                <input type="number" class="${type}-max" value="${val1}" placeholder="Max $">
+                <input type="number" class="${type}-val" value="${val2}" placeholder="${type === 'tier' ? 'Daily %' : 'Req %'}">
+                <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function addTierRow() {
+        const container = document.getElementById('tier-list-container');
+        const div = document.createElement('div');
+        div.className = 'dynamic-row tier-row';
+        div.innerHTML = `
+            <input type="number" class="tier-max" placeholder="Max $" value="1000">
+            <input type="number" class="tier-val" placeholder="Reward %" value="1.0">
+            <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+        `;
+        container.appendChild(div);
+    }
+
+    function addLimitRow() {
+        const container = document.getElementById('limit-list-container');
+        const div = document.createElement('div');
+        div.className = 'dynamic-row limit-row';
+        div.innerHTML = `
+            <input type="number" class="limit-max" placeholder="Max $" value="500">
+            <input type="number" class="limit-val" placeholder="Req %" value="10">
+            <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+        `;
+        container.appendChild(div);
     }
 
     function saveMarketData() {
@@ -777,14 +920,52 @@
     }
 
     function saveStakingRules() {
+        const estAPY = parseFloat(document.getElementById('rule-apy').value);
+        
+        // Calculate Frequency in MS
+        const freqSelect = document.getElementById('reward-freq').value;
+        let finalMs = 86400000;
+        if(freqSelect === 'custom') {
+            const mins = parseFloat(document.getElementById('reward-freq-custom').value);
+            if(!isNaN(mins) && mins > 0) finalMs = mins * 60000;
+        } else {
+            finalMs = parseInt(freqSelect);
+        }
+
+        // Scrape Tiers
+        const tierRows = document.querySelectorAll('.tier-row');
+        let newTiers = [];
+        tierRows.forEach(row => {
+            const max = parseFloat(row.querySelector('.tier-max').value);
+            const rate = parseFloat(row.querySelector('.tier-val').value);
+            if(!isNaN(max) && !isNaN(rate)) {
+                newTiers.push({ max: max, rate: rate / 100 }); // Convert to decimal
+            }
+        });
+        newTiers.sort((a,b) => a.max - b.max); // Sort logic
+
+        // Scrape Limits
+        const limitRows = document.querySelectorAll('.limit-row');
+        let newLimits = [];
+        limitRows.forEach(row => {
+            const max = parseFloat(row.querySelector('.limit-max').value);
+            const pct = parseFloat(row.querySelector('.limit-val').value);
+            if(!isNaN(max) && !isNaN(pct)) {
+                newLimits.push({ max: max, percent: pct / 100 }); // Convert to decimal
+            }
+        });
+        newLimits.sort((a,b) => a.max - b.max);
+
         const updates = {};
-        updates['globalStakingRules/estAPY'] = parseFloat(document.getElementById('rule-apy').value);
-        updates['globalStakingRules/minWithdrawal'] = parseFloat(document.getElementById('rule-min').value);
-        updates['globalStakingRules/minWithdrawalCoin'] = document.getElementById('rule-coin').value;
+        updates['globalStakingRules/estAPY'] = estAPY;
+        updates['globalStakingRules/rewardPeriodMs'] = finalMs; // Save period
+        updates['globalStakingRules/tiers'] = newTiers;
+        updates['globalStakingRules/withdrawLimits'] = newLimits;
+
         updateDBRoot(updates);
     }
 
-    // --- 6. ADDRESS POOL (UPDATED) ---
+    // --- 6. ADDRESS POOL ---
     function renderAddressPool() {
         const tbody = document.getElementById('poolTableBody');
         const filter = document.getElementById('poolSearch').value.toLowerCase();
