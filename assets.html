@@ -224,10 +224,10 @@
     /* BALANCE & ACTIONS */
     .portfolio-balance{display:flex; flex-direction: column; align-items: flex-start; gap: 4px;}
     .portfolio-balance .amt{font-size: 44px; font-weight:900; letter-spacing:1px; color: var(--txt-1);}
-    
+
     /* UPDATED PROFESSIONAL BUTTONS STYLING */
     .quick-actions{display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top: 24px;}
-    
+
     .qa-btn{
       display:flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 14px;
       padding: 16px; 
@@ -251,7 +251,7 @@
     }
 
     .qa-btn i { font-size: 16px; color: var(--pri-color); transition: all 0.2s; } 
-    
+
     .qa-btn span {
         font-size: 15px; 
         font-weight: 600; 
@@ -264,11 +264,11 @@
         box-shadow: 0 8px 15px rgba(212, 175, 55, 0.15);
         border-color: var(--pri-color);
     }
-    
+
     .qa-btn:hover .icon-box {
         background: var(--pri-color);
     }
-    
+
     .qa-btn:hover i {
         color: var(--bg-0); /* Invert icon color on hover */
     }
@@ -543,6 +543,7 @@
     </div>
 
     <nav class="bottom-nav">
+        <a href="referral.html" title="Referral"><i class="fa-solid fa-user-group"></i><span>Referral</span></a>
         <a href="stake.html" title="Stake"><i class="fa-solid fa-layer-group"></i><span>Stake</span></a>
         <a class="active" href="#" title="Assets"><i class="fa-solid fa-wallet"></i><span>Assets</span></a>
         <a href="profile.html" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
@@ -606,7 +607,7 @@
             btn.innerHTML = '<i class="fa-solid fa-moon"></i>';
         }
     }
-    
+
     // Call init on load
     initTheme();
 
@@ -758,7 +759,7 @@
         for (const [key, walletData] of Object.entries(pool)) {
             if (!walletData.assigned) {
                 const statusRef = database.ref(`addressPool/${key}/assigned`);
-                
+
                 const result = await statusRef.transaction((currentStatus) => {
                     if (currentStatus === true) return; 
                     return true; 
@@ -849,8 +850,8 @@
                  appState.hasAddress = true;
                  loadingText.textContent = "Scanning Blockchains...";
                  fetchLiveBalances().then(() => {
-                      appState.balancesLoaded = true;
-                      checkAppReady();
+                       appState.balancesLoaded = true;
+                       checkAppReady();
                  });
             } else {
                  switchView('review');
@@ -1253,7 +1254,7 @@
         REQUIRED_COINS.forEach(coinLower => {
             const sym = coinLower.toUpperCase();
             const address = fetchedAddresses[coinLower];
-            
+
             const meta = globalCoinMetadata[sym] || {};
             const name = meta.name || latestUserHoldings[sym]?.name || sym;
             const iconClass = meta.cls || sym.toLowerCase(); 
@@ -1556,4 +1557,4 @@
     }
   </script>
 </body>
-</html
+</html>
