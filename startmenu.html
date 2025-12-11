@@ -5,20 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TruVesta Gateway | System Check</title>
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
         :root {
             --bg-dark: #050507;
-            --glass-panel: rgba(20, 20, 25, 0.7);
+            --glass-panel: rgba(20, 20, 25, 0.6);
             --glass-border: rgba(255, 255, 255, 0.08);
             --txt-primary: #FFFFFF;
             --txt-secondary: #94A3B8;
-            --accent-primary: #FFD700;
+            --accent-gold: #FFD700;
+            --accent-blue: #00F0FF;
+            --accent-premium: #E2E8F0; /* Platinum/Silver */
             --success: #10B981;
             --danger: #EF4444;
             --warning: #F59E0B;
@@ -29,105 +30,175 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg-dark);
             color: var(--txt-primary);
-            height: 100vh;
+            min-height: 100vh;
             display: grid;
             place-items: center;
-            overflow: hidden;
+            overflow-x: hidden;
             position: relative;
+            padding-bottom: 50px; /* Space for the new bottom section */
         }
 
         .ambient-bg {
             position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at 50% 10%, rgba(255, 215, 0, 0.05), transparent 60%);
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(0, 240, 255, 0.04), transparent 30%),
+                radial-gradient(circle at 85% 30%, rgba(255, 215, 0, 0.03), transparent 30%);
+        }
+        .grid-overlay {
+            position: fixed; inset: 0; z-index: -1;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+            animation: panGrid 60s linear infinite;
         }
 
         .container {
-            width: 90%; max-width: 900px;
+            width: 90%; max-width: 1200px;
             background: var(--glass-panel);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
             border: 1px solid var(--glass-border);
+            border-top: 1px solid rgba(255,255,255,0.15);
             border-radius: 32px;
             padding: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            animation: fadeIn 0.6s ease-out;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+            animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            margin: 40px 0;
+            position: relative;
         }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px; }
-        .brand { display: flex; align-items: center; gap: 12px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 24px; }
-        .brand img { height: 32px; border-radius: 6px; }
-        .system-time { color: var(--txt-secondary); font-family: monospace; font-size: 14px; }
+        /* Decorative top gradient line */
+        .container::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), var(--accent-blue), transparent);
+            opacity: 0.5;
+        }
 
-        .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--glass-border); }
+        .brand { display: flex; align-items: center; gap: 14px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -0.5px; }
+        .brand img { height: 36px; border-radius: 8px; }
+        .system-time { 
+            color: var(--txt-secondary); font-family: 'JetBrains Mono', monospace; font-size: 13px; 
+            background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border);
+        }
+
+        /* Status Grid */
+        .status-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+            gap: 15px; margin-bottom: 45px; 
+        }
         .status-card {
-            background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-            padding: 15px 20px; border-radius: 16px;
-            display: flex; flex-direction: column; gap: 8px;
+            background: rgba(255,255,255,0.015); border: 1px solid var(--glass-border);
+            padding: 16px; border-radius: 16px;
+            display: flex; flex-direction: column; gap: 6px;
+            transition: 0.3s;
         }
-        .status-header { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--txt-secondary); text-transform: uppercase; letter-spacing: 1px; }
-        .status-indicator { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--success); }
-        .dot { width: 8px; height: 8px; background: currentColor; border-radius: 50%; box-shadow: 0 0 10px currentColor; animation: pulse 2s infinite; }
+        .status-card:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.15); }
+        .status-header { font-size: 11px; color: var(--txt-secondary); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .status-indicator { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--txt-primary); }
+        .dot { width: 6px; height: 6px; border-radius: 50%; box-shadow: 0 0 8px currentColor; animation: pulse 2s infinite; }
+        .dot.green { background: var(--success); color: var(--success); }
+        .dot.blue { background: var(--accent-blue); color: var(--accent-blue); }
+        .dot.gold { background: var(--accent-gold); color: var(--accent-gold); }
 
-        .versions-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        /* Versions Section */
+        .versions-wrapper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 40px; }
+        
         .version-card {
             background: rgba(255,255,255,0.02);
             border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 25px;
-            transition: all 0.3s; position: relative; overflow: hidden;
-            display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;
+            border-radius: 24px; padding: 30px;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column; min-height: 420px;
+        }
+
+        .version-card.gold-theme { background: radial-gradient(circle at top right, rgba(255, 215, 0, 0.03), transparent 60%), rgba(255,255,255,0.02); }
+        .version-card.gold-theme:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); border-color: rgba(255, 215, 0, 0.3); }
+
+        .version-card.blue-theme { background: radial-gradient(circle at top right, rgba(0, 240, 255, 0.05), transparent 60%), rgba(255,255,255,0.02); border-color: rgba(0, 240, 255, 0.2); }
+        .version-card.blue-theme:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(0, 240, 255, 0.1); border-color: var(--accent-blue); }
+
+        .version-card.legacy { opacity: 0.5; filter: grayscale(0.8); }
+
+        .v-badge { position: absolute; top: 20px; right: 20px; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .v-badge.beta { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .v-badge.blue { background: rgba(0, 240, 255, 0.1); color: var(--accent-blue); border: 1px solid rgba(0, 240, 255, 0.3); box-shadow: 0 0 10px rgba(0, 240, 255, 0.1); }
+        .v-badge.outdated { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        .v-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px; }
+        .v-theme-name { font-size: 12px; color: var(--txt-secondary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; display: block; font-weight: 600; }
+        
+        .feature-list { list-style: none; margin-bottom: auto; }
+        .feature-list li { font-size: 13px; color: var(--txt-secondary); margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px; line-height: 1.4; }
+        .feature-list li i { margin-top: 3px; font-size: 10px; }
+        .feature-list li.highlight { color: var(--txt-primary); font-weight: 500; }
+
+        .btn-launch { width: 100%; padding: 14px; border: none; border-radius: 14px; margin-top: 25px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; text-decoration: none; font-size: 14px; letter-spacing: 0.3px; }
+        .btn-gold { background: rgba(255, 215, 0, 0.1); color: var(--accent-gold); border: 1px solid rgba(255, 215, 0, 0.3); }
+        .btn-gold:hover { background: rgba(255, 215, 0, 0.2); transform: translateY(-2px); }
+        .btn-blue { background: var(--accent-blue); color: #000; box-shadow: 0 0 20px rgba(0, 240, 255, 0.2); }
+        .btn-blue:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(0, 240, 255, 0.4); }
+        .btn-disabled { background: transparent; border: 1px solid var(--glass-border); color: var(--txt-secondary); cursor: not-allowed; opacity: 0.5; }
+
+        /* --- PREMIUM SENTINEL SECTION --- */
+        .section-divider { margin-bottom: 25px; display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .section-label { font-size: 12px; color: var(--txt-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 1.5px; }
+        
+        .sentinel-card {
+            background: linear-gradient(145deg, rgba(20, 20, 25, 0.9), rgba(10, 10, 12, 0.95));
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px; padding: 35px;
+            display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;
+            position: relative; overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
         
-        /* Recommended Card Style */
-        .version-card.recommended {
-            border-color: rgba(255, 215, 0, 0.3);
-            background: linear-gradient(135deg, rgba(255,215,0,0.05), transparent);
-        }
-        .version-card.recommended:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
-            border-color: var(--accent-primary);
+        .sentinel-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%);
+            animation: panGrid 30s linear infinite; pointer-events: none;
         }
 
-        /* Legacy Card Style */
-        .version-card.legacy { opacity: 0.6; }
-        .version-card.legacy:hover { opacity: 0.8; background: rgba(255,255,255,0.04); }
+        .sentinel-info h3 { font-family: 'Outfit', sans-serif; font-size: 24px; margin-bottom: 5px; background: linear-gradient(90deg, #fff, #94A3B8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .sentinel-info p { color: var(--txt-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+        
+        .demand-meter { margin-top: 15px; }
+        .demand-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; font-weight: 600; color: var(--txt-secondary); }
+        .progress-bar-bg { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--danger), var(--warning)); animation: shimmy 2s linear infinite; }
 
-        .v-badge {
-            position: absolute; top: 15px; right: 15px;
-            padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase;
+        .sentinel-action { display: flex; flex-direction: column; justify-content: center; border-left: 1px solid rgba(255,255,255,0.05); padding-left: 30px; }
+        .price-tag { font-size: 28px; font-weight: 700; color: var(--txt-primary); margin-bottom: 5px; }
+        .price-sub { font-size: 13px; color: var(--txt-secondary); margin-bottom: 15px; }
+        
+        .btn-waitlist {
+            background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--txt-primary);
+            width: 100%; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer;
+            transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; font-size: 12px;
         }
-        .v-badge.live { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .v-badge.legacy { background: rgba(148, 163, 184, 0.2); color: var(--txt-secondary); border: 1px solid var(--glass-border); }
+        .btn-waitlist:hover { background: rgba(255,255,255,0.05); border-color: var(--txt-primary); }
 
-        .v-title { font-size: 20px; font-weight: 700; margin-bottom: 5px; font-family: 'Outfit', sans-serif; }
-        .v-desc { font-size: 14px; color: var(--txt-secondary); margin-bottom: 20px; line-height: 1.5; }
-
-        .btn-launch {
-            width: 100%; padding: 12px; border: none; border-radius: 12px;
-            font-weight: 600; cursor: pointer; transition: 0.2s;
-            display: flex; justify-content: center; align-items: center; gap: 8px;
-            text-decoration: none;
-        }
-        .btn-primary { background: var(--accent-primary); color: #000; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2); }
-        .btn-primary:hover { transform: scale(1.02); }
-        .btn-outline { background: transparent; border: 1px solid var(--glass-border); color: var(--txt-secondary); }
-        .btn-outline:hover { border-color: var(--txt-primary); color: var(--txt-primary); }
-
-        /* Animation */
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        @keyframes shimmy { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+        @keyframes panGrid { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Responsive */
-        @media(max-width: 768px) {
-            .container { padding: 20px; width: 95%; }
-            .status-grid { grid-template-columns: 1fr; gap: 10px; margin-bottom: 25px; }
-            .status-card { flex-direction: row; justify-content: space-between; align-items: center; padding: 12px; }
+        @media(max-width: 900px) {
+            .container { padding: 25px; width: 95%; max-width: 600px; }
             .versions-wrapper { grid-template-columns: 1fr; }
-            .header { margin-bottom: 20px; flex-direction: column; align-items: flex-start; gap: 10px; }
+            .header { margin-bottom: 25px; flex-direction: column; align-items: flex-start; gap: 15px; }
+            .status-grid { grid-template-columns: repeat(2, 1fr); }
+            .sentinel-card { grid-template-columns: 1fr; padding: 25px; }
+            .sentinel-action { border-left: none; border-top: 1px solid rgba(255,255,255,0.05); padding-left: 0; padding-top: 25px; margin-top: 10px; }
         }
     </style>
 </head>
 <body>
     <div class="ambient-bg"></div>
+    <div class="grid-overlay"></div>
 
     <div class="container">
         <div class="header">
@@ -135,57 +206,123 @@
                 <img src="https://foldr.space/img/c2TH9tRISaImc2TH" alt="Logo">
                 <span>TruVesta Gateway</span>
             </div>
-            <div class="system-time" id="sysTime">SYSTEM TIME: 00:00:00 UTC</div>
+            <div class="system-time" id="sysTime">00:00:00 UTC</div>
         </div>
 
         <div class="status-grid">
             <div class="status-card">
-                <span class="status-header">Auth Service</span>
-                <span class="status-indicator"><div class="dot"></div> Operational</span>
+                <span class="status-header"><i class="fa-solid fa-server"></i> Auth Service</span>
+                <span class="status-indicator"><div class="dot green"></div> Operational</span>
             </div>
             <div class="status-card">
-                <span class="status-header">Blockchain Nodes</span>
-                <span class="status-indicator"><div class="dot"></div> Synced (12ms)</span>
+                <span class="status-header"><i class="fa-solid fa-layer-group"></i> Staking</span>
+                <span class="status-indicator"><div class="dot green"></div> Active</span>
             </div>
             <div class="status-card">
-                <span class="status-header">Market Data</span>
-                <span class="status-indicator"><div class="dot"></div> Live Stream</span>
+                <span class="status-header"><i class="fa-solid fa-link"></i> Nodes</span>
+                <span class="status-indicator"><div class="dot blue"></div> Synced (12ms)</span>
+            </div>
+            <div class="status-card">
+                <span class="status-header"><i class="fa-solid fa-file-contract"></i> Knowledge Base</span>
+                <span class="status-indicator" style="color: var(--txt-primary);"><div class="dot gold"></div> Indexed & Ready</span>
             </div>
         </div>
 
-        <div style="margin-bottom: 20px; font-size: 14px; color: var(--txt-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">Select Version</div>
+        <div class="section-divider">
+            <span class="section-label">Environment Selection</span>
+            <div style="height: 1px; background: var(--glass-border); flex-grow: 1;"></div>
+        </div>
 
         <div class="versions-wrapper">
-            <!-- V2.1 (Live) -->
-            <div class="version-card recommended">
-                <div class="v-badge live">Stable Release</div>
-                <div>
-                    <div class="v-title">TruVesta v2.1</div>
-                    <p class="v-desc">Latest stable release with integrated multi-chain wallet, real-time staking rewards, and advanced security patches.</p>
+            <div class="version-card legacy">
+                <div class="v-badge outdated">Deprecated</div>
+                <div class="v-header-group">
+                    <div class="v-title">TruVesta v1.9</div>
+                    <span class="v-theme-name">Legacy Build</span>
                 </div>
-                <a href="dashboard.html" class="btn-launch btn-primary">
-                    Launch Dashboard <i class="fa-solid fa-rocket"></i>
-                </a>
+                <ul class="feature-list">
+                    <li><i class="fa-solid fa-xmark" style="color: var(--danger)"></i> Disconnected from Mainnet</li>
+                    <li><i class="fa-solid fa-xmark" style="color: var(--danger)"></i> Nodes Decommissioned</li>
+                </ul>
+                <button class="btn-launch btn-disabled" disabled>Offline <i class="fa-solid fa-ban"></i></button>
             </div>
 
-            <!-- V1.0 (Legacy) -->
-            <div class="version-card legacy">
-                <div class="v-badge legacy">Legacy</div>
-                <div>
-                    <div class="v-title">TruVesta v1.0 (Classic)</div>
-                    <p class="v-desc">Previous version. Limited features. Support for this version will be discontinued on Jan 1st, 2026.</p>
+            <div class="version-card gold-theme">
+                <div class="v-badge beta">Stable Beta</div>
+                <div class="v-header-group">
+                    <div class="v-title">TruVesta v2.0</div>
+                    <span class="v-theme-name" style="color: var(--accent-gold);">Gilded Horizon</span>
                 </div>
-                <button class="btn-launch btn-outline" disabled style="cursor: not-allowed;">
-                    Server Offline <i class="fa-solid fa-ban"></i>
+                <ul class="feature-list">
+                    <li class="highlight"><i class="fa-solid fa-shield-halved" style="color: var(--accent-gold)"></i> Security Patch v2.0.4</li>
+                    <li><i class="fa-solid fa-bug"></i> Critical Bug Fixes</li>
+                    <li><i class="fa-solid fa-moon"></i> Dark / Light Modes</li>
+                    <li><i class="fa-solid fa-box-archive"></i> Legacy Pools</li>
+                </ul>
+                <a href="V2.1/index.html" class="btn-launch btn-gold">Access v2.0 <i class="fa-solid fa-flask"></i></a>
+            </div>
+
+            <div class="version-card blue-theme">
+                <div class="v-badge blue">Latest Build</div>
+                <div class="v-header-group">
+                    <div class="v-title">TruVesta v2.1</div>
+                    <span class="v-theme-name" style="color: var(--accent-blue);">Azure Pulse</span>
+                </div>
+                <ul class="feature-list">
+                    <li class="highlight"><i class="fa-solid fa-shield-cat" style="color: var(--accent-blue)"></i> Security Patch v2.1.0</li>
+                    <li class="highlight"><i class="fa-solid fa-key" style="color: var(--accent-blue)"></i> Auth Handshake Fixed</li>
+                    <li><i class="fa-solid fa-bridge"></i> Multi-Chain Bridge</li>
+                    <li><i class="fa-solid fa-wand-magic-sparkles"></i> Glow Blue UI</li>
+                </ul>
+                <a href="V2/index.html" class="btn-launch btn-blue">Launch v2.1 <i class="fa-solid fa-rocket"></i></a>
+            </div>
+        </div>
+
+        <div class="section-divider">
+            <span class="section-label">Premium Modules</span>
+            <div style="height: 1px; background: var(--glass-border); flex-grow: 1;"></div>
+        </div>
+
+        <div class="sentinel-card">
+            <div class="sentinel-info">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                    <h3>TruVesta Sentinel</h3>
+                    <span style="font-size:10px; background:#fff; color:#000; padding:2px 6px; border-radius:4px; font-weight:700;">PRO KIT</span>
+                </div>
+                <p>Institutional-grade signal analysis engine. Features AI-driven whale tracking, dark pool liquidity detection, and predictive entry points. Highly exclusive infrastructure.</p>
+                
+                <ul class="feature-list">
+                    <li class="highlight"><i class="fa-solid fa-microchip" style="color: #fff"></i> Quantum Algo Processing</li>
+                    <li class="highlight"><i class="fa-solid fa-eye" style="color: #fff"></i> Dark Pool Scanners</li>
+                </ul>
+
+                <div class="demand-meter">
+                    <div class="demand-label">
+                        <span>Global Allocation</span>
+                        <span style="color: var(--danger);">100% CLAIMED</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sentinel-action">
+                <div class="price-tag">$4,999<span style="font-size:14px; color:var(--txt-secondary)">/mo</span></div>
+                <div class="price-sub">Sold out due to high demand.</div>
+                <button class="btn-waitlist">
+                    Join Waitlist <i class="fa-solid fa-hourglass-half"></i>
                 </button>
             </div>
         </div>
+
     </div>
 
     <script>
         function updateTime() {
             const now = new Date();
-            document.getElementById('sysTime').textContent = `SYSTEM TIME: ${now.toUTCString().split(' ')[4]} UTC`;
+            const timeString = now.toISOString().split('T')[1].split('.')[0];
+            document.getElementById('sysTime').innerHTML = `<i class="fa-regular fa-clock" style="margin-right:8px"></i> ${timeString} UTC`;
         }
         setInterval(updateTime, 1000);
         updateTime();
