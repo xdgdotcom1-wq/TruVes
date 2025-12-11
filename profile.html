@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  
+
   <style>
     /* === LUXURIOUS THEME VARIABLES (Matches Assets.html) === */
     :root{
@@ -49,9 +49,9 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
     body::-webkit-scrollbar {display: none;}
-    
+
     .app{padding:16px; display:flex; flex-direction:column; gap:20px; max-width: 500px; margin: 0 auto;}
-    
+
     /* HEADER */
     .header{display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px;}
     .header h1 { 
@@ -59,7 +59,7 @@
         letter-spacing: 1px; margin: 0; font-size: 26px;
     }
     .header-actions { display: flex; gap: 15px; align-items: center; }
-    
+
     /* PROFILE CARD */
     .profile-card{
       background: var(--bg-1); border:1px solid var(--edge); border-radius: var(--radius);
@@ -82,10 +82,10 @@
       width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 12px;
       border: 3px solid var(--bg-1); font-weight: 700;
     }
-    
+
     .user-name{font-size: 22px; font-weight: 700; margin: 0; color: var(--txt-1); letter-spacing: -0.5px;}
     .user-email{color: var(--txt-2); font-size: 13px; margin-top: 4px; font-weight: 400;}
-    
+
     .user-id-box {
         display: flex; align-items: center; gap: 8px; margin-top: 18px;
         padding: 8px 14px; background: var(--bg-2); border-radius: 20px;
@@ -108,7 +108,7 @@
     }
     .menu-item:last-child{border-bottom: none;}
     .menu-item:hover{background: var(--bg-2);}
-    
+
     .menu-left{display: flex; align-items: center; gap: 16px;}
     .icon-box{
         width: 36px; height: 36px; border-radius: 10px; 
@@ -119,6 +119,7 @@
     .icon-wallet { color: var(--pri-color); }
     .icon-sec { color: var(--good); }
     .icon-bio { color: #60A5FA; }
+    .icon-referral { color: #A855F7; } /* Purple for referral */
     .icon-logout { color: var(--bad); }
 
     .menu-text{font-weight: 500; font-size: 15px;}
@@ -142,7 +143,7 @@
     .logout-btn-container { margin-top: 10px; }
     .logout-item { color: var(--bad) !important; }
     .logout-item:hover { background: rgba(248, 113, 113, 0.08); }
-    
+
     /* TOAST NOTIFICATION */
     #toast {
         visibility: hidden; min-width: 280px; background-color: var(--bg-1); border: 1px solid var(--pri-color);
@@ -162,14 +163,15 @@
       background: var(--bg-1); border-top: 1px solid var(--edge); z-index: 1000;
       box-shadow: 0 -5px 30px rgba(0,0,0,.5);
     }
-    .bottom-nav a{
+    .bottom-nav a, .bottom-nav button {
       flex:1; display:flex; flex-direction: column; align-items: center; justify-content: center;
       text-decoration: none; color: var(--txt-2); font-size: 10px; font-weight: 500; gap: 4px; padding: 8px 0;
       transition: color .2s;
+      background: none; border: none; cursor: pointer; font-family: inherit;
     }
-    .bottom-nav a i{font-size: 20px;}
-    .bottom-nav a.active{color: var(--pri-color); font-weight: 700;}
-    .bottom-nav a:hover{color: var(--txt-1);}
+    .bottom-nav a i, .bottom-nav button i{font-size: 20px;}
+    .bottom-nav a.active, .bottom-nav button.active{color: var(--pri-color); font-weight: 700;}
+    .bottom-nav a:hover, .bottom-nav button:hover{color: var(--txt-1);}
 
     /* MODAL BASICS */
     .modal {
@@ -186,7 +188,7 @@
         padding: 16px; border-bottom: 1px solid var(--edge); display: flex; justify-content: space-between; align-items: center;
     }
     .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; max-height: 60vh; overflow-y: auto; }
-    
+
     /* ADDRESS MANAGER STYLES */
     .address-field label { font-size: 12px; color: var(--txt-2); margin-left: 4px; display: block; margin-bottom: 4px;}
     .address-input-group { display: flex; align-items: center; gap: 8px; position: relative; }
@@ -219,7 +221,7 @@
   </style>
 </head>
 <body>
-  
+
   <div id="toast"><i class="fa-solid fa-circle-check" style="color:var(--good)"></i> <span>Action Saved</span></div>
 
   <div class="app">
@@ -234,7 +236,7 @@
           </button>
       </div>
     </header>
-    
+
     <div class="profile-card">
       <div class="avatar-container">
         <img id="user-avatar" src="" class="avatar" style="display:none;">
@@ -243,10 +245,10 @@
         </div>
         <div class="badge"><i class="fa-solid fa-check"></i></div>
       </div>
-      
+
       <h2 class="user-name" id="user-display-name">...</h2>
       <div class="user-email" id="user-email">Loading data...</div>
-      
+
       <button class="user-id-box" onclick="copyUserId()">
         <span id="display-user-id">...</span>
         <i class="fa-regular fa-copy"></i>
@@ -255,7 +257,7 @@
 
     <div class="section-title">Wallet & Security</div>
     <div class="menu-group">
-      
+
       <div class="menu-item" onclick="openAddressModal()">
         <div class="menu-left">
           <div class="icon-box icon-wallet"><i class="fa-solid fa-wallet"></i></div>
@@ -266,7 +268,7 @@
         </div>
         <div class="menu-right"><i class="fa-solid fa-chevron-right"></i></div>
       </div>
-      
+
       <div class="menu-item">
         <div class="menu-left">
           <div class="icon-box icon-sec"><i class="fa-solid fa-shield-halved"></i></div>
@@ -279,7 +281,7 @@
             </label>
         </div>
       </div>
-      
+
       <div class="menu-item" onclick="showComingSoon('Biometric Hardware Support')">
         <div class="menu-left">
           <div class="icon-box icon-bio"><i class="fa-solid fa-fingerprint"></i></div>
@@ -291,9 +293,23 @@
       </div>
     </div>
 
+    <div class="section-title">Earnings</div>
+    <div class="menu-group">
+      <div class="menu-item" onclick="window.location.href='referral.html'">
+        <div class="menu-left">
+          <div class="icon-box icon-referral"><i class="fa-solid fa-user-group"></i></div>
+          <div style="display:flex; flex-direction:column;">
+              <span class="menu-text">Referral Program</span>
+              <span style="font-size:10px; color:var(--txt-2);">Invite & Earn</span>
+          </div>
+        </div>
+        <div class="menu-right"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+    </div>
+
     <div class="section-title">Preferences</div>
     <div class="menu-group">
-      
+
       <div class="menu-item" onclick="showComingSoon('Language Packs')">
         <div class="menu-left">
           <div class="icon-box"><i class="fa-solid fa-globe"></i></div>
@@ -301,7 +317,7 @@
         </div>
         <div class="menu-right">English <i class="fa-solid fa-chevron-right"></i></div>
       </div>
-      
+
       <div class="menu-item" onclick="showComingSoon('Multi-Currency Support')">
         <div class="menu-left">
           <div class="icon-box"><i class="fa-solid fa-dollar-sign"></i></div>
@@ -309,7 +325,7 @@
         </div>
         <div class="menu-right">USD <i class="fa-solid fa-chevron-right"></i></div>
       </div>
-      
+
       <div class="menu-item">
         <div class="menu-left">
           <div class="icon-box"><i class="fa-regular fa-bell"></i></div>
@@ -347,9 +363,18 @@
   </div>
 
   <nav class="bottom-nav">
-    <a href="stake.html" title="Stake"><i class="fa-solid fa-layer-group"></i><span>Stake</span></a>
-    <a href="assets.html" title="Assets"><i class="fa-solid fa-wallet"></i><span>Assets</span></a>
-    <a class="active" href="#" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+      <a href="referral.html" title="Referral">
+          <i class="fa-solid fa-user-group"></i><span>Referral</span>
+      </a>
+      <a href="stake.html" title="Stake">
+          <i class="fa-solid fa-layer-group"></i><span>Stake</span>
+      </a>
+      <a href="assets.html" title="Assets">
+          <i class="fa-solid fa-wallet"></i><span>Assets</span>
+      </a>
+      <a class="active" href="#" title="Profile">
+          <i class="fa-solid fa-user"></i><span>Profile</span>
+      </a>
   </nav>
 
   <div class="modal" id="addressModal">
@@ -362,7 +387,7 @@
               <p style="font-size:12px; color:var(--txt-2); background: var(--bg-2); padding:8px; border-radius:6px; margin:0; border: 1px solid var(--edge);">
                   <i class="fa-solid fa-lock" style="color:var(--pri-color)"></i> These are your permanently assigned deposit addresses. They cannot be changed.
               </p>
-              
+
               <div class="address-field">
                   <label>Bitcoin (BTC)</label>
                   <div class="address-input-group">
@@ -421,7 +446,7 @@
             <p style="font-size:13px; color:var(--txt-2); margin:0; line-height:1.4;">
                 A 6-digit verification code has been sent to your registered email address.
             </p>
-            
+
             <div class="otp-input-container">
                 <input type="text" id="otpInput" class="otp-input" placeholder="000000" maxlength="6">
             </div>
@@ -451,7 +476,7 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const database = firebase.database();
-    
+
     let currentUserUid = null;
 
     // --- THEME LOGIC ---
@@ -479,7 +504,7 @@
             btn.innerHTML = '<i class="fa-solid fa-moon"></i>';
         }
     }
-    
+
     initTheme(); // Run on load
 
     // --- AUTH STATE & DATA LOADING ---
@@ -497,7 +522,7 @@
 
             document.getElementById('user-display-name').textContent = name;
             document.getElementById('user-email').textContent = email;
-            
+
             // Set Avatar
             const avatarImg = document.getElementById('user-avatar');
             avatarImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=D4AF37&color=1C1C1E&size=128&bold=true`;
@@ -525,7 +550,7 @@
     // 1. Toggle Settings (Notifications)
     window.toggleSetting = function(key, value) {
         if(!currentUserUid) return;
-        
+
         database.ref('privilegesecdata/' + currentUserUid + '/settings/' + key).set(value)
         .then(() => {
             const status = value ? 'Enabled' : 'Disabled';
@@ -563,25 +588,25 @@
     window.verifyOtp = function() {
         const input = document.getElementById('otpInput').value;
         const btn = document.getElementById('verifyOtpBtn');
-        
+
         if(input.length !== 6) {
             showToast('<i class="fa-solid fa-circle-exclamation"></i> Invalid Code');
             return;
         }
 
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
-        
+
         // Simulate API verification delay
         setTimeout(() => {
             closeOtpModal();
             btn.innerHTML = 'Verify & Enable 2FA'; // Reset btn text
-            
+
             // Turn the switch ON visually
             document.getElementById('2fa-toggle').checked = true;
-            
+
             // Save to DB
             toggleSetting('twoFactor', true);
-            
+
             showToast('<i class="fa-solid fa-shield-halved"></i> 2FA Enabled Successfully');
         }, 1500);
     }
@@ -590,7 +615,7 @@
     window.openAddressModal = function() {
         if(!currentUserUid) return;
         const modal = document.getElementById('addressModal');
-        
+
         // Load current addresses into inputs
         database.ref('privilegesecdata/' + currentUserUid).once('value', (snap) => {
             const data = snap.val() || {};
