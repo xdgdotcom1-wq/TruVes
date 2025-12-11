@@ -13,6 +13,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
   <style>
     /* === LUXURIOUS THEME VARIABLES (Gold/Deep Charcoal) === */
     :root{
@@ -35,6 +39,570 @@
     }
 
     /* === LIGHT THEME OVERRIDES === */
+    body.light-theme {
+        --bg-0: #F2F2F7; /* Light Grey Background */
+        --bg-1: #FFFFFF; /* Pure White Card */
+        --bg-2: #E5E5EA; /* Light Grey Elements */
+        --txt-1: #1C1C1E; /* Dark Text */
+        --txt-2: #8E8E93; /* Grey Text */
+        --edge: rgba(0, 0, 0, 0.1); /* Subtle dark border */
+        --glow: 0 4px 15px rgba(0,0,0,0.08); /* Soft shadow */
+        --input-bg: #FFFFFF;
+        --btn-txt: #1C1C1E; 
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior: smooth;}
+    body{
+      margin:0; padding-bottom: 80px;
+      font-family: Inter, system-ui, sans-serif;
+      color:var(--txt-1); background-color: var(--bg-0);
+      letter-spacing:.2px; min-height: 100dvh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    body::-webkit-scrollbar {display: none;}
+    .app{display:flex; flex-direction:column; position: relative; min-height: 100dvh;}
+
+    /* === VIEW STATES === */
+    #dashboard-view { 
+        display: none; 
+        opacity: 0;
+        transition: opacity 0.5s ease-in;
+    }
+    #dashboard-view.visible {
+        opacity: 1;
+    }
+
+    .full-screen-message {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        height: 100vh; width: 100vw; position: fixed; top: 0; left: 0;
+        background: var(--bg-0); z-index: 9999;
+        transition: opacity 0.5s ease-out;
+    }
+    .full-screen-message.fade-out {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* PROFESSIONAL LOADING SCREEN */
+    .loading-container {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 30px;
+    }
+
+    /* Outer Ring */
+    .loading-ring {
+        position: absolute;
+        width: 100%; height: 100%;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        border-top-color: var(--pri-color);
+        animation: spin 1.5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+    }
+
+    /* Middle Ring */
+    .loading-ring::before {
+        content: "";
+        position: absolute;
+        top: 5px; left: 5px; right: 5px; bottom: 5px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        border-top-color: rgba(212, 175, 55, 0.6);
+        animation: spin 3s cubic-bezier(0.4, 0.0, 0.2, 1) infinite reverse;
+    }
+
+    /* Inner Ring */
+    .loading-ring::after {
+        content: "";
+        position: absolute;
+        top: 15px; left: 15px; right: 15px; bottom: 15px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        border-top-color: rgba(212, 175, 55, 0.3);
+        animation: spin 1s linear infinite;
+    }
+
+    .loading-icon {
+        font-size: 32px;
+        color: var(--pri-color);
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes pulse { 0% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(0.9); } }
+
+    .loading-text {
+        font-family: 'Playfair Display', serif;
+        color: var(--pri-color);
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        margin-bottom: 8px;
+    }
+    .loading-sub {
+        font-size: 12px;
+        color: var(--txt-2);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-weight: 500;
+    }
+
+    /* Other Status Icons */
+    .status-icon {
+        font-size: 40px; width: 80px; height: 80px;
+        background: var(--bg-1); border-radius: 50%;
+        display: grid; place-items: center; margin-bottom: 24px;
+        border: 1px solid var(--edge); box-shadow: var(--glow);
+    }
+    .status-icon.warn { color: var(--warn); border-color: rgba(251, 191, 36, 0.3); }
+
+    /* NAV */
+    .bottom-nav{
+      position:fixed; bottom:0; left:0; right:0; height: 65px;
+      display:flex; align-items:center; justify-content: space-around;
+      background: var(--bg-1); border-top: 1px solid var(--edge); z-index: 1000;
+      box-shadow: 0 -5px 30px rgba(0,0,0,.1);
+      transition: background 0.3s;
+    }
+    .bottom-nav a{
+      flex:1; display:flex; flex-direction: column; align-items: center; justify-content: center;
+      text-decoration: none; color: var(--txt-2); font-size: 10px; font-weight: 500; gap: 4px; padding: 8px 0;
+      transition: color .2s;
+    }
+    .bottom-nav a i{font-size: 20px;}
+    .bottom-nav a.active{color: var(--pri-color); font-weight: 700;}
+    .bottom-nav a:hover{color: var(--txt-1);}
+
+    .main{padding:16px; display:flex; flex-direction:column; gap:16px;}
+
+    /* HEADER */
+    .header{display:flex; gap:14px; align-items:center; justify-content:space-between; padding: 4px 0;}
+    .header .app-title {
+        font-family: 'Playfair Display', serif; /* Luxurious title font */
+        font-weight: 900;
+        font-size: 24px;
+        color: var(--pri-color);
+        letter-spacing: 1px;
+    }
+    .header .header-actions { display: flex; gap: 8px; }
+    .header .btn-icon {
+      width: 40px; height: 40px;
+      display: grid; place-items: center;
+      font-size: 16px;
+      background: transparent; border: 0; color: var(--txt-2); cursor: pointer;
+      transition: color 0.3s;
+    }
+    .header .btn-icon:hover {color: var(--pri-color);}
+
+    /* BUTTONS */
+    .btn{
+      padding:10px 14px; border-radius:10px; border: 0;
+      color:var(--txt-1); background: var(--bg-2); cursor:pointer;
+      font-size: 14px; font-weight: 500; transition: background .2s;
+    }
+    .btn:hover {background: var(--bg-2); filter: brightness(1.1);}
+    .btn.primary{
+      background: var(--btn-bg); color: var(--btn-txt); font-weight: 700;
+      box-shadow: 0 4px 10px rgba(212, 175, 55, 0.4); /* Gold glow on primary button */
+    }
+    .btn.primary:hover {background: #FFD700;}
+
+    /* CARDS */
+    .card{
+      background: var(--bg-1); border:1px solid var(--edge); 
+      border-radius: var(--radius); box-shadow: var(--glow);
+      transition: background 0.3s, border 0.3s;
+    }
+    .card .head{
+      display:flex; align-items:center; justify-content:space-between; 
+      padding:14px 16px; border-bottom:1px solid var(--edge);
+    }
+    .card .head h3{margin:0; font-size:17px; font-weight:700; color: var(--pri-color);}
+    .card .body{padding:16px;}
+
+    /* BALANCE & ACTIONS */
+    .portfolio-balance{display:flex; flex-direction: column; align-items: flex-start; gap: 4px;}
+    .portfolio-balance .amt{font-size: 44px; font-weight:900; letter-spacing:1px; color: var(--txt-1);}
+
+    /* UPDATED PROFESSIONAL BUTTONS STYLING */
+    .quick-actions{display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top: 24px;}
+
+    .qa-btn{
+      display:flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 14px;
+      padding: 16px; 
+      border-radius:16px;
+      background: var(--bg-1); 
+      color: var(--txt-1); 
+      cursor:pointer;
+      transition: all .2s ease;
+      border: 1px solid var(--edge);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qa-btn .icon-box {
+        width: 38px; height: 38px;
+        background: rgba(212, 175, 55, 0.1);
+        border-radius: 50%;
+        display: grid; place-items: center;
+        transition: all 0.2s;
+    }
+
+    .qa-btn i { font-size: 16px; color: var(--pri-color); transition: all 0.2s; } 
+
+    .qa-btn span {
+        font-size: 15px; 
+        font-weight: 600; 
+        letter-spacing: 0.3px;
+    }
+
+    .qa-btn:hover{
+        background: var(--bg-2); 
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(212, 175, 55, 0.15);
+        border-color: var(--pri-color);
+    }
+
+    .qa-btn:hover .icon-box {
+        background: var(--pri-color);
+    }
+
+    .qa-btn:hover i {
+        color: var(--bg-0); /* Invert icon color on hover */
+    }
+
+    .qa-btn:active { transform: translateY(0); }
+
+    /* ASSET LIST */
+    .assets-list {display: flex; flex-direction: column; gap: 12px;}
+    .asset-row {
+        /* Adjusted grid to accommodate the conditional rendering */
+        display: grid; grid-template-columns: 1.2fr 1fr 1.1fr; align-items: center; 
+        padding: 12px 16px;
+        background: var(--bg-1); border-radius: 12px;
+        border: 1px solid var(--edge); cursor: pointer; gap: 8px;
+        transition: background 0.3s;
+    }
+    .asset-row:hover {background: var(--bg-2); border-color: var(--pri-color);}
+    .asset-row .col-1 {display: flex; align-items: center; gap: 12px; overflow: hidden;}
+    .asset-row .coin {
+        width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+        background: var(--bg-2); flex-shrink: 0;
+    }
+    .asset-row .coin-info {display: flex; flex-direction: column;}
+    .asset-row .coin-info .symbol {font-weight: 600; font-size: 16px; color: var(--txt-1);}
+    .asset-row .coin-info .name {
+        font-size: 12px; color: var(--txt-2); margin-top: 2px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    /* Updated grid column for when price is unavailable */
+    .asset-row .col-2.full-width { grid-column: span 2; }
+
+    .asset-row .col-2, .asset-row .col-3 {display: flex; flex-direction: column; text-align: right;}
+    .asset-row .price, .asset-row .value {font-weight: 600; font-size: 15px; color: var(--txt-1);}
+    .asset-row .change, .asset-row .holdings {font-size: 12px; color: var(--txt-2); margin-top: 2px;}
+    .asset-row .change.up { color: var(--good); }
+    .asset-row .change.down { color: var(--bad); }
+
+    .asset-row.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        filter: grayscale(1);
+    }
+    .asset-row.disabled:hover {
+        border-color: var(--edge); /* No gold hover */
+        background: var(--bg-1);
+    }
+
+    .footer{opacity:.5; font-size:12px; text-align:center; padding:16px;}
+
+    /* MODAL */
+    .modal{
+      position:fixed; inset:0; display:none; place-items:center; 
+      background:rgba(0,0,0,.8); z-index: 2000; overflow-y: auto;
+    }
+    .modal.open{display:grid;}
+    .modal .panel{
+      width:min(520px,94vw); border-radius:16px; border:1px solid var(--pri-color); /* Gold border for modal */
+      background:var(--bg-1); box-shadow:var(--glow);
+    }
+    .panel .panel-h{display:flex; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--edge);}
+    .panel .panel-b{padding:16px;}
+
+    /* COIN DETAIL VIEW */
+    .coin-detail-view {
+      display: none; flex-direction: column; position: absolute; inset: 0;
+      background: var(--bg-0); z-index: 500; padding-bottom: 80px; overflow-y: auto;
+    }
+    .app.show-detail .main { display: none; }
+    .app.show-detail .coin-detail-view { display: flex; }
+
+    .coin-detail-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px; padding-top: 20px;
+    }
+    .coin-detail-header .btn-icon {
+      width: 40px; height: 40px; display: grid; place-items: center;
+      font-size: 16px; background: var(--bg-2); border: 0; color: var(--txt-1); 
+      cursor: pointer; border-radius: 50%;
+    }
+
+    .coin-balance-area {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 20px 16px; gap: 12px;
+    }
+    .coin-balance-area .icon { width: 50px; height: 50px; border-radius: 50%; }
+    .coin-balance-area .name { font-size: 18px; font-weight: 600; margin-top: 8px; color: var(--txt-1); }
+    .coin-balance-area .symbol { font-size: 14px; color: var(--txt-2); }
+    .coin-balance-area .crypto-amt { font-size: 36px; font-weight: 700; margin-top: 10px; color: var(--pri-color);}
+    .coin-balance-area .usd-amt { font-size: 15px; color: var(--txt-2); font-weight: 500; }
+
+    .coin-actions {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px;
+    }
+    .coin-actions .action-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 12px 10px; border-radius: 12px; border: 1px solid var(--edge);
+      background: var(--bg-1); color: var(--txt-1); cursor:pointer;
+      font-size: 13px; font-weight: 600; transition: background .2s;
+    }
+    .coin-actions .action-btn:hover { background: var(--bg-2); border-color: var(--pri-color); }
+
+    .chart-timeframes { display: flex; justify-content: space-around; gap: 8px; padding: 0 16px 12px 16px; }
+    .time-btn {
+      flex: 1; padding: 6px 0; border: 1px solid var(--edge); background: var(--bg-1);
+      color: var(--txt-2); border-radius: 8px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+    }
+    .time-btn.active { background: var(--btn-bg); color: var(--btn-txt); font-weight: 700; }
+
+    .chart-container { padding: 16px; height: 250px; }
+    .chart-container canvas { width: 100% !important; height: 100% !important; }
+
+    .tx-history-header {
+      padding: 16px; font-size: 17px; font-weight: 700; color: var(--txt-1);
+      border-top: 1px solid var(--edge); margin-top: 10px;
+    }
+    .tx-history-list { display: flex; flex-direction: column; padding: 0 16px; gap: 12px; }
+    .logout-link { margin-top: 20px; color: var(--txt-2); text-decoration: underline; cursor: pointer; }
+
+    /* Network Badge */
+    .network-badge {
+      font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px;
+      text-transform: uppercase; margin-left: 8px;
+    }
+    .net-eth { background: rgba(100, 100, 255, 0.2); color: #7878FF; }
+    .net-bsc { background: rgba(240, 185, 11, 0.2); color: #F0B90B; }
+    .net-btc { background: rgba(247, 147, 26, 0.2); color: #F7931A; }
+    .net-sol { background: rgba(0, 255, 163, 0.2); color: #00FFa3; }
+    .net-xrp { background: rgba(175, 175, 175, 0.2); color: #FFFFFF; border: 1px solid #FFFFFF; }
+    .body.light-theme .net-xrp { color: #555; border: 1px solid #555; } /* Fix XRP badge for light mode */
+    .net-trx { background: rgba(235, 0, 41, 0.2); color: #EB0029; }
+
+    /* Scan Input Wrapper */
+    .input-wrapper {
+        position: relative;
+        width: 100%;
+    }
+    .scan-btn-inside {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: var(--txt-2);
+        cursor: pointer;
+        font-size: 18px;
+        transition: color 0.2s;
+    }
+    .scan-btn-inside:hover { color: var(--pri-color); }
+
+  </style>
+</head>
+<body>
+
+  <div id="loading-view" class="full-screen-message">
+    <div class="loading-container">
+        <div class="loading-ring"></div>
+        <i class="fa-solid fa-shield-halved loading-icon"></i>
+    </div>
+    <div class="loading-text">TruVesta</div>
+    <div class="loading-sub" id="loading-sub-text">Establishing Secure Connection...</div>
+  </div>
+
+  <div id="review-view" class="full-screen-message" style="display:none;">
+    <div class="status-icon warn"><i class="fa-solid fa-clock"></i></div>
+    <h2 style="margin:0 0 10px 0; color: var(--txt-1);">No Wallets Available</h2>
+    <p style="color:var(--txt-2); font-size:14px; max-width: 300px; line-height:1.5;">
+        Please contact support. All available wallets are currently assigned.
+    </p>
+    <a onclick="logout()" class="logout-link">Log Out</a>
+  </div>
+
+  <div class="app" id="dashboard-view">
+    <main class="main">
+
+      <header class="header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-2); display: grid; place-items: center; border: 1px solid var(--edge);">
+             <i class="fa-solid fa-shield-halved" style="font-size: 20px; color: var(--pri-color);"></i>
+          </div>
+          <span class="app-title">TruVesta</span>
+        </div>
+        <div class="header-actions">
+            <button class="btn-icon" onclick="toggleTheme()" id="themeToggleBtn"><i class="fa-solid fa-moon"></i></button>
+            <button class="btn-icon" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+      </header>
+
+      <div class="card" id="balance-card">
+        <div class="head"><h3>Holdings Overview</h3></div>
+        <div class="body">
+          <div class="portfolio-balance">
+            <div class="amt" id="portfolioValue">$0.00</div>
+            <div class="chg up" id="portfolioChange">+0.0%</div>
+          </div>
+          <div class="quick-actions">
+            <button class="qa-btn" onclick="openModal('receive')">
+                <div class="icon-box"><i class="fa-solid fa-arrow-down"></i></div>
+                <span>Deposit</span>
+            </button>
+            <button class="qa-btn" onclick="openModal('send')">
+                <div class="icon-box"><i class="fa-solid fa-arrow-up"></i></div>
+                <span>Withdraw</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="staking-overview-card">
+        <div class="head">
+          <h3>Staking Overview</h3>
+          <button class="btn primary" style="padding: 6px 12px; font-size: 12px;" onclick="location.href='stake.html'">Manage</button>
+        </div>
+        <div class="body" style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="portfolio-balance" style="align-items: flex-start; gap: 4px;">
+            <span style="font-size: 14px; font-weight: 500; color: var(--txt-2);">Total Staked</span>
+            <div class="amt" id="stakingTotalStaked" style="font-size: 36px; color: var(--txt-1);">$0.00</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 15px; border-top: 1px solid var(--edge);">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-size: 15px; color: var(--txt-2);">Avg. Daily Rate</span>
+              <span id="stakingAvgRate" style="font-size: 15px; font-weight: 600; color: var(--good);">0.0%</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-size: 15px; color: var(--txt-2);">Available Rewards</span>
+              <span id="stakingTotalRewards" style="font-size: 15px; font-weight: 600; color: var(--pri-color);">$0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="assets-list" id="assetsListContainer"></div>
+
+      <div class="footer">TruVesta v2.1 - Multi-Chain Enabled</div>
+    </main>
+
+    <div class="coin-detail-view" id="coinDetailView">
+      <header class="coin-detail-header">
+        <button class="btn-icon" onclick="hideCoinDetail()"><i class="fa-solid fa-arrow-left"></i></button>
+        <span style="font-weight: 600; font-size: 18px; color: var(--txt-1);" id="detailCoinName"></span>
+        <button class="btn-icon"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      </header>
+
+      <div class="coin-balance-area">
+        <img class="icon" id="detailCoinIcon" src="">
+        <span class="name" id="detailCoinName2"></span>
+        <span class="crypto-amt" id="detailCryptoAmt"></span>
+        <span class="symbol" id="detailCoinSymbol"></span>
+        <span class="usd-amt" id="detailUsdAmt"></span>
+      </div>
+
+      <div class="coin-actions">
+        <button class="action-btn" onclick="openModal('receive')"><i class="fa-solid fa-arrow-down"></i><span>Deposit</span></button>
+        <button class="action-btn" onclick="openModal('send')"><i class="fa-solid fa-arrow-up"></i><span>Withdraw</span></button>
+        <button class="action-btn" onclick="openComingSoonModal()">
+            <i class="fa-solid fa-right-left"></i>
+            <span>Swap</span>
+            <span style="font-size: 8px; background: var(--pri-color); color: var(--bg-0); padding: 1px 4px; border-radius: 4px; margin-top: -2px; font-weight:700;">SOON</span>
+        </button>
+      </div>
+
+      <div class="chart-timeframes" id="chartTimeframes" data-symbol="">
+        <button class="time-btn" onclick="updateChartData(this, 1)">1D</button>
+        <button class="time-btn active" onclick="updateChartData(this, 7)">1W</button>
+        <button class="time-btn" onclick="updateChartData(this, 30)">1M</button>
+        <button class="time-btn" onclick="updateChartData(this, 90)">3M</button>
+        <button class="time-btn" onclick="updateChartData(this, 365)">1Y</button>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="coinChart"></canvas>
+      </div>
+      <div class="tx-history-header">History</div>
+      <div class="tx-history-list" id="txHistoryList"></div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="referral.html" title="Referral"><i class="fa-solid fa-user-group"></i><span>Referral</span></a>
+        <a href="stake.html" title="Stake"><i class="fa-solid fa-layer-group"></i><span>Stake</span></a>
+        <a class="active" href="#" title="Assets"><i class="fa-solid fa-wallet"></i><span>Assets</span></a>
+        <a href="profile.html" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+    </nav>
+  </div> 
+
+  <div class="modal" id="modal">
+    <div class="panel">
+      <div class="panel-h">
+        <div style="display:flex; align-items:center;">
+            <strong id="modalTitle" style="color: var(--txt-1);">Action</strong>
+            <span id="networkBadge"></span>
+        </div>
+        <button class="btn" onclick="document.getElementById('modal').classList.remove('open')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="panel-b" id="modalBody"></div>
+    </div>
+  </div>  
+
+  <script>
+      function openComingSoonModal() {
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const networkBadge = document.getElementById('networkBadge');
+
+        if(modalTitle) modalTitle.innerText = "Coming Soon";
+        if(networkBadge) networkBadge.style.display = 'none';
+        
+        if(modalBody) {
+            modalBody.innerHTML = `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 30px 10px; text-align:center;">
+                    <div style="font-size: 40px; color: var(--pri-color); margin-bottom: 15px;">
+                        <i class="fa-solid fa-rocket"></i>
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; color: var(--txt-1);">Swaps Are Launching Soon</h3>
+                    <p style="color: var(--txt-2); font-size: 14px; line-height: 1.5; margin: 0;">
+                        We are currently finalizing our decentralized exchange integration to ensure the best rates and security for your swaps.
+                    </p>
+                    <button class="btn primary" style="margin-top: 20px; width: 100%;" onclick="document.getElementById('modal').classList.remove('open')">Got it</button>
+                </div>
+            `;
+        }
+        
+        if(modal) modal.classList.add('open');
+      }
+  </script>
+
+  <script src="assets.js"></script>
+</body>
+</html>    /* === LIGHT THEME OVERRIDES === */
     body.light-theme {
         --bg-0: #F2F2F7; /* Light Grey Background */
         --bg-1: #FFFFFF; /* Pure White Card */
