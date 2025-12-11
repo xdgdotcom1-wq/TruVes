@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TruVesta - Staking</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+
+  <style>
+    /* === LUXURIOUS THEME VARIABLES === */
+    :root{
+      --bg-0: #1C1C1E; --bg-1: #2C2C2E; --bg-2: #404043;
+      --txt-1: #E0E0E0; --txt-2: #A0A0A0;
+      --pri-color: #D4AF37; --pri-gradient: linear-gradient(90deg, #D4AF37, #FFD700);
+      --btn-bg: #D4AF37; --btn-txt: #1C1C1E;
+      --good: #34D399; --bad: #F87171; --warn: #FBBF24;
+      --edge: rgba(212, 175, 55, .2);
+      --glow: 0 4px 15px rgba(0,0,0,.5);
+      --radius: 14px;
+      --input-bg: #404043;
+    }
+
+    body.light-theme {
+        --bg-0: #F2F2F7; --bg-1: #FFFFFF; --bg-2: #E5E5EA;
+        --txt-1: #1C1C1E; --txt-2: #8E8E93;
+        --edge: rgba(0, 0, 0, 0.1); --glow: 0 4px 15px rgba(0,0,0,0.08);
+        --input-bg: #E5E5EA; --btn-txt: #1C1C1E; 
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding-bottom: 80px;
+      font-family: Inter, system-ui, sans-serif;
+      color:var(--txt-1); background-color: var(--bg-0);
+      letter-spacing:.2px; min-height: 100dvh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    body::-webkit-scrollbar {display: none;}
+
+    .app{display:flex; flex-direction:column; position: relative; min-height: 100dvh;}
+    .main{padding:16px; display:flex; flex-direction:column; gap:16px;}
+
+    /* HEADER */
+    .header{display:flex; gap:14px; align-items:center; justify-content:space-between; padding: 4px 0;}
+    .header .app-title {
+        font-family: 'Playfair Display', serif; font-weight: 900; font-size: 24px; color: var(--pri-color); letter-spacing: 1px;
+    }
+    .header .btn-icon {
+      width: 40px; height: 40px; display: grid; place-items: center; font-size: 18px;
+      background: transparent; border: 0; color: var(--txt-2); cursor: pointer; transition: color 0.2s;
+    }
+    .header .btn-icon:hover { color: var(--pri-color); }
+
+    /* BUTTONS */
+    .btn{
+      padding:10px 14px; border-radius:10px; border: 0;
+      color:var(--txt-1); background: var(--bg-2); cursor:pointer;
+      font-size: 14px; font-weight: 500; transition: background .2s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn.primary{
+      background: var(--btn-bg); color: var(--btn-txt); font-weight: 700;
+      box-shadow: 0 4px 10px rgba(212, 175, 55, 0.4); 
+    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+    /* CARDS */
+    .card{
+      background: var(--bg-1); border:1px solid var(--edge); 
+      border-radius: var(--radius); box-shadow: var(--glow);
+    }
+    .card .head{
+      display:flex; align-items:center; justify-content:space-between; 
+      padding:14px 16px; border-bottom:1px solid var(--edge);
+    }
+    .card .head h3{margin:0; font-size:17px; font-weight:700; color: var(--pri-color);}
+    .card .body{padding:16px;}
+
+    /* NAV */
+    .bottom-nav{
+      position:fixed; bottom:0; left:0; right:0; height: 65px;
+      display:flex; align-items:center; justify-content: space-around;
+      background: var(--bg-1); border-top: 1px solid var(--edge); z-index: 1000;
+      box-shadow: 0 -5px 30px rgba(0,0,0,.5);
+    }
+    .bottom-nav a, .bottom-nav button{
+      flex:1; display:flex; flex-direction: column; align-items: center; justify-content: center;
+      text-decoration: none; color: var(--txt-2); font-size: 10px; font-weight: 500; gap: 4px; padding: 8px 0;
+      transition: color .2s; background: none; border: none; cursor: pointer; font-family: inherit;
+    }
+    .bottom-nav a i, .bottom-nav button i{font-size: 20px;}
+    .bottom-nav a.active, .bottom-nav button.active{color: var(--pri-color); font-weight: 700;}
+
+    /* FORM ELEMENTS */
+    .form-group{margin-bottom:16px;}
+    .form-group label{font-size:12px; color:var(--txt-2); margin-left:4px; display:block; margin-bottom: 4px;}
+    .form-group input, .form-group select {
+        width:100%; padding:14px; background:var(--bg-2); border:1px solid var(--edge); 
+        color:var(--txt-1); border-radius:12px; outline:none; font-size: 16px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .form-group input:focus, .form-group select:focus {
+        border-color: var(--pri-color); box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15);
+    }
+    .input-addon-container { position: relative; }
+    .input-addon-container .addon {
+        position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+        color: var(--txt-2); font-weight: 600; font-size: 14px; pointer-events: none;
+    }
+
+    /* STAKE LIST */
+    .stake-list { display: flex; flex-direction: column; gap: 12px; }
+    .stake-item {
+        background: var(--bg-2); border: 1px solid var(--edge); border-radius: 12px; padding: 14px 16px; 
+    }
+    .stake-item-header {
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 1px solid var(--edge); padding-bottom: 10px; margin-bottom: 10px;
+    }
+    .stake-item-header .symbol { font-weight: 700; font-size: 18px; color: var(--pri-color); }
+    .stake-item-details { display: flex; flex-direction: column; gap: 8px; }
+    .detail-row { display: flex; justify-content: space-between; font-size: 14px; }
+    .detail-label { color: var(--txt-2); }
+    .detail-value { font-weight: 600; color: var(--txt-1); }
+    .progress-bar {
+        height: 6px; background: var(--bg-1); border-radius: 3px; margin-top: 5px; overflow: hidden;
+    }
+    .progress-bar-fill { height: 100%; background: var(--good); transition: width 0.5s ease-in-out; }
+    .reward-status { 
+        display: flex; flex-direction: column; gap: 8px; padding-top: 10px; margin-top: 10px; border-top: 1px solid var(--edge); 
+    }
+    .status-msg { margin-top: 15px; font-size: 13px; color: var(--warn); }
+    .stake-item.pending { border-color: var(--warn); } 
+    .stake-item.active { border-color: var(--good); }
+
+    input[readonly] { background-color: var(--bg-1); color: var(--txt-2); cursor: not-allowed; border-color: var(--edge); }
+
+    /* MODAL */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: all; }
+    .custom-dialog {
+        background: var(--bg-1); width: 90%; max-width: 350px; border-radius: 20px;
+        border: 1px solid var(--edge); box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        overflow: hidden;
+    }
+    .modal-overlay.show .custom-dialog { transform: translateY(0); }
+    .dialog-header {
+        background: var(--bg-2); padding: 15px 20px; border-bottom: 1px solid var(--edge);
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .dialog-title {
+        font-family: 'Playfair Display', serif; color: var(--pri-color); font-size: 18px; font-weight: 700; margin: 0;
+    }
+    .dialog-body { padding: 20px; text-align: center; color: var(--txt-1); font-size: 15px; line-height: 1.5; }
+    .dialog-actions { display: flex; gap: 10px; padding: 0 20px 20px 20px; }
+    .dialog-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; font-size: 14px; }
+    .btn-cancel { background: var(--bg-2); color: var(--txt-2); }
+    .btn-confirm { background: var(--pri-color); color: var(--btn-txt); }
+  </style>
+</head>
+<body>
+
+  <div id="customModal" class="modal-overlay">
+      <div class="custom-dialog">
+          <div class="dialog-header"><h3 class="dialog-title" id="modalTitle">Notification</h3></div>
+          <div class="dialog-body" id="modalMessage">Message goes here...</div>
+          <div class="dialog-actions">
+              <button class="dialog-btn btn-cancel" id="modalCancelBtn" onclick="closeModal(false)">Cancel</button>
+              <button class="dialog-btn btn-confirm" id="modalConfirmBtn" onclick="closeModal(true)">Confirm</button>
+          </div>
+      </div>
+  </div>
+
+  <div class="app">
+    <main class="main">
+      <header class="header">
+        <button class="btn-icon" onclick="window.location.href='assets.html'"><i class="fa-solid fa-arrow-left"></i></button>
+        <span class="app-title">Staking Hub</span>
+        <button onclick="toggleTheme()" id="themeToggleBtn" class="btn-icon"><i class="fa-solid fa-moon"></i></button>
+      </header>
+
+      <div class="card" id="global-stake-overview">
+        <div class="head"><h3>Portfolio Stakes</h3></div>
+        <div class="body" style="display: flex; flex-direction: column; gap: 15px;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="font-size: 15px; color: var(--txt-2);">Total Staked Value</span>
+            <span id="totalStakedValue" style="font-size: 15px; font-weight: 600; color: var(--txt-1);">$0.00</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="font-size: 15px; color: var(--txt-2);">Available Rewards</span>
+            <span id="totalAvailableRewards" style="font-size: 15px; font-weight: 600; color: var(--pri-color);">$0.00</span>
+          </div>
+          <p id="rewardPeriodInfo" style="font-size: 11px; color: var(--txt-2); text-align: right; margin: -10px 0 0 0;">
+            Rewards credit every: <span id="rewardPeriodDisplay" style="color: var(--txt-1); font-weight: 600;">24 Hours</span>
+          </p>
+
+          <button class="btn primary" id="withdrawRewardsBtn" onclick="withdrawAllRewards()" disabled style="width:100%; padding:14px; font-size:16px; margin-top: 10px;">
+              Withdraw All Rewards
+          </button>
+        </div>
+      </div>
+
+      <div class="card" id="create-stake-card">
+        <div class="head"><h3>New Stake</h3></div>
+        <div class="body">
+          <div class="form-group">
+            <label for="stakeCoin">Coin to Stake</label>
+            <select id="stakeCoin" style="font-weight: 600;">
+              <option value="">Loading Balances...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="stakeAmount">Amount to Lock</label>
+            <div class="input-addon-container">
+                <input id="stakeAmount" type="number" placeholder="0.00" min="0.001">
+                <span class="addon" id="stakeCoinSymbol">--</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:6px;">
+                 <p id="stakeBalanceInfo" style="font-size: 12px; color: var(--txt-2); margin:0;">Available: 0.00 --</p>
+                 <p id="dynamicRateInfo" style="font-size: 12px; color: var(--pri-color); font-weight:600; margin:0;">
+                     0.00% / Period &nbsp;|&nbsp; Est. Return: $0.00
+                 </p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="stakeDuration">Staking Period (Fixed)</label>
+            <div class="input-addon-container">
+                <input id="stakeDurationDisplay" type="text" value="250 Days" readonly style="font-weight: 600;">
+                <span class="addon"><i class="fa-solid fa-lock" style="font-size: 14px; color: var(--txt-2);"></i></span>
+            </div>
+            <p id="apyInfo" style="font-size: 12px; color: var(--warn); margin-top: 6px;">
+                Interest credited per reward period.<br>
+                <span style="color:var(--txt-2);">Withdrawal unlock depends on stake amount (10% - 30% completion).</span>
+            </p>
+          </div>
+          <button class="btn primary" id="confirmStakeBtn" onclick="confirmStake()" style="width:100%; padding:14px; font-size:16px;">
+              Confirm Stake
+          </button>
+        </div>
+      </div>
+
+      <div class="card" id="active-stakes-card">
+        <div class="head"><h3>Your Active Stakes</h3></div>
+        <div class="body">
+          <p id="noStakesMessage" style="text-align:center; color:var(--txt-2); margin-bottom: 16px;">No active stakes found.</p>
+          <div class="stake-list" id="activeStakesList"></div>
+        </div>
+      </div>
+    </main>
+  </div> 
+
+  <nav class="bottom-nav">
+      <button onclick="window.location.href='referral.html'">
+          <i class="fa-solid fa-user-group"></i><span>Referral</span>
+      </button>
+      <button class="active" onclick="window.location.reload()">
+          <i class="fa-solid fa-layer-group"></i><span>Stake</span>
+      </button>
+      <a href="assets.html" title="Assets"><i class="fa-solid fa-wallet"></i><span>Assets</span></a>
+      <a href="profile.html" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+  </nav>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script src="stake.js"></script>
+
+</body>
+</html>

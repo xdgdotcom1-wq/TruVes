@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TruVesta - Profile Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <style>
+    /* === LUXURIOUS THEME VARIABLES (Matches Assets.html) === */
+    :root{
+      --bg-0: #1C1C1E; /* Deep Charcoal */
+      --bg-1: #2C2C2E; /* Dark Grey */
+      --bg-2: #404043; /* Medium Dark Grey */
+      --txt-1: #E0E0E0; /* Off-White */
+      --txt-2: #A0A0A0; /* Soft Grey */
+      --pri-color: #D4AF37; /* Classic Gold */
+      --pri-gradient: linear-gradient(90deg, #D4AF37, #FFD700);
+      --btn-bg: #D4AF37;
+      --btn-txt: #1C1C1E;
+      --good: #34D399; 
+      --bad: #F87171;
+      --edge: rgba(212, 175, 55, .2);
+      --glow: 0 4px 15px rgba(0,0,0,.5);
+      --radius: 14px;
+      --input-bg: #404043;
+    }
+
+    /* === LIGHT THEME OVERRIDES === */
+    body.light-theme {
+        --bg-0: #F2F2F7;
+        --bg-1: #FFFFFF;
+        --bg-2: #E5E5EA;
+        --txt-1: #1C1C1E;
+        --txt-2: #8E8E93;
+        --edge: rgba(0, 0, 0, 0.1);
+        --glow: 0 4px 15px rgba(0,0,0,0.08);
+        --input-bg: #E5E5EA;
+        --btn-txt: #1C1C1E; 
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding-bottom: 90px; font-family: Inter, sans-serif;
+      color:var(--txt-1); background-color: var(--bg-0); min-height: 100dvh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    body::-webkit-scrollbar {display: none;}
+
+    .app{padding:16px; display:flex; flex-direction:column; gap:20px; max-width: 500px; margin: 0 auto;}
+
+    /* HEADER */
+    .header{display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px;}
+    .header h1 { 
+        color: var(--pri-color); font-family: 'Playfair Display', serif; 
+        letter-spacing: 1px; margin: 0; font-size: 26px;
+    }
+    .header-actions { display: flex; gap: 15px; align-items: center; }
+
+    /* PROFILE CARD */
+    .profile-card{
+      background: var(--bg-1); border:1px solid var(--edge); border-radius: var(--radius);
+      padding: 30px 20px; display: flex; flex-direction: column; align-items: center; text-align: center;
+      box-shadow: var(--glow); position: relative; overflow: hidden;
+    }
+    /* Gold sheen at top */
+    .profile-card::before {
+        content: ''; position: absolute; top:0; left:0; right:0; height: 3px;
+        background: var(--pri-gradient);
+    }
+
+    .avatar-container{position: relative; margin-bottom: 16px;}
+    .avatar{
+        width: 86px; height: 86px; border-radius: 50%; object-fit: cover; 
+        border: 2px solid var(--pri-color); padding: 3px; background: var(--bg-1);
+    }
+    .badge{
+      position: absolute; bottom: 2px; right: 2px; background: var(--pri-color); color: var(--bg-0);
+      width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 12px;
+      border: 3px solid var(--bg-1); font-weight: 700;
+    }
+
+    .user-name{font-size: 22px; font-weight: 700; margin: 0; color: var(--txt-1); letter-spacing: -0.5px;}
+    .user-email{color: var(--txt-2); font-size: 13px; margin-top: 4px; font-weight: 400;}
+
+    .user-id-box {
+        display: flex; align-items: center; gap: 8px; margin-top: 18px;
+        padding: 8px 14px; background: var(--bg-2); border-radius: 20px;
+        font-size: 11px; color: var(--pri-color); cursor: pointer; border: 1px solid var(--edge);
+        transition: all 0.2s;
+    }
+    .user-id-box:active { transform: scale(0.96); }
+    .user-id-box span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 180px; font-family: monospace;}
+
+    /* MENU SECTIONS */
+    .section-title {
+        font-size: 12px; color: var(--txt-2); font-weight: 700; 
+        text-transform: uppercase; letter-spacing: 1px; margin: 10px 4px 6px;
+    }
+
+    .menu-group{background: var(--bg-1); border:1px solid var(--edge); border-radius: var(--radius); overflow: hidden;}
+    .menu-item{
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; border-bottom: 1px solid var(--edge); cursor: pointer; transition: background .2s;
+    }
+    .menu-item:last-child{border-bottom: none;}
+    .menu-item:hover{background: var(--bg-2);}
+
+    .menu-left{display: flex; align-items: center; gap: 16px;}
+    .icon-box{
+        width: 36px; height: 36px; border-radius: 10px; 
+        background: var(--bg-2); display: grid; place-items: center; color: var(--txt-1);
+        font-size: 16px;
+    }
+    /* Specific icon colors */
+    .icon-wallet { color: var(--pri-color); }
+    .icon-sec { color: var(--good); }
+    .icon-bio { color: #60A5FA; }
+    .icon-referral { color: #A855F7; } /* Purple for referral */
+    .icon-logout { color: var(--bad); }
+
+    .menu-text{font-weight: 500; font-size: 15px;}
+    .menu-right{color: var(--txt-2); font-size: 14px; display: flex; align-items: center; gap: 10px;}
+
+    /* TOGGLE SWITCH */
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+        position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+        background-color: var(--bg-0); transition: .4s; border-radius: 34px; border: 1px solid var(--edge);
+    }
+    .slider:before {
+        position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px;
+        background-color: var(--txt-2); transition: .4s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--pri-color); border-color: var(--pri-color); }
+    input:checked + .slider:before { transform: translateX(20px); background-color: var(--bg-0); }
+
+    /* LOGOUT BUTTON */
+    .logout-btn-container { margin-top: 10px; }
+    .logout-item { color: var(--bad) !important; }
+    .logout-item:hover { background: rgba(248, 113, 113, 0.08); }
+
+    /* TOAST NOTIFICATION */
+    #toast {
+        visibility: hidden; min-width: 280px; background-color: var(--bg-1); border: 1px solid var(--pri-color);
+        color: var(--txt-1); text-align: center; border-radius: 12px; padding: 14px;
+        position: fixed; z-index: 2000; left: 50%; bottom: 90px; transform: translateX(-50%);
+        font-size: 14px; box-shadow: 0 5px 20px rgba(0,0,0,0.6); font-weight: 500;
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    #toast.show { visibility: visible; animation: fadein 0.3s, fadeout 0.3s 2.5s; }
+    @keyframes fadein { from {bottom: 70px; opacity: 0;} to {bottom: 90px; opacity: 1;} }
+    @keyframes fadeout { from {bottom: 90px; opacity: 1;} to {bottom: 70px; opacity: 0;} }
+
+    /* BOTTOM NAV */
+    .bottom-nav{
+      position:fixed; bottom:0; left:0; right:0; height: 65px;
+      display:flex; align-items:center; justify-content: space-around;
+      background: var(--bg-1); border-top: 1px solid var(--edge); z-index: 1000;
+      box-shadow: 0 -5px 30px rgba(0,0,0,.5);
+    }
+    .bottom-nav a, .bottom-nav button {
+      flex:1; display:flex; flex-direction: column; align-items: center; justify-content: center;
+      text-decoration: none; color: var(--txt-2); font-size: 10px; font-weight: 500; gap: 4px; padding: 8px 0;
+      transition: color .2s;
+      background: none; border: none; cursor: pointer; font-family: inherit;
+    }
+    .bottom-nav a i, .bottom-nav button i{font-size: 20px;}
+    .bottom-nav a.active, .bottom-nav button.active{color: var(--pri-color); font-weight: 700;}
+    .bottom-nav a:hover, .bottom-nav button:hover{color: var(--txt-1);}
+
+    /* MODAL BASICS */
+    .modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3000;
+      display: none; place-items: center; padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+    .modal.open { display: grid; }
+    .modal-content {
+        background: var(--bg-1); border: 1px solid var(--edge); border-radius: 16px;
+        width: 100%; max-width: 400px; box-shadow: var(--glow); overflow: hidden;
+    }
+    .modal-header {
+        padding: 16px; border-bottom: 1px solid var(--edge); display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; max-height: 60vh; overflow-y: auto; }
+
+    /* ADDRESS MANAGER STYLES */
+    .address-field label { font-size: 12px; color: var(--txt-2); margin-left: 4px; display: block; margin-bottom: 4px;}
+    .address-input-group { display: flex; align-items: center; gap: 8px; position: relative; }
+    .address-input-group img { width: 24px; height: 24px; border-radius: 50%; }
+    .address-input-group input { 
+        flex: 1; background: var(--bg-2); border: 1px solid var(--edge); color: var(--txt-1);
+        padding: 10px; padding-right: 35px; border-radius: 8px; outline: none; font-family: monospace; font-size: 12px;
+        cursor: not-allowed;
+    }
+    .address-input-group .copy-btn {
+        position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+        background: none; border: none; color: var(--pri-color); cursor: pointer; padding: 5px;
+    }
+
+    /* OTP MODAL STYLES */
+    .otp-input-container { text-align: center; margin: 20px 0; }
+    .otp-input {
+        width: 100%; padding: 15px; font-size: 24px; letter-spacing: 5px; text-align: center;
+        background: var(--bg-2); border: 1px solid var(--edge); color: var(--pri-color);
+        border-radius: 12px; outline: none; font-family: monospace;
+    }
+    .otp-input:focus { border-color: var(--pri-color); box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+    .verify-btn {
+        width: 100%; padding: 14px; background: var(--btn-bg); color: var(--btn-txt);
+        border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 15px;
+        transition: transform 0.1s;
+    }
+    .verify-btn:active { transform: scale(0.98); }
+
+  </style>
+</head>
+<body>
+
+  <div id="toast"><i class="fa-solid fa-circle-check" style="color:var(--good)"></i> <span>Action Saved</span></div>
+
+  <div class="app">
+    <header class="header">
+      <h1>Profile</h1>
+      <div class="header-actions">
+          <button onclick="toggleTheme()" id="themeToggleBtn" style="background: none; border: none; color: var(--txt-2); font-size: 18px; cursor: pointer;">
+             <i class="fa-solid fa-moon"></i>
+          </button>
+          <button onclick="logout()" style="background: none; border: none; color: var(--txt-2); font-size: 18px; cursor: pointer;">
+              <i class="fa-solid fa-power-off"></i>
+          </button>
+      </div>
+    </header>
+
+    <div class="profile-card">
+      <div class="avatar-container">
+        <img id="user-avatar" src="" class="avatar" style="display:none;">
+        <div id="avatar-loader" style="width:86px; height:86px; border-radius:50%; border:2px solid var(--bg-2); display:grid; place-items:center;">
+             <i class="fa-solid fa-spinner fa-spin" style="color:var(--pri-color);"></i>
+        </div>
+        <div class="badge"><i class="fa-solid fa-check"></i></div>
+      </div>
+
+      <h2 class="user-name" id="user-display-name">...</h2>
+      <div class="user-email" id="user-email">Loading data...</div>
+
+      <button class="user-id-box" onclick="copyUserId()">
+        <span id="display-user-id">...</span>
+        <i class="fa-regular fa-copy"></i>
+      </button>
+    </div>
+
+    <div class="section-title">Wallet & Security</div>
+    <div class="menu-group">
+
+      <div class="menu-item" onclick="openAddressModal()">
+        <div class="menu-left">
+          <div class="icon-box icon-wallet"><i class="fa-solid fa-wallet"></i></div>
+          <div style="display:flex; flex-direction:column;">
+              <span class="menu-text">Address Manager</span>
+              <span style="font-size:10px; color:var(--txt-2);">View Public Keys</span>
+          </div>
+        </div>
+        <div class="menu-right"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+
+      <div class="menu-item">
+        <div class="menu-left">
+          <div class="icon-box icon-sec"><i class="fa-solid fa-shield-halved"></i></div>
+          <span class="menu-text">2FA Enabled</span>
+        </div>
+        <div class="menu-right">
+            <label class="switch">
+                <input type="checkbox" id="2fa-toggle" onchange="handle2FAToggle(this)">
+                <span class="slider"></span>
+            </label>
+        </div>
+      </div>
+
+      <div class="menu-item" onclick="showComingSoon('Biometric Hardware Support')">
+        <div class="menu-left">
+          <div class="icon-box icon-bio"><i class="fa-solid fa-fingerprint"></i></div>
+          <span class="menu-text">Biometric Login</span>
+        </div>
+        <div class="menu-right">
+             <span style="font-size:10px; background:var(--bg-2); padding:2px 6px; border-radius:4px;">SOON</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Earnings</div>
+    <div class="menu-group">
+      <div class="menu-item" onclick="window.location.href='referral.html'">
+        <div class="menu-left">
+          <div class="icon-box icon-referral"><i class="fa-solid fa-user-group"></i></div>
+          <div style="display:flex; flex-direction:column;">
+              <span class="menu-text">Referral Program</span>
+              <span style="font-size:10px; color:var(--txt-2);">Invite & Earn</span>
+          </div>
+        </div>
+        <div class="menu-right"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+    </div>
+
+    <div class="section-title">Preferences</div>
+    <div class="menu-group">
+
+      <div class="menu-item" onclick="showComingSoon('Language Packs')">
+        <div class="menu-left">
+          <div class="icon-box"><i class="fa-solid fa-globe"></i></div>
+          <span class="menu-text">Language</span>
+        </div>
+        <div class="menu-right">English <i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+
+      <div class="menu-item" onclick="showComingSoon('Multi-Currency Support')">
+        <div class="menu-left">
+          <div class="icon-box"><i class="fa-solid fa-dollar-sign"></i></div>
+          <span class="menu-text">Currency</span>
+        </div>
+        <div class="menu-right">USD <i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+
+      <div class="menu-item">
+        <div class="menu-left">
+          <div class="icon-box"><i class="fa-regular fa-bell"></i></div>
+          <span class="menu-text">Notifications</span>
+        </div>
+        <div class="menu-right">
+            <label class="switch">
+                <input type="checkbox" id="notif-toggle" onchange="toggleSetting('notifications', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+      </div>
+
+      <a href="mailto:support@truvesta.com?subject=Support Request" style="text-decoration:none; color:inherit;">
+          <div class="menu-item">
+            <div class="menu-left">
+              <div class="icon-box"><i class="fa-solid fa-headset"></i></div>
+              <span class="menu-text">Contact Support</span>
+            </div>
+            <div class="menu-right"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+          </div>
+      </a>
+
+      <div class="menu-item logout-item" onclick="logout()">
+        <div class="menu-left">
+          <div class="icon-box icon-logout" style="background:rgba(248,113,113,0.1);"><i class="fa-solid fa-right-from-bracket"></i></div>
+          <span class="menu-text">Log Out</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center; font-size:11px; color:var(--txt-2); padding:20px 0; opacity: 0.5;">
+      TruVesta Secure Wallet v2.1<br>ID: <span id="footer-uid"></span>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+      <a href="referral.html" title="Referral">
+          <i class="fa-solid fa-user-group"></i><span>Referral</span>
+      </a>
+      <a href="stake.html" title="Stake">
+          <i class="fa-solid fa-layer-group"></i><span>Stake</span>
+      </a>
+      <a href="assets.html" title="Assets">
+          <i class="fa-solid fa-wallet"></i><span>Assets</span>
+      </a>
+      <a class="active" href="#" title="Profile">
+          <i class="fa-solid fa-user"></i><span>Profile</span>
+      </a>
+  </nav>
+
+  <div class="modal" id="addressModal">
+      <div class="modal-content">
+          <div class="modal-header">
+              <strong style="font-size:16px;">Assigned Addresses</strong>
+              <button onclick="document.getElementById('addressModal').classList.remove('open')" style="background:none; border:none; color:var(--txt-2); cursor:pointer;"><i class="fa-solid fa-xmark fa-lg"></i></button>
+          </div>
+          <div class="modal-body">
+              <p style="font-size:12px; color:var(--txt-2); background: var(--bg-2); padding:8px; border-radius:6px; margin:0; border: 1px solid var(--edge);">
+                  <i class="fa-solid fa-lock" style="color:var(--pri-color)"></i> These are your permanently assigned deposit addresses. They cannot be changed.
+              </p>
+
+              <div class="address-field">
+                  <label>Bitcoin (BTC)</label>
+                  <div class="address-input-group">
+                      <img src="https://assets.coincap.io/assets/icons/btc@2x.png">
+                      <input type="text" id="addr-btc" readonly>
+                      <button class="copy-btn" onclick="copyAddressField('addr-btc')"><i class="fa-regular fa-copy"></i></button>
+                  </div>
+              </div>
+              <div class="address-field">
+                  <label>Ethereum (ETH/ERC20)</label>
+                  <div class="address-input-group">
+                      <img src="https://assets.coincap.io/assets/icons/eth@2x.png">
+                      <input type="text" id="addr-eth" readonly>
+                      <button class="copy-btn" onclick="copyAddressField('addr-eth')"><i class="fa-regular fa-copy"></i></button>
+                  </div>
+              </div>
+              <div class="address-field">
+                  <label>BNB Smart Chain (BNB)</label>
+                  <div class="address-input-group">
+                      <img src="https://assets.coincap.io/assets/icons/bnb@2x.png">
+                      <input type="text" id="addr-bnb" readonly>
+                      <button class="copy-btn" onclick="copyAddressField('addr-bnb')"><i class="fa-regular fa-copy"></i></button>
+                  </div>
+              </div>
+              <div class="address-field">
+                  <label>Tether (USDT)</label>
+                  <div class="address-input-group">
+                      <img src="https://assets.coincap.io/assets/icons/usdt@2x.png">
+                      <input type="text" id="addr-usdt" readonly>
+                      <button class="copy-btn" onclick="copyAddressField('addr-usdt')"><i class="fa-regular fa-copy"></i></button>
+                  </div>
+              </div>
+              <div class="address-field">
+                <label>Solana (SOL)</label>
+                <div class="address-input-group">
+                    <img src="https://assets.coincap.io/assets/icons/sol@2x.png">
+                    <input type="text" id="addr-sol" readonly>
+                    <button class="copy-btn" onclick="copyAddressField('addr-sol')"><i class="fa-regular fa-copy"></i></button>
+                </div>
+            </div>
+          </div>
+      </div>
+  </div>
+
+  <div class="modal" id="otpModal">
+    <div class="modal-content" style="max-width: 320px;">
+        <div class="modal-header">
+            <strong style="font-size:16px;">Security Verification</strong>
+            <button onclick="closeOtpModal()" style="background:none; border:none; color:var(--txt-2); cursor:pointer;"><i class="fa-solid fa-xmark fa-lg"></i></button>
+        </div>
+        <div class="modal-body" style="text-align:center;">
+            <div style="width:50px; height:50px; background:var(--bg-2); border-radius:50%; display:grid; place-items:center; margin:0 auto; color:var(--pri-color); font-size:24px;">
+                <i class="fa-solid fa-envelope-circle-check"></i>
+            </div>
+            <h3 style="margin:10px 0 0 0; font-size:18px; color:var(--txt-1);">Enter OTP</h3>
+            <p style="font-size:13px; color:var(--txt-2); margin:0; line-height:1.4;">
+                A 6-digit verification code has been sent to your registered email address.
+            </p>
+
+            <div class="otp-input-container">
+                <input type="text" id="otpInput" class="otp-input" placeholder="000000" maxlength="6">
+            </div>
+
+            <button id="verifyOtpBtn" class="verify-btn" onclick="verifyOtp()">Verify & Enable 2FA</button>
+            <p style="font-size:12px; color:var(--txt-2); margin-top:10px; cursor:pointer;">Resend Code</p>
+        </div>
+    </div>
+</div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script>
+    // --- FIREBASE CONFIG (Must match Index/Assets) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyByvett5gGhga0jx2pBChmg41IKaTvbY24",
+      authDomain: "bustrack-e4f8f.firebaseapp.com",
+      databaseURL: "https://bustrack-e4f8f-default-rtdb.firebaseio.com",
+      projectId: "bustrack-e4f8f",
+      storageBucket: "bustrack-e4f8f.firebasestorage.app",
+      messagingSenderId: "544737954134",
+      appId: "1:544737954134:web:91a197cc88d0a67c43eef7"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+
+    let currentUserUid = null;
+
+    // --- THEME LOGIC ---
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+        }
+        updateThemeIcon();
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('light-theme');
+        const isLight = document.body.classList.contains('light-theme');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+        const btn = document.getElementById('themeToggleBtn');
+        const isLight = document.body.classList.contains('light-theme');
+        if (isLight) {
+            btn.innerHTML = '<i class="fa-solid fa-sun" style="color: var(--pri-color);"></i>';
+        } else {
+            btn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+        }
+    }
+
+    initTheme(); // Run on load
+
+    // --- AUTH STATE & DATA LOADING ---
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        currentUserUid = user.uid;
+        document.getElementById('display-user-id').textContent = user.uid;
+        document.getElementById('footer-uid').textContent = user.uid;
+
+        // Load Basic Profile Data
+        database.ref('users/' + user.uid).once('value', (snap) => {
+            const data = snap.val() || {};
+            const name = data.name || "TruVesta User";
+            const email = data.email || user.email;
+
+            document.getElementById('user-display-name').textContent = name;
+            document.getElementById('user-email').textContent = email;
+
+            // Set Avatar
+            const avatarImg = document.getElementById('user-avatar');
+            avatarImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=D4AF37&color=1C1C1E&size=128&bold=true`;
+            avatarImg.onload = () => {
+                document.getElementById('avatar-loader').style.display = 'none';
+                avatarImg.style.display = 'block';
+            };
+        });
+
+        // Load Toggle Settings
+        database.ref('privilegesecdata/' + user.uid + '/settings').once('value', (snap) => {
+            const settings = snap.val() || {};
+            // Set initial state without triggering the handle2FAToggle event
+            document.getElementById('2fa-toggle').checked = settings.twoFactor === true;
+            document.getElementById('notif-toggle').checked = settings.notifications !== false; 
+        });
+
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // --- FEATURES IMPLEMENTATION ---
+
+    // 1. Toggle Settings (Notifications)
+    window.toggleSetting = function(key, value) {
+        if(!currentUserUid) return;
+
+        database.ref('privilegesecdata/' + currentUserUid + '/settings/' + key).set(value)
+        .then(() => {
+            const status = value ? 'Enabled' : 'Disabled';
+            const icon = value ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>';
+            showToast(`${icon} Preference Saved`);
+        })
+        .catch((e) => showToast('<i class="fa-solid fa-triangle-exclamation"></i> Save Failed'));
+    }
+
+    // 2. 2FA Toggle Handler (with OTP Simulation)
+    window.handle2FAToggle = function(checkbox) {
+        if(checkbox.checked) {
+            // User is trying to turn ON
+            checkbox.checked = false; // Reset visually immediately
+            showToast('<i class="fa-solid fa-paper-plane"></i> Sending OTP...');
+            setTimeout(() => {
+                openOtpModal();
+            }, 1000);
+        } else {
+            // User is turning OFF (Directly allow for this demo, or add OTP here too if needed)
+            toggleSetting('twoFactor', false);
+        }
+    }
+
+    function openOtpModal() {
+        document.getElementById('otpModal').classList.add('open');
+        document.getElementById('otpInput').value = '';
+        document.getElementById('otpInput').focus();
+    }
+
+    function closeOtpModal() {
+        document.getElementById('otpModal').classList.remove('open');
+    }
+
+    window.verifyOtp = function() {
+        const input = document.getElementById('otpInput').value;
+        const btn = document.getElementById('verifyOtpBtn');
+
+        if(input.length !== 6) {
+            showToast('<i class="fa-solid fa-circle-exclamation"></i> Invalid Code');
+            return;
+        }
+
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+
+        // Simulate API verification delay
+        setTimeout(() => {
+            closeOtpModal();
+            btn.innerHTML = 'Verify & Enable 2FA'; // Reset btn text
+
+            // Turn the switch ON visually
+            document.getElementById('2fa-toggle').checked = true;
+
+            // Save to DB
+            toggleSetting('twoFactor', true);
+
+            showToast('<i class="fa-solid fa-shield-halved"></i> 2FA Enabled Successfully');
+        }, 1500);
+    }
+
+    // 3. Address Manager (Read Only)
+    window.openAddressModal = function() {
+        if(!currentUserUid) return;
+        const modal = document.getElementById('addressModal');
+
+        // Load current addresses into inputs
+        database.ref('privilegesecdata/' + currentUserUid).once('value', (snap) => {
+            const data = snap.val() || {};
+            document.getElementById('addr-btc').value = data.btc || 'Not Assigned';
+            document.getElementById('addr-eth').value = data.eth || 'Not Assigned';
+            document.getElementById('addr-bnb').value = data.bnb || 'Not Assigned';
+            document.getElementById('addr-usdt').value = data.usdt || 'Not Assigned';
+            document.getElementById('addr-sol').value = data.sol || 'Not Assigned';
+            modal.classList.add('open');
+        });
+    }
+
+    window.copyAddressField = function(elementId) {
+        const val = document.getElementById(elementId).value;
+        if(val && val !== 'Not Assigned') {
+            navigator.clipboard.writeText(val).then(() => {
+                showToast('<i class="fa-regular fa-copy"></i> Address Copied');
+            });
+        }
+    }
+
+    // 4. Coming Soon Handler
+    window.showComingSoon = function(feature) {
+        showToast(`<i class="fa-solid fa-clock"></i> ${feature} coming soon`);
+    }
+
+    // 5. Utilities
+    window.copyUserId = function() {
+        if(!currentUserUid) return;
+        navigator.clipboard.writeText(currentUserUid).then(() => {
+            showToast('<i class="fa-regular fa-copy"></i> User ID Copied');
+        });
+    }
+
+    window.logout = function() {
+      auth.signOut().then(() => { window.location.href = 'index.html'; });
+    }
+
+    window.showToast = function(htmlContent) {
+      const x = document.getElementById("toast");
+      x.innerHTML = htmlContent;
+      x.className = "show";
+      setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
+  </script>
+</body>
+</html>
