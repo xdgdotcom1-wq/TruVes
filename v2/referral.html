@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>TruVesta - Referral</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <style>
+    /* =========================================
+       1. CORE THEME (MATCHING DASHBOARD)
+       ========================================= */
+    :root {
+      /* Core Colors */
+      --bg-dark: #050507;
+      --glass-panel: rgba(20, 20, 25, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-highlight: rgba(255, 255, 255, 0.03);
+
+      /* Text */
+      --txt-primary: #FFFFFF;
+      --txt-secondary: #94A3B8;
+      --txt-dim: #475569;
+
+      /* Accents - GLOW BLUE THEME */
+      --accent-primary: #00C6FF;
+      --accent-glow: rgba(0, 198, 255, 0.5);
+      --accent-gradient: linear-gradient(135deg, #00C6FF 0%, #0072FF 100%);
+
+      /* States */
+      --success: #10B981;
+      --warning: #F59E0B;
+      --warning-bg: rgba(245, 158, 11, 0.1);
+
+      /* UI Constants */
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    body.light-theme {
+      --bg-dark: #F0F2F5;
+      --glass-panel: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(0, 0, 0, 0.05);
+      --txt-primary: #1E293B;
+      --txt-secondary: #64748B;
+      --txt-dim: #CBD5E1;
+      --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    /* Reset & Base */
+    *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+    html{scroll-behavior: smooth;}
+    body{
+      margin:0; padding-bottom: 80px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--txt-primary);
+      background-color: var(--bg-dark);
+      overflow-x: hidden;
+      min-height: 100vh;
+      transition: background 0.3s ease;
+    }
+
+    /* Background Animation */
+    .ambient-bg {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+      background: radial-gradient(circle at 85% 15%, rgba(0, 198, 255, 0.1), transparent 25%),
+                  radial-gradient(circle at 15% 85%, rgba(0, 114, 255, 0.08), transparent 25%);
+      pointer-events: none;
+    }
+
+    .app{display:flex; flex-direction:column; position: relative; min-height: 100dvh;}
+    .main{padding: 20px; display:flex; flex-direction:column; gap: 20px; max-width: 600px; margin: 0 auto; width: 100%;}
+
+    /* Header */
+    .header { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
+    .header .app-title {
+        font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 24px;
+        background: linear-gradient(135deg, #FFF 0%, #AAA 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    body.light-theme .header .app-title { background: linear-gradient(135deg, #333 0%, #000 100%); -webkit-background-clip: text; }
+    
+    .btn-icon {
+        width: 40px; height: 40px; display: grid; place-items: center;
+        background: var(--glass-panel); border: 1px solid var(--glass-border);
+        border-radius: 50%; color: var(--txt-primary); cursor: pointer;
+        backdrop-filter: blur(10px); transition: all 0.2s; font-size: 16px;
+    }
+    .btn-icon:hover { background: var(--glass-border); color: var(--accent-primary); }
+
+    /* Cards */
+    .card {
+      background: var(--glass-panel);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-glass);
+      overflow: hidden;
+    }
+    .card .head {
+        padding: 18px 20px;
+        display: flex; align-items: center;
+        border-bottom: 1px solid var(--glass-border);
+        background: var(--glass-highlight);
+    }
+    .card .head h3 { margin:0; font-family: 'Outfit', sans-serif; font-size: 18px; color: var(--txt-primary); font-weight: 700; }
+    .card .body { padding: 20px; }
+
+    /* Bottom Nav (Consistent with Dashboard) */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 65px;
+      display: flex; align-items: center; justify-content: space-around;
+      background: var(--glass-panel);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--glass-border);
+      z-index: 1000;
+      box-shadow: 0 -5px 30px rgba(0,0,0,0.5);
+    }
+    .bottom-nav button, .bottom-nav a {
+      flex:1; display:flex; flex-direction: column; align-items: center; justify-content: center;
+      background: none; border: none; color: var(--txt-secondary);
+      text-decoration: none; font-size: 10px; font-weight: 500; gap: 4px; padding: 8px 0;
+      cursor: pointer; transition: color 0.2s; font-family: inherit;
+    }
+    .bottom-nav button i, .bottom-nav a i { font-size: 20px; }
+    .bottom-nav button.active, .bottom-nav a.active { color: var(--accent-primary); font-weight: 700; }
+
+
+    /* =========================================
+       2. REFERRAL PAGE SPECIFIC STYLES
+       ========================================= */
+    
+    .referral-hero {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; padding: 30px 0 10px 0;
+    }
+    .hero-icon {
+        width: 90px; height: 90px; border-radius: 50%;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+        border: 1px solid var(--glass-border); 
+        box-shadow: 0 0 40px var(--accent-glow); /* Blue Glow */
+        display: grid; place-items: center; margin-bottom: 25px;
+        font-size: 36px; color: var(--accent-primary);
+    }
+
+    .status-badge {
+        display: inline-block; padding: 6px 14px; background: var(--warning-bg);
+        color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3);
+        border-radius: 20px; font-size: 11px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;
+    }
+
+    /* Feature List */
+    .feature-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+    .feature-item {
+        display: flex; gap: 16px; align-items: flex-start; padding: 16px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.0) 100%);
+        border: 1px solid var(--glass-border); border-radius: var(--radius-sm);
+        transition: transform 0.2s;
+    }
+    .feature-item:hover { background: var(--glass-highlight); transform: translateX(2px); }
+    
+    .feature-icon-box {
+        width: 36px; height: 36px; border-radius: 10px;
+        background: rgba(0, 198, 255, 0.1); /* Blue Tint */
+        border: 1px solid rgba(0, 198, 255, 0.2);
+        display: grid; place-items: center; color: var(--accent-primary); font-size: 16px; flex-shrink: 0;
+    }
+    .feature-text h4 { margin: 0 0 4px 0; font-size: 15px; color: var(--txt-primary); font-weight: 700; }
+    .feature-text p { margin: 0; font-size: 13px; color: var(--txt-secondary); line-height: 1.5; }
+
+  </style>
+</head>
+<body>
+
+  <div class="ambient-bg"></div>
+
+  <div class="app">
+    <main class="main">
+        <header class="header">
+            <button class="btn-icon" onclick="window.location.href='index.html'"><i class="fa-solid fa-arrow-left"></i></button>
+            <span class="app-title">Affiliate</span>
+            <div style="width: 44px;"></div> 
+        </header>
+
+        <div class="referral-hero">
+            <div class="hero-icon">
+                <i class="fa-solid fa-rocket"></i>
+            </div>
+            
+            <span class="status-badge">Work In Progress</span>
+            <h2 style="color: var(--txt-primary); margin: 5px 0 10px 0; font-size: 28px; font-family: 'Outfit', sans-serif;">Referral Program</h2>
+            <p style="color: var(--txt-secondary); font-size: 15px; max-width: 320px; margin-bottom: 30px; line-height: 1.6;">
+                Our new tiered commission ecosystem is currently in the final stages of development.
+            </p>
+
+            <div class="card" style="width: 100%; text-align: left;">
+                <div class="head"><h3>Upcoming Features</h3></div>
+                <div class="body">
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <div class="feature-icon-box"><i class="fa-solid fa-users-viewfinder"></i></div>
+                            <div class="feature-text">
+                                <h4>3-Tier Architecture</h4>
+                                <p>Earn varying percentages from direct referrals, secondary, and tertiary connections.</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon-box"><i class="fa-solid fa-bolt"></i></div>
+                            <div class="feature-text">
+                                <h4>Instant Settlement</h4>
+                                <p>Commissions are settled in real-time directly to your wallet upon staking events.</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon-box"><i class="fa-solid fa-chart-pie"></i></div>
+                            <div class="feature-text">
+                                <h4>Deep Analytics</h4>
+                                <p>Comprehensive dashboard to track network growth, active nodes, and yields.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" style="width: 100%; text-align: left; margin-top: 20px; border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 0 20px rgba(245, 158, 11, 0.05);">
+                <div class="head" style="background: rgba(245, 158, 11, 0.1); border-bottom-color: rgba(245, 158, 11, 0.2);">
+                    <h3 style="color: var(--warning); display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Engineering Status
+                    </h3>
+                </div>
+                <div class="body">
+                    <p style="font-size: 14px; color: var(--txt-primary); line-height: 1.6;">
+                        The Referral Module is currently undergoing <strong>smart contract auditing</strong> and <strong>stress-testing</strong> of the attribution ledger. 
+                    </p>
+                    <p style="font-size: 13px; color: var(--txt-secondary); line-height: 1.6; margin-top: 12px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+                        To ensure 100% accuracy in commission distribution and prevent latency, we are optimizing the cross-chain synchronization protocol.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+  </div>
+
+  <nav class="bottom-nav">
+      <a class="active" href="referral.html" title="Referral"><i class="fa-solid fa-user-group"></i><span>Referral</span></a>
+      <a href="stake.html" title="Stake"><i class="fa-solid fa-layer-group"></i><span>Stake</span></a>
+      <a href="index.html" title="Assets"><i class="fa-solid fa-wallet"></i><span>Assets</span></a>
+      <a href="profile.html" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+  </nav>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+  <script>
+    // --- FIREBASE INIT ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyByvett5gGhga0jx2pBChmg41IKaTvbY24",
+      authDomain: "bustrack-e4f8f.firebaseapp.com",
+      projectId: "bustrack-e4f8f",
+    };
+    // Initialize only if not already initialized
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // --- THEME LOGIC ---
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+        }
+    }
+    initTheme(); 
+  </script>
+</body>
+</html>
