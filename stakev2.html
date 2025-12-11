@@ -27,10 +27,10 @@
       --txt-secondary: #94A3B8;
       --txt-dim: #475569;
 
-      /* Accents - GLOW BLUE THEME */
-      --accent-primary: #00C6FF;
-      --accent-glow: rgba(0, 198, 255, 0.5);
-      --accent-gradient: linear-gradient(135deg, #00C6FF 0%, #0072FF 100%);
+      /* Accents - SWITCHED TO PROFESSIONAL BLUE */
+      --accent-primary: #4C82FB;
+      --accent-glow: rgba(76, 130, 251, 0.4);
+      --accent-gradient: linear-gradient(135deg, #4C82FB 0%, #2563EB 100%);
       
       /* States */
       --success: #10B981;
@@ -68,11 +68,11 @@
       transition: background 0.3s ease;
     }
 
-    /* Background Animation - Updated to Blue Glow */
+    /* Background Animation - Updated to Blue */
     .ambient-bg {
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
-        background: radial-gradient(circle at 15% 50%, rgba(0, 198, 255, 0.1), transparent 25%),
-                    radial-gradient(circle at 85% 30%, rgba(0, 114, 255, 0.08), transparent 25%);
+        background: radial-gradient(circle at 15% 50%, rgba(76, 130, 251, 0.08), transparent 25%),
+                    radial-gradient(circle at 85% 30%, rgba(100, 100, 255, 0.05), transparent 25%);
         pointer-events: none;
     }
 
@@ -118,7 +118,7 @@
 
     .btn.primary {
         background: var(--accent-gradient);
-        color: #FFFFFF;
+        color: #FFFFFF; /* Changed to white text for better contrast on blue */
         border: none;
         box-shadow: 0 4px 15px var(--accent-glow);
     }
@@ -250,7 +250,7 @@
   <div class="app">
     <main class="main">
       <header class="header">
-        <button class="btn-icon" onclick="window.location.href='assets.html'"><i class="fa-solid fa-arrow-left"></i></button>
+        <button class="btn-icon" onclick="window.location.href='assetsv2.html'"><i class="fa-solid fa-arrow-left"></i></button>
         <span class="app-title">Staking Hub</span>
         <button onclick="toggleTheme()" id="themeToggleBtn" class="btn-icon"><i class="fa-solid fa-moon"></i></button>
       </header>
@@ -326,21 +326,21 @@
   </div> 
 
   <nav class="bottom-nav">
-      <button onclick="window.location.href='referral.html'">
+      <button onclick="window.location.href='referralv2.html'">
           <i class="fa-solid fa-user-group"></i><span>Referral</span>
       </button>
       <button class="active" onclick="window.location.reload()">
           <i class="fa-solid fa-layer-group"></i><span>Stake</span>
       </button>
-      <a href="assets.html" title="Assets"><i class="fa-solid fa-wallet"></i><span>Assets</span></a>
-      <a href="profile.html" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+      <a href="assetsv2.html" title="Assets"><i class="fa-solid fa-wallet"></i><span>Assets</span></a>
+      <a href="profilev2.html" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
   </nav>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-  <script src="stake.js"></script>
+  <script src="stakev2.js"></script>
 
 </body>
 </html>
