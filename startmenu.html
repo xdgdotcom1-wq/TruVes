@@ -19,7 +19,7 @@
             --txt-secondary: #94A3B8;
             --accent-gold: #FFD700;
             --accent-blue: #00F0FF;
-            --accent-premium: #E2E8F0; /* Platinum/Silver */
+            --accent-premium: #E2E8F0;
             --success: #10B981;
             --danger: #EF4444;
             --warning: #F59E0B;
@@ -35,7 +35,7 @@
             place-items: center;
             overflow-x: hidden;
             position: relative;
-            padding-bottom: 50px; /* Space for the new bottom section */
+            padding-bottom: 50px;
         }
 
         .ambient-bg {
@@ -76,13 +76,20 @@
             opacity: 0.5;
         }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--glass-border); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--glass-border); }
         .brand { display: flex; align-items: center; gap: 14px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -0.5px; }
         .brand img { height: 36px; border-radius: 8px; }
         .system-time { 
             color: var(--txt-secondary); font-family: 'JetBrains Mono', monospace; font-size: 13px; 
             background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border);
         }
+
+        /* Section Labels */
+        .section-header { 
+            font-size: 12px; color: var(--txt-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 1.5px; 
+            margin-bottom: 15px; display: flex; align-items: center; gap: 10px;
+        }
+        .section-header::after { content: ''; height: 1px; background: var(--glass-border); flex-grow: 1; }
 
         /* Status Grid */
         .status-grid { 
@@ -144,10 +151,7 @@
         .btn-blue:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(0, 240, 255, 0.4); }
         .btn-disabled { background: transparent; border: 1px solid var(--glass-border); color: var(--txt-secondary); cursor: not-allowed; opacity: 0.5; }
 
-        /* --- PREMIUM SENTINEL SECTION --- */
-        .section-divider { margin-bottom: 25px; display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-        .section-label { font-size: 12px; color: var(--txt-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 1.5px; }
-        
+        /* Sentinel Section */
         .sentinel-card {
             background: linear-gradient(145deg, rgba(20, 20, 25, 0.9), rgba(10, 10, 12, 0.95));
             border: 1px solid rgba(255,255,255,0.1);
@@ -209,6 +213,8 @@
             <div class="system-time" id="sysTime">00:00:00 UTC</div>
         </div>
 
+        <div class="section-header">System Diagnostics</div>
+        
         <div class="status-grid">
             <div class="status-card">
                 <span class="status-header"><i class="fa-solid fa-server"></i> Auth Service</span>
@@ -228,23 +234,23 @@
             </div>
         </div>
 
-        <div class="section-divider">
-            <span class="section-label">Environment Selection</span>
-            <div style="height: 1px; background: var(--glass-border); flex-grow: 1;"></div>
-        </div>
-
+        <div class="section-header">Select Environment</div>
+        
         <div class="versions-wrapper">
-            <div class="version-card legacy">
-                <div class="v-badge outdated">Deprecated</div>
+            
+            <div class="version-card blue-theme">
+                <div class="v-badge blue">Latest Build</div>
                 <div class="v-header-group">
-                    <div class="v-title">TruVesta v1.9</div>
-                    <span class="v-theme-name">Legacy Build</span>
+                    <div class="v-title">TruVesta v2.1</div>
+                    <span class="v-theme-name" style="color: var(--accent-blue);">Azure Pulse</span>
                 </div>
                 <ul class="feature-list">
-                    <li><i class="fa-solid fa-xmark" style="color: var(--danger)"></i> Disconnected from Mainnet</li>
-                    <li><i class="fa-solid fa-xmark" style="color: var(--danger)"></i> Nodes Decommissioned</li>
+                    <li class="highlight"><i class="fa-solid fa-shield-cat" style="color: var(--accent-blue)"></i> Security Patch v2.1.0</li>
+                    <li class="highlight"><i class="fa-solid fa-key" style="color: var(--accent-blue)"></i> Auth Handshake Fixed</li>
+                    <li><i class="fa-solid fa-bridge"></i> Multi-Chain Bridge</li>
+                    <li><i class="fa-solid fa-wand-magic-sparkles"></i> Glow Blue UI</li>
                 </ul>
-                <button class="btn-launch btn-disabled" disabled>Offline <i class="fa-solid fa-ban"></i></button>
+                <a href="V2/index.html" class="btn-launch btn-blue">Launch v2.1 <i class="fa-solid fa-rocket"></i></a>
             </div>
 
             <div class="version-card gold-theme">
@@ -262,26 +268,22 @@
                 <a href="V2.1/index.html" class="btn-launch btn-gold">Access v2.0 <i class="fa-solid fa-flask"></i></a>
             </div>
 
-            <div class="version-card blue-theme">
-                <div class="v-badge blue">Latest Build</div>
+            <div class="version-card legacy">
+                <div class="v-badge outdated">Deprecated</div>
                 <div class="v-header-group">
-                    <div class="v-title">TruVesta v2.1</div>
-                    <span class="v-theme-name" style="color: var(--accent-blue);">Azure Pulse</span>
+                    <div class="v-title">TruVesta v1.9</div>
+                    <span class="v-theme-name">Legacy Build</span>
                 </div>
                 <ul class="feature-list">
-                    <li class="highlight"><i class="fa-solid fa-shield-cat" style="color: var(--accent-blue)"></i> Security Patch v2.1.0</li>
-                    <li class="highlight"><i class="fa-solid fa-key" style="color: var(--accent-blue)"></i> Auth Handshake Fixed</li>
-                    <li><i class="fa-solid fa-bridge"></i> Multi-Chain Bridge</li>
-                    <li><i class="fa-solid fa-wand-magic-sparkles"></i> Glow Blue UI</li>
+                    <li><i class="fa-solid fa-xmark" style="color: var(--danger)"></i> Disconnected from Mainnet</li>
+                    <li><i class="fa-solid fa-xmark" style="color: var(--danger)"></i> Nodes Decommissioned</li>
                 </ul>
-                <a href="v2/index.html" class="btn-launch btn-blue">Launch v2.1 <i class="fa-solid fa-rocket"></i></a>
+                <button class="btn-launch btn-disabled" disabled>Offline <i class="fa-solid fa-ban"></i></button>
             </div>
+
         </div>
 
-        <div class="section-divider">
-            <span class="section-label">Premium Modules</span>
-            <div style="height: 1px; background: var(--glass-border); flex-grow: 1;"></div>
-        </div>
+        <div class="section-header">Premium Modules</div>
 
         <div class="sentinel-card">
             <div class="sentinel-info">
