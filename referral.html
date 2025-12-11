@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TruVesta - Referral</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <style>
+    /* === LUXURIOUS THEME VARIABLES (MATCHES STAKE) === */
+    :root{
+      --bg-0: #1C1C1E; --bg-1: #2C2C2E; --bg-2: #404043;
+      --txt-1: #E0E0E0; --txt-2: #A0A0A0;
+      --pri-color: #D4AF37; --pri-gradient: linear-gradient(90deg, #D4AF37, #FFD700);
+      --btn-bg: #D4AF37; --btn-txt: #1C1C1E;
+      --good: #34D399; --bad: #F87171; --warn: #FBBF24;
+      --edge: rgba(212, 175, 55, .2);
+      --glow: 0 4px 15px rgba(0,0,0,.5);
+      --radius: 14px;
+    }
+
+    body.light-theme {
+        --bg-0: #F2F2F7; --bg-1: #FFFFFF; --bg-2: #E5E5EA;
+        --txt-1: #1C1C1E; --txt-2: #8E8E93;
+        --edge: rgba(0, 0, 0, 0.1); --glow: 0 4px 15px rgba(0,0,0,0.08);
+        --btn-txt: #1C1C1E; 
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding-bottom: 80px;
+      font-family: Inter, system-ui, sans-serif;
+      color:var(--txt-1); background-color: var(--bg-0);
+      letter-spacing:.2px; min-height: 100dvh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    body::-webkit-scrollbar {display: none;}
+
+    .app{display:flex; flex-direction:column; position: relative; min-height: 100dvh;}
+    .main{padding:16px; display:flex; flex-direction:column; gap:16px;}
+
+    /* HEADER */
+    .header{display:flex; gap:14px; align-items:center; justify-content:space-between; padding: 4px 0;}
+    .header .app-title {
+        font-family: 'Playfair Display', serif; font-weight: 900; font-size: 24px; color: var(--pri-color); letter-spacing: 1px;
+    }
+    .header .btn-icon {
+      width: 40px; height: 40px; display: grid; place-items: center; font-size: 18px;
+      background: transparent; border: 0; color: var(--txt-2); cursor: pointer; transition: color 0.2s;
+    }
+    .header .btn-icon:hover { color: var(--pri-color); }
+
+    /* CARDS */
+    .card{
+      background: var(--bg-1); border:1px solid var(--edge); 
+      border-radius: var(--radius); box-shadow: var(--glow);
+    }
+    .card .head{
+      display:flex; align-items:center; justify-content:space-between; 
+      padding:14px 16px; border-bottom:1px solid var(--edge);
+    }
+    .card .head h3{margin:0; font-size:17px; font-weight:700; color: var(--pri-color);}
+    .card .body{padding:16px;}
+
+    /* REFERRAL SPECIFIC STYLES */
+    .feature-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 15px; }
+    .feature-item { display: flex; gap: 15px; align-items: flex-start; padding: 12px; background: var(--bg-2); border-radius: 10px; border: 1px solid var(--edge); }
+    .feature-icon { color: var(--pri-color); font-size: 20px; margin-top: 3px; }
+    .feature-text h4 { margin: 0 0 4px 0; font-size: 15px; color: var(--txt-1); }
+    .feature-text p { margin: 0; font-size: 12px; color: var(--txt-2); line-height: 1.4; }
+    .status-badge {
+        display: inline-block; padding: 6px 12px; background: rgba(251, 191, 36, 0.15);
+        color: var(--warn); border: 1px solid var(--warn); border-radius: 20px;
+        font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+    }
+
+    /* NAV */
+    .bottom-nav{
+      position:fixed; bottom:0; left:0; right:0; height: 65px;
+      display:flex; align-items:center; justify-content: space-around;
+      background: var(--bg-1); border-top: 1px solid var(--edge); z-index: 1000;
+      box-shadow: 0 -5px 30px rgba(0,0,0,.5);
+    }
+    .bottom-nav a, .bottom-nav button{
+      flex:1; display:flex; flex-direction: column; align-items: center; justify-content: center;
+      text-decoration: none; color: var(--txt-2); font-size: 10px; font-weight: 500; gap: 4px; padding: 8px 0;
+      transition: color .2s; background: none; border: none; cursor: pointer; font-family: inherit;
+    }
+    .bottom-nav a i, .bottom-nav button i{font-size: 20px;}
+    .bottom-nav a.active, .bottom-nav button.active{color: var(--pri-color); font-weight: 700;}
+  </style>
+</head>
+<body>
+
+  <div class="app">
+    <main class="main">
+        <header class="header">
+            <button class="btn-icon" onclick="window.location.href='stake.html'"><i class="fa-solid fa-arrow-left"></i></button>
+            <span class="app-title">Affiliate</span>
+            <div style="width: 40px;"></div> 
+        </header>
+
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px 0;">
+            <div style="width: 80px; height: 80px; background: var(--bg-1); border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--edge); box-shadow: var(--glow); margin-bottom: 20px;">
+                <i class="fa-solid fa-rocket" style="font-size: 32px; color: var(--pri-color);"></i>
+            </div>
+            
+            <span class="status-badge">Work In Progress</span>
+            <h2 style="font-family: 'Playfair Display'; color: var(--txt-1); margin: 10px 0 5px 0; font-size: 24px;">Referral Program</h2>
+            <p style="color: var(--txt-2); font-size: 14px; max-width: 300px; margin-bottom: 30px;">
+                Our new tiered commission ecosystem is currently in the final stages of development.
+            </p>
+
+            <div class="card" style="width: 100%; text-align: left;">
+                <div class="head"><h3>Upcoming Features</h3></div>
+                <div class="body">
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <i class="fa-solid fa-users-viewfinder feature-icon"></i>
+                            <div class="feature-text">
+                                <h4>3-Tier Earning Architecture</h4>
+                                <p>Earn varying percentages from direct referrals, secondary, and tertiary network connections.</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fa-solid fa-bolt feature-icon"></i>
+                            <div class="feature-text">
+                                <h4>Instant USDT Settlement</h4>
+                                <p>Commissions are settled in real-time directly to your wallet upon network staking events.</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <i class="fa-solid fa-chart-pie feature-icon"></i>
+                            <div class="feature-text">
+                                <h4>Deep Analytics Ledger</h4>
+                                <p>Comprehensive dashboard to track network growth, active nodes, and cumulative yields.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" style="width: 100%; text-align: left; margin-top: 15px; border-color: var(--warn);">
+                <div class="head" style="border-bottom-color: rgba(251, 191, 36, 0.2);">
+                    <h3 style="color: var(--warn);"><i class="fa-solid fa-triangle-exclamation"></i> Engineering Status</h3>
+                </div>
+                <div class="body">
+                    <p style="font-size: 13px; color: var(--txt-1); line-height: 1.6;">
+                        The Referral Module is currently undergoing <strong>smart contract auditing</strong> and <strong>stress-testing</strong> of the attribution ledger. 
+                    </p>
+                    <p style="font-size: 13px; color: var(--txt-2); line-height: 1.6; margin-top: 10px;">
+                        To ensure 100% accuracy in commission distribution and prevent latency during high-volume concurrency, we are optimizing the cross-chain synchronization protocol before the public rollout.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+  </div>
+
+  <nav class="bottom-nav">
+      <button onclick="window.location.href='stake.html'">
+          <i class="fa-solid fa-layer-group"></i><span>Stake</span>
+      </button>
+      <button class="active" onclick="window.location.reload()">
+          <i class="fa-solid fa-user-group"></i><span>Referral</span>
+      </button>
+      <a href="assets.html" title="Assets"><i class="fa-solid fa-wallet"></i><span>Assets</span></a>
+      <a href="profile.html" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+  </nav>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+  <script>
+    // --- FIREBASE INIT ---
+    // Kept here to ensure auth state continuity if you add dynamic referral links later
+    const firebaseConfig = {
+      apiKey: "AIzaSyByvett5gGhga0jx2pBChmg41IKaTvbY24",
+      authDomain: "bustrack-e4f8f.firebaseapp.com",
+      projectId: "bustrack-e4f8f",
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // --- THEME LOGIC (Reads from local storage to match Stake page) ---
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+        }
+    }
+    initTheme(); 
+  </script>
+</body>
+</html>
