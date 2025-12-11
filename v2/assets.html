@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TruVesta - Assets</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <style>
+    /* =========================================
+       1. CORE THEME (Your Provided CSS)
+       ========================================= */
+    :root {
+      /* Core Colors */
+      --bg-dark: #050507;
+      --glass-panel: rgba(20, 20, 25, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-highlight: rgba(255, 255, 255, 0.03);
+
+      /* Text */
+      --txt-primary: #FFFFFF;
+      --txt-secondary: #94A3B8;
+      --txt-dim: #475569;
+
+      /* Accents - GLOW BLUE THEME */
+      --accent-primary: #00C6FF;
+      --accent-glow: rgba(0, 198, 255, 0.5);
+      --accent-gradient: linear-gradient(135deg, #00C6FF 0%, #0072FF 100%);
+
+      /* States */
+      --success: #10B981;
+      --success-bg: rgba(16, 185, 129, 0.15);
+      --danger: #EF4444;
+      --danger-bg: rgba(239, 68, 68, 0.15);
+      --warning: #F59E0B;
+
+      /* UI Constants */
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    body.light-theme {
+      --bg-dark: #F0F2F5;
+      --glass-panel: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(0, 0, 0, 0.05);
+      --txt-primary: #1E293B;
+      --txt-secondary: #64748B;
+      --txt-dim: #CBD5E1;
+      --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    /* Reset & Base */
+    *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+    html{scroll-behavior: smooth;}
+    body{
+      margin:0; padding-bottom: 80px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--txt-primary);
+      background-color: var(--bg-dark);
+      overflow-x: hidden;
+      min-height: 100vh;
+      transition: background 0.3s ease;
+    }
+
+    /* Background Animation */
+    .ambient-bg {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+      background: radial-gradient(circle at 15% 50%, rgba(0, 198, 255, 0.1), transparent 25%),
+                  radial-gradient(circle at 85% 30%, rgba(0, 114, 255, 0.08), transparent 25%);
+      pointer-events: none;
+    }
+
+    .app{display:flex; flex-direction:column; position: relative; min-height: 100dvh;}
+    .main{padding: 16px; display:flex; flex-direction:column; gap: 16px;}
+
+    /* Typography */
+    h1, h2, h3 { margin: 0; font-family: 'Outfit', sans-serif; letter-spacing: -0.02em; }
+
+    /* Glass Cards */
+    .card {
+      background: var(--glass-panel);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-glass);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card .head {
+      padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--glass-border);
+      background: var(--glass-highlight);
+    }
+    .card .head h3 { font-size: 17px; color: var(--txt-primary); font-weight: 700; }
+    .card .body { padding: 16px; }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 14px;
+      border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+      font-family: inherit;
+      color: var(--txt-primary);
+      background: var(--glass-panel);
+      border: 1px solid var(--glass-border);
+    }
+    .btn:active { transform: scale(0.96); }
+    .btn.primary {
+      background: var(--accent-gradient);
+      color: #FFFFFF;
+      border: none;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+    .btn.primary:hover { box-shadow: 0 6px 20px var(--accent-glow); transform: translateY(-1px); }
+
+    /* Header */
+    .header { display: flex; gap:14px; align-items: center; justify-content: space-between; padding: 4px 0; }
+    .header .app-title {
+      font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 24px;
+      background: linear-gradient(135deg, #FFF 0%, #AAA 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    body.light-theme .header .app-title { background: linear-gradient(135deg, #333 0%, #000 100%); -webkit-background-clip: text; }
+
+    .btn-icon {
+      width: 40px; height: 40px; display: grid; place-items: center;
+      background: var(--glass-panel); border: 1px solid var(--glass-border);
+      border-radius: 50%; color: var(--txt-primary); cursor: pointer;
+      backdrop-filter: blur(10px); transition: all 0.2s;
+      font-size: 18px;
+    }
+    .btn-icon:hover { background: var(--glass-border); color: var(--accent-primary); }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 65px;
+      display: flex; align-items: center; justify-content: space-around;
+      background: var(--glass-panel);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--glass-border);
+      z-index: 1000;
+      box-shadow: 0 -5px 30px rgba(0,0,0,0.5);
+    }
+    .bottom-nav button, .bottom-nav a {
+      flex:1; display:flex; flex-direction: column; align-items: center; justify-content: center;
+      background: none; border: none; color: var(--txt-secondary);
+      text-decoration: none; font-size: 10px; font-weight: 500; gap: 4px; padding: 8px 0;
+      cursor: pointer; transition: color 0.2s; font-family: inherit;
+    }
+    .bottom-nav button i, .bottom-nav a i { font-size: 20px; }
+    .bottom-nav button.active, .bottom-nav a.active { color: var(--accent-primary); font-weight: 700; }
+
+    /* Inputs (Used by JS/Modals) */
+    .input-wrapper { position: relative; width: 100%; }
+    input, select {
+      width: 100%; padding: 14px;
+      background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); color: var(--txt-primary);
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 500;
+      outline: none; transition: border 0.2s, background 0.2s;
+    }
+    input:focus, select:focus { border-color: var(--accent-primary); background: rgba(0,0,0,0.3); }
+
+    /* =========================================
+       2. COMPATIBILITY LAYER (Mapping HTML to New Theme)
+       ========================================= */
+
+    /* View States */
+    #dashboard-view { display: none; opacity: 0; transition: opacity 0.5s ease-in; }
+    #dashboard-view.visible { opacity: 1; }
+
+    .full-screen-message {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100vh; width: 100vw; position: fixed; top: 0; left: 0;
+      background: var(--bg-dark); z-index: 9999;
+      transition: opacity 0.5s ease-out;
+    }
+    .full-screen-message.fade-out { opacity: 0; pointer-events: none; }
+
+    /* Loading Screen - Updated to Blue/Glass */
+    .loading-container { position: relative; width: 100px; height: 100px; display: grid; place-items: center; margin-bottom: 30px; }
+    .loading-ring {
+      position: absolute; width: 100%; height: 100%; border-radius: 50%;
+      border: 2px solid transparent; border-top-color: var(--accent-primary);
+      animation: spin 1.5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .loading-ring::before {
+      content: ""; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px;
+      border-radius: 50%; border: 2px solid transparent;
+      border-top-color: rgba(0, 198, 255, 0.6);
+      animation: spin 3s cubic-bezier(0.4, 0.0, 0.2, 1) infinite reverse;
+    }
+    .loading-icon { font-size: 32px; color: var(--accent-primary); animation: pulse 2s ease-in-out infinite; }
+    .loading-text { font-family: 'Outfit', sans-serif; color: var(--accent-primary); font-size: 28px; font-weight: 700; letter-spacing: 2px; margin-bottom: 8px; }
+    .loading-sub { font-size: 12px; color: var(--txt-secondary); letter-spacing: 1px; text-transform: uppercase; font-weight: 500; }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes pulse { 0% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(0.9); } }
+
+    /* Specific Dashboard Elements */
+    .portfolio-balance { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+    .portfolio-balance .amt { font-family: 'Outfit', sans-serif; font-size: 44px; font-weight: 700; letter-spacing: -1px; color: var(--txt-primary); }
+    .portfolio-balance .chg { font-weight: 600; font-size: 14px; padding: 4px 8px; border-radius: 6px; }
+    .portfolio-balance .chg.up { color: var(--success); background: var(--success-bg); }
+    .portfolio-balance .chg.down { color: var(--danger); background: var(--danger-bg); }
+
+    /* Quick Actions Buttons (Re-styled for Glass) */
+    .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+    .qa-btn {
+      display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 14px;
+      padding: 16px; border-radius: var(--radius-sm);
+      background: var(--glass-highlight); border: 1px solid var(--glass-border);
+      color: var(--txt-primary); cursor: pointer; transition: all 0.2s ease;
+      position: relative; overflow: hidden;
+    }
+    .qa-btn .icon-box {
+      width: 38px; height: 38px; background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%; display: grid; place-items: center; transition: all 0.2s;
+    }
+    .qa-btn i { font-size: 16px; color: var(--accent-primary); transition: all 0.2s; }
+    .qa-btn span { font-size: 15px; font-weight: 600; letter-spacing: 0.3px; }
+    .qa-btn:hover { background: var(--glass-border); transform: translateY(-2px); border-color: var(--accent-primary); }
+    .qa-btn:hover .icon-box { background: var(--accent-primary); }
+    .qa-btn:hover i { color: #FFF; }
+    .qa-btn:active { transform: translateY(0); }
+
+    /* Assets List */
+    .assets-list { display: flex; flex-direction: column; gap: 12px; }
+    .asset-row {
+      display: grid; grid-template-columns: 1.2fr 1fr 1.1fr; align-items: center;
+      padding: 14px 16px; background: var(--glass-panel); border-radius: var(--radius-sm);
+      border: 1px solid var(--glass-border); cursor: pointer; gap: 8px; transition: all 0.2s;
+    }
+    .asset-row:hover { background: var(--glass-highlight); border-color: var(--accent-primary); transform: translateX(2px); }
+    .asset-row .col-1 { display: flex; align-items: center; gap: 12px; overflow: hidden; }
+    .asset-row .coin { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: var(--glass-border); flex-shrink: 0; }
+    .asset-row .coin-info { display: flex; flex-direction: column; }
+    .asset-row .coin-info .symbol { font-weight: 700; font-size: 16px; color: var(--txt-primary); }
+    .asset-row .coin-info .name { font-size: 12px; color: var(--txt-secondary); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .asset-row .col-2.full-width { grid-column: span 2; }
+    .asset-row .col-2, .asset-row .col-3 { display: flex; flex-direction: column; text-align: right; }
+    .asset-row .price, .asset-row .value { font-weight: 600; font-size: 15px; color: var(--txt-primary); }
+    .asset-row .change, .asset-row .holdings { font-size: 12px; color: var(--txt-secondary); margin-top: 2px; }
+    .asset-row .change.up { color: var(--success); }
+    .asset-row .change.down { color: var(--danger); }
+    .asset-row.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+
+    /* Coin Detail View */
+    .coin-detail-view {
+      display: none; flex-direction: column; position: absolute; inset: 0;
+      background: var(--bg-dark); z-index: 500; padding-bottom: 80px; overflow-y: auto;
+    }
+    .app.show-detail .main { display: none; }
+    .app.show-detail .coin-detail-view { display: flex; }
+    
+    .coin-detail-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px; padding-top: 20px; background: var(--glass-highlight);
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .coin-balance-area { display: flex; flex-direction: column; align-items: center; padding: 30px 16px; gap: 12px; }
+    .coin-balance-area .icon { width: 64px; height: 64px; border-radius: 50%; box-shadow: 0 0 20px var(--glass-border); }
+    .coin-balance-area .name { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 700; margin-top: 8px; color: var(--txt-primary); }
+    .coin-balance-area .symbol { font-size: 14px; color: var(--txt-secondary); background: var(--glass-border); padding: 4px 10px; border-radius: 20px; }
+    .coin-balance-area .crypto-amt { font-family: 'Outfit', sans-serif; font-size: 32px; font-weight: 700; margin-top: 10px; color: var(--accent-primary); text-shadow: 0 0 10px var(--accent-glow); }
+    .coin-balance-area .usd-amt { font-size: 16px; color: var(--txt-secondary); font-weight: 500; }
+
+    .coin-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; }
+    .coin-actions .action-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 16px 10px; border-radius: var(--radius-sm); border: 1px solid var(--glass-border);
+      background: var(--glass-panel); color: var(--txt-primary); cursor: pointer;
+      font-size: 13px; font-weight: 600; transition: background .2s;
+    }
+    .coin-actions .action-btn:hover { background: var(--glass-highlight); border-color: var(--accent-primary); color: var(--accent-primary); }
+    
+    /* Charts */
+    .chart-timeframes { display: flex; justify-content: space-around; gap: 8px; padding: 0 16px 12px 16px; }
+    .time-btn {
+      flex: 1; padding: 8px 0; border: 1px solid var(--glass-border); background: transparent;
+      color: var(--txt-secondary); border-radius: 8px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+    }
+    .time-btn.active { background: var(--accent-primary); color: #FFF; border-color: var(--accent-primary); box-shadow: 0 0 10px var(--accent-glow); }
+    .chart-container { padding: 16px; height: 250px; }
+    .tx-history-header { padding: 16px; font-size: 17px; font-weight: 700; color: var(--txt-primary); border-top: 1px solid var(--glass-border); margin-top: 10px; }
+    .tx-history-list { display: flex; flex-direction: column; padding: 0 16px; gap: 12px; }
+
+    /* Modal Adapters */
+    .modal {
+      position: fixed; inset: 0; display: none; place-items: center;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; overflow-y: auto;
+    }
+    .modal.open { display: grid; }
+    .modal .panel {
+      width: min(520px, 94vw); border-radius: var(--radius-md); border: 1px solid var(--glass-border);
+      background: #121214; box-shadow: var(--shadow-glass);
+    }
+    .panel .panel-h { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--glass-border); background: var(--glass-highlight); }
+    .panel .panel-b { padding: 20px; color: var(--txt-secondary); }
+
+    /* Misc */
+    .footer { opacity: 0.5; font-size: 12px; text-align: center; padding: 16px; color: var(--txt-dim); }
+    .scan-btn-inside {
+        position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+        background: transparent; border: none; color: var(--txt-secondary);
+        cursor: pointer; font-size: 18px; transition: color 0.2s;
+    }
+    .scan-btn-inside:hover { color: var(--accent-primary); }
+
+    /* Network Badges */
+    .network-badge { font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; margin-left: 8px; }
+    .net-eth { background: rgba(100, 100, 255, 0.2); color: #7878FF; }
+    .net-bsc { background: rgba(240, 185, 11, 0.2); color: #F0B90B; }
+    .net-btc { background: rgba(247, 147, 26, 0.2); color: #F7931A; }
+    .net-sol { background: rgba(0, 255, 163, 0.2); color: #00FFa3; }
+    .net-xrp { background: rgba(255, 255, 255, 0.1); color: #FFFFFF; border: 1px solid rgba(255,255,255,0.2); }
+    body.light-theme .net-xrp { color: #333; border-color: #999; }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-bg"></div>
+
+  <div id="loading-view" class="full-screen-message">
+    <div class="loading-container">
+        <div class="loading-ring"></div>
+        <i class="fa-solid fa-shield-halved loading-icon"></i>
+    </div>
+    <div class="loading-text">TruVesta</div>
+    <div class="loading-sub" id="loading-sub-text">Establishing Secure Connection...</div>
+  </div>
+
+  <div id="review-view" class="full-screen-message" style="display:none;">
+    <div style="font-size: 40px; color: var(--warning); margin-bottom: 16px;"><i class="fa-solid fa-clock"></i></div>
+    <h2 style="margin:0 0 10px 0; color: var(--txt-primary);">No Wallets Available</h2>
+    <p style="color:var(--txt-secondary); font-size:14px; max-width: 300px; line-height:1.5; text-align: center;">
+        Please contact support. All available wallets are currently assigned.
+    </p>
+    <a onclick="logout()" style="margin-top: 20px; color: var(--accent-primary); text-decoration: underline; cursor: pointer;">Log Out</a>
+  </div>
+
+  <div class="app" id="dashboard-view">
+    <main class="main">
+
+      <header class="header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; border-radius: 12px; background: var(--glass-panel); display: grid; place-items: center; border: 1px solid var(--glass-border);">
+             <i class="fa-solid fa-shield-halved" style="font-size: 20px; color: var(--accent-primary);"></i>
+          </div>
+          <span class="app-title">TruVesta</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn-icon" onclick="toggleTheme()" id="themeToggleBtn"><i class="fa-solid fa-moon"></i></button>
+            <button class="btn-icon" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+      </header>
+
+      <div class="card" id="balance-card">
+        <div class="head"><h3>Holdings Overview</h3></div>
+        <div class="body">
+          <div class="portfolio-balance">
+            <div class="amt" id="portfolioValue">$0.00</div>
+            <div class="chg up" id="portfolioChange">+0.0%</div>
+          </div>
+          <div class="quick-actions">
+            <button class="qa-btn" onclick="openModal('receive')">
+                <div class="icon-box"><i class="fa-solid fa-arrow-down"></i></div>
+                <span>Deposit</span>
+            </button>
+            <button class="qa-btn" onclick="openModal('send')">
+                <div class="icon-box"><i class="fa-solid fa-arrow-up"></i></div>
+                <span>Withdraw</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="staking-overview-card">
+        <div class="head">
+          <h3>Staking Overview</h3>
+          <button class="btn primary" style="padding: 6px 12px; font-size: 12px;" onclick="location.href='stake.html'">Manage</button>
+        </div>
+        <div class="body" style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="portfolio-balance" style="align-items: flex-start; gap: 4px;">
+            <span style="font-size: 14px; font-weight: 500; color: var(--txt-secondary);">Total Staked</span>
+            <div class="amt" id="stakingTotalStaked" style="font-size: 36px; color: var(--txt-primary);">$0.00</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 15px; border-top: 1px solid var(--glass-border);">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-size: 15px; color: var(--txt-secondary);">Avg. Daily Rate</span>
+              <span id="stakingAvgRate" style="font-size: 15px; font-weight: 600; color: var(--success);">0.0%</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-size: 15px; color: var(--txt-secondary);">Available Rewards</span>
+              <span id="stakingTotalRewards" style="font-size: 15px; font-weight: 600; color: var(--accent-primary);">$0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="assets-list" id="assetsListContainer"></div>
+
+      <div class="footer">TruVesta v2.1 - Multi-Chain Enabled</div>
+    </main>
+
+    <div class="coin-detail-view" id="coinDetailView">
+      <header class="coin-detail-header">
+        <button class="btn-icon" onclick="hideCoinDetail()"><i class="fa-solid fa-arrow-left"></i></button>
+        <span style="font-weight: 600; font-size: 18px; color: var(--txt-primary);" id="detailCoinName"></span>
+        <button class="btn-icon"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      </header>
+
+      <div class="coin-balance-area">
+        <img class="icon" id="detailCoinIcon" src="">
+        <span class="name" id="detailCoinName2"></span>
+        <span class="crypto-amt" id="detailCryptoAmt"></span>
+        <span class="symbol" id="detailCoinSymbol"></span>
+        <span class="usd-amt" id="detailUsdAmt"></span>
+      </div>
+
+      <div class="coin-actions">
+        <button class="action-btn" onclick="openModal('receive')"><i class="fa-solid fa-arrow-down"></i><span>Deposit</span></button>
+        <button class="action-btn" onclick="openModal('send')"><i class="fa-solid fa-arrow-up"></i><span>Withdraw</span></button>
+        <button class="action-btn" onclick="openComingSoonModal()">
+            <i class="fa-solid fa-right-left"></i>
+            <span>Swap</span>
+            <span style="font-size: 8px; background: var(--accent-primary); color: #FFF; padding: 1px 4px; border-radius: 4px; margin-top: -2px; font-weight:700;">SOON</span>
+        </button>
+      </div>
+
+      <div class="chart-timeframes" id="chartTimeframes" data-symbol="">
+        <button class="time-btn" onclick="updateChartData(this, 1)">1D</button>
+        <button class="time-btn active" onclick="updateChartData(this, 7)">1W</button>
+        <button class="time-btn" onclick="updateChartData(this, 30)">1M</button>
+        <button class="time-btn" onclick="updateChartData(this, 90)">3M</button>
+        <button class="time-btn" onclick="updateChartData(this, 365)">1Y</button>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="coinChart"></canvas>
+      </div>
+      <div class="tx-history-header">History</div>
+      <div class="tx-history-list" id="txHistoryList"></div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="referral.html" title="Referral"><i class="fa-solid fa-user-group"></i><span>Referral</span></a>
+        <a href="stake.html" title="Stake"><i class="fa-solid fa-layer-group"></i><span>Stake</span></a>
+        <a class="active" href="#" title="Assets"><i class="fa-solid fa-wallet"></i><span>Assets</span></a>
+        <a href="profile.html" title="Profile"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+    </nav>
+  </div> 
+
+  <div class="modal" id="modal">
+    <div class="panel">
+      <div class="panel-h">
+        <div style="display:flex; align-items:center;">
+            <strong id="modalTitle" style="color: var(--txt-primary); font-family: 'Outfit', sans-serif;">Action</strong>
+            <span id="networkBadge"></span>
+        </div>
+        <button class="btn" onclick="document.getElementById('modal').classList.remove('open')" style="padding: 8px 12px;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="panel-b" id="modalBody"></div>
+    </div>
+  </div>  
+
+  <script>
+      function openComingSoonModal() {
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const networkBadge = document.getElementById('networkBadge');
+
+        if(modalTitle) modalTitle.innerText = "Coming Soon";
+        if(networkBadge) networkBadge.style.display = 'none';
+        
+        if(modalBody) {
+            modalBody.innerHTML = `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 30px 10px; text-align:center;">
+                    <div style="font-size: 40px; color: var(--accent-primary); margin-bottom: 15px; text-shadow: 0 0 20px var(--accent-glow);">
+                        <i class="fa-solid fa-rocket"></i>
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; color: var(--txt-primary);">Swaps Are Launching Soon</h3>
+                    <p style="color: var(--txt-secondary); font-size: 14px; line-height: 1.5; margin: 0;">
+                        We are currently finalizing our decentralized exchange integration to ensure the best rates and security for your swaps.
+                    </p>
+                    <button class="btn primary" style="margin-top: 20px; width: 100%;" onclick="document.getElementById('modal').classList.remove('open')">Got it</button>
+                </div>
+            `;
+        }
+        
+        if(modal) modal.classList.add('open');
+      }
+  </script>
+
+  <script src="assets.js"></script>
+</body>
+</html>
